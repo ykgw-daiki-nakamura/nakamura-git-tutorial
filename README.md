@@ -2,7 +2,7 @@
 
 Git / GitHub を**チーム開発で実践的に使いこなす**ための、図解付きチュートリアルサイトです。[VitePress](https://vitepress.dev/) で構築し、Mermaid によるダイアグラムで概念を視覚的に解説しています。
 
-🔗 **公開サイト**: https://ykgw-daiki-nakamura.github.io/nakamura-git-tutorial/
+🔗 **公開サイト**: <https://ykgw-daiki-nakamura.github.io/nakamura-git-tutorial/>
 
 ## 扱う内容
 
@@ -26,11 +26,14 @@ npm run docs:build
 
 # ビルド結果をプレビュー
 npm run docs:preview
+
+# Markdown の整形チェック
+npm run lint:md
 ```
 
 ## ディレクトリ構成
 
-```
+```text
 docs/
 ├─ .vitepress/
 │  └─ config.mjs       # サイト設定（nav / sidebar / Mermaid）
