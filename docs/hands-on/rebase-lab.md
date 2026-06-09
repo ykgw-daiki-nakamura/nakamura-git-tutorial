@@ -165,10 +165,30 @@ rebase でもコンフリクトは起きます。手順は merge とほぼ同じ
 やめたくなったら `git rebase --abort` で開始前に戻せます。
 :::
 
+## ⑤ に進む前に：ローカルの main を戻す
+
+::: warning ローカル編の後片付け（重要）
+①〜④ では、練習のために**ローカルの `main` に直接コミット**しました。このまま⑤以降で `main` からブランチを切って push すると、**練習用のコミットが PR に混ざったり**、`git pull` が複雑になってしまいます。⑤に進む前に、ローカルの `main` を共有リポジトリの最新状態に戻しておきましょう。
+
+```bash
+git switch main
+git fetch origin
+git reset --hard origin/main   # ローカル main の練習コミットを破棄し、origin/main に合わせる
+```
+
+練習用ブランチ（`practice/...`）が残っていれば削除しておきます（任意）。
+
+```bash
+git branch -D practice/notes practice/branch practice/timeout-5000   # 作ったものだけでOK
+```
+
+うまくいかないときは、**作業フォルダを消して clone し直す**のが最も確実です。
+:::
+
 ## まとめ
 
 - `git rebase main` で feature の土台を最新 main に付け替え、履歴を一直線にできる
 - rebase はコミットを作り直すため、**共有済みの履歴には使わない**
 - `git rebase -i` で squash すると、細かいコミットを意味のある単位にまとめられる
 
-ここまででローカル編は完了です。次からは、共有リポジトリへ push する [⑤ GitHub にリモート連携](./remote-lab) に進みます。
+ここまででローカル編は完了です。上の後片付けを済ませたら、共有リポジトリへ push する [⑤ GitHub にリモート連携](./remote-lab) に進みます。
