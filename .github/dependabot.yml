@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # GitHub Actions は SHA でピン留めしているため、Dependabot で
+  # 定期的に SHA とバージョンコメントを更新し、ピンの陳腐化を防ぐ。
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+
+  # npm 依存（package-lock.json）のセキュリティ/バージョン更新。
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
