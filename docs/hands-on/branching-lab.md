@@ -1,17 +1,21 @@
 # ② ブランチとマージ
 
-ブランチは並行作業の要です。この実習では、練習ページを編集しながら **fast-forward マージ** と **3-way マージ** の 2 種類を作って見比べます。対応する解説は [ブランチとマージ](../guide/branching) です。
+ブランチは並行作業の要です。この実習では、作業ブランチを作り、**PR を出す前に最新の `main` を自分のブランチへ取り込む**——実務で日常的に行う操作を体験します。対応する解説は [ブランチとマージ](../guide/branching) です。
 
 ## 🎯 この実習のゴール
 
 - `git switch -c` でブランチを作成・移動できる
-- 練習ページを編集してコミットし、`main` にマージできる
-- fast-forward と 3-way マージの違いを履歴で理解する
-- `git log --graph` で分岐を読める
+- **最新の `main` を自分の作業ブランチに取り込める**（`git merge main`）
+- `git log --graph` で分岐と合流を読める
+- fast-forward と 3-way マージの違いを理解する
 
 | 前提 | 所要時間 |
 | --- | --- |
 | 共有リポジトリを clone 済み（以降ローカルのみ） | 約 20 分 |
+
+::: tip なぜ「main を取り込む」のか
+作業ブランチが長く生きるほど、その間に `main` は他の人の PR で進んでいきます。差が開いたまま放置すると、最後の PR で大きなコンフリクトになりがちです。**こまめに最新の `main` を自分のブランチへ取り込む**ことで、衝突を小さいうちに片付けられます。これは GitHub Flow で頻繁に行う操作です。
+:::
 
 ::: tip スタート地点をそろえる
 各実習は `main` から始めます。まず `git switch main` で main に戻ってから進めてください（前の実習のブランチが残っていても問題ありません）。
@@ -23,7 +27,7 @@
 
 ```bash
 git switch main
-git switch -c practice/branch-ff
+git switch -c practice/branch
 # docs/practice/index.md の「練習ログ」に1行追記してから:
 git commit -am "docs: ブランチ実習の記録を追加"
 ```
@@ -35,80 +39,55 @@ git log --oneline -2
 ```
 
 ```text
-1111aaa (HEAD -> practice/branch-ff) docs: ブランチ実習の記録を追加
+1111aaa (HEAD -> practice/branch) docs: ブランチ実習の記録を追加
 5ac3fde (main) build(vitepress): chunk size 警告を解消するため...
 ```
 
-`practice/branch-ff` が `main` より 1 つ先に進みました。`main` 自体はまだ動いていません。
+`practice/branch` が `main` より 1 つ先に進みました。
 
 ::: details 🔍 `git commit -am` とは
 `-a` は「追跡済みファイルの変更を自動でステージ」、`-m` は「メッセージ指定」です。`git add` を省略できますが、**新規ファイル（Untracked）は対象外**なので、既存ファイルの編集にだけ使えます。
 :::
 
-## ステップ 2：fast-forward マージ
+## ステップ 2：その間に main が進んだ状況を作る
 
-`main` に戻ってブランチを取り込みます。この間 `main` は変わっていないため、**先端を進めるだけ（fast-forward）** で済みます。
+あなたが作業している間に、**別の人の PR がマージされて `main` が進んだ**——という状況を再現します。`main` に切り替えて、別のセクション（自己紹介）を変更してコミットします。
 
 ```bash
 git switch main
-git merge practice/branch-ff
-```
-
-✅ **チェックポイント**
-
-```text
-Updating 5ac3fde..1111aaa
-Fast-forward
- docs/practice/index.md | 1 +
- 1 file changed, 1 insertion(+)
-```
-
-`Fast-forward` と表示されればOK。`main` が `practice/branch-ff` と同じ位置まで進みました。使い終わったブランチは削除します。
-
-```bash
-git branch -d practice/branch-ff
-```
-
-## ステップ 3：分岐した状態を作る
-
-今度は **両方のブランチが進んだ状態** を作ります。まず `main` 側で「自己紹介」セクションを編集してコミットします。
-
-```bash
 # docs/practice/index.md の「自己紹介」に1行追記してから:
 git commit -am "docs: 自己紹介を追記(main側)"
+git switch practice/branch
 ```
 
-次に、**ひとつ前のコミット**から新しいブランチを切り、今度は「練習ログ」を編集します（別のセクションを触るのがポイント）。
-
-```bash
-git switch -c practice/branch-3way HEAD~1
-# docs/practice/index.md の「練習ログ」に1行追記してから:
-git commit -am "docs: 練習ログを追記(feature側)"
-```
+::: tip 実際のチームでは
+本物のチーム開発では、`main` は自分ではなく**他のメンバーの PR がマージされて**進みます。その場合は `git switch main && git pull` で最新を取得してから、作業ブランチに戻ります。ここではローカルだけで再現するため、自分で `main` にコミットしています。
+:::
 
 ✅ **チェックポイント**
+
+作業ブランチに戻った状態で、分岐を確認します。
 
 ```bash
 git log --oneline --all --graph -4
 ```
 
 ```text
-* 4444ddd (HEAD -> practice/branch-3way) docs: 練習ログを追記(feature側)
-| * 3333ccc (main) docs: 自己紹介を追記(main側)
+* 3333ccc (main) docs: 自己紹介を追記(main側)
+| * 1111aaa (HEAD -> practice/branch) docs: ブランチ実習の記録を追加
 |/
-* 1111aaa docs: ブランチ実習の記録を追加
 * 5ac3fde build(vitepress): chunk size 警告を解消するため...
 ```
 
-`main` と `practice/branch-3way` が**枝分かれ**しました。共通の親から両方が進んでいます。
+`main` と `practice/branch` が**枝分かれ**しました。共通の親から、それぞれ別の方向へ進んでいます。
 
-## ステップ 4：3-way マージ
+## ステップ 3：最新の main を自分のブランチに取り込む
 
-`main` に戻ってマージします。両ブランチは**別々のセクション**を編集しているので、コンフリクトせずに合流できます。
+作業ブランチにいる状態で、`main` を取り込みます。両方が別々のセクションを進めているので、Git は **3-way マージ**で合流させます。
 
 ```bash
-git switch main
-git merge practice/branch-3way
+# いま practice/branch にいることを確認
+git merge main
 ```
 
 マージコミットのメッセージを尋ねるエディタが開いたら、そのまま保存して閉じます。
@@ -120,43 +99,58 @@ git log --oneline --graph -5
 ```
 
 ```text
-*   5555eee (HEAD -> main) Merge branch 'practice/branch-3way'
+*   4444ddd (HEAD -> practice/branch) Merge branch 'main' into practice/branch
 |\
-| * 4444ddd docs: 練習ログを追記(feature側)
-* | 3333ccc docs: 自己紹介を追記(main側)
+| * 3333ccc (main) docs: 自己紹介を追記(main側)
+* | 1111aaa docs: ブランチ実習の記録を追加
 |/
-* 1111aaa docs: ブランチ実習の記録を追加
+* 5ac3fde build(vitepress): chunk size 警告を解消するため...
 ```
 
-fast-forward と違い、**両方の枝を束ねる「マージコミット」**（`Merge branch ...`）が作られました。これが 3-way マージです。
-
-## fast-forward と 3-way の違い
+**両方の枝を束ねる「マージコミット」**（`Merge branch 'main' ...`）ができ、あなたのブランチに `main` の最新が取り込まれました。この状態で PR を出せば、最新の `main` を踏まえた差分になります。
 
 ```mermaid
 gitGraph
     commit id: "起点"
-    branch feature
-    checkout feature
-    commit id: "作業"
+    branch practice/branch
+    checkout practice/branch
+    commit id: "自分の作業"
     checkout main
-    commit id: "main側の変更"
-    merge feature id: "マージコミット"
+    commit id: "他の人の変更"
+    checkout practice/branch
+    merge main id: "main を取り込む"
 ```
 
-- **fast-forward**：分岐後に main が動いていない → 履歴は一直線
-- **3-way マージ**：両方が動いた → 合流点にマージコミットができる
+## fast-forward と 3-way の違い
+
+いま作られた「マージコミット」が **3-way マージ**です。一方、**fast-forward** は次のような場合に起こります。
+
+- もし**あなたがまだ何もコミットしていない**うちに `main` だけが進んでいたら、`git merge main` は新しいコミットを作らず、ブランチの先端を `main` に**滑らせるだけ**で済みます。これが fast-forward です。
+
+| | 起きる条件 | 結果 |
+| --- | --- | --- |
+| **fast-forward** | 片方しか進んでいない | 履歴は一直線。マージコミットなし |
+| **3-way マージ** | 両方が進んでいる | 合流点にマージコミットができる |
+
+::: tip この知識が効く場面
+
+- **GitHub の「Merge pull request」ボタン** … `main` へのマージは、ふだん**この緑のボタン**が行います（手で `git merge` する必要はありません）。ボタンが作るのが、まさにこのマージコミットです。
+- **`git pull`** … `pull` は `fetch` + `merge`。だから `git pull` でもマージコミットができることがあります。
+- **一直線に保ちたいなら** … マージの代わりに `rebase` を使う手もあります。次の [④ rebase で履歴を整える](./rebase-lab) で扱います。
+:::
 
 ## ⚠️ つまずきポイント
 
 ::: warning 同じ場所を触るとコンフリクトする
-この実習では main 側と feature 側で**別のセクション**を編集したので、すんなりマージできました。もし**同じ行**を両方で変更していたら、ここでコンフリクトが発生します。その対処は次の [③ コンフリクトを解決する](./conflicts-lab) で練習します。
+この実習では `main` 側と作業ブランチ側で**別のセクション**を編集したので、すんなりマージできました。もし**同じ行**を両方で変更していたら、`git merge main` でコンフリクトが発生します。その対処は次の [③ コンフリクトを解決する](./conflicts-lab) で練習します。
 :::
 
 ## まとめ
 
 - ブランチは `git switch -c <名前>` で作成＆移動
-- 取り込みは `main` に戻ってから `git merge <ブランチ>`
-- main が動いていなければ fast-forward、動いていれば 3-way マージ
+- **作業ブランチにいる状態で `git merge main`** すれば、最新の `main` を取り込める（PR 前の定番操作）
+- `main` への最終的なマージは、ふだん **GitHub の PR ボタン**が行う
+- 両方が進んでいれば 3-way（マージコミット）、片方だけなら fast-forward
 - `git log --graph --all` で分岐と合流を可視化できる
 
-枝分かれが同じ場所に及ぶと衝突が起きます。その対処を [③ コンフリクトを解決する](./conflicts-lab) で練習しましょう。
+取り込みのときに同じ行がぶつかると衝突します。その対処を [③ コンフリクトを解決する](./conflicts-lab) で練習しましょう。
