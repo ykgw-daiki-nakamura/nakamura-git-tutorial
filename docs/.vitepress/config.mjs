@@ -3,6 +3,24 @@ import { withMermaid } from 'vitepress-plugin-mermaid'
 const siteUrl = 'https://ykgw-daiki-nakamura.github.io/nakamura-git-tutorial/'
 const description = 'Git / GitHub をチーム開発で実践的に使いこなすための図解付きチュートリアル'
 
+// 実習タブ用サイドバー（/hands-on/ と /practice/ で共有する）
+const handsOnSidebar = [
+  {
+    text: '実習（ハンズオン）',
+    items: [
+      { text: '実習の進め方', link: '/hands-on/' },
+      { text: '練習場（サンドボックス）', link: '/practice/' },
+      { text: '① ローカルで基本操作', link: '/hands-on/basics-lab' },
+      { text: '② ブランチとマージ', link: '/hands-on/branching-lab' },
+      { text: '③ コンフリクトを解決する', link: '/hands-on/conflicts-lab' },
+      { text: '④ rebase で履歴を整える', link: '/hands-on/rebase-lab' },
+      { text: '⑤ GitHub にリモート連携', link: '/hands-on/remote-lab' },
+      { text: '⑥ GitHub Flow を一周する', link: '/hands-on/github-flow-lab' },
+      { text: '⑦ CI を動かす', link: '/hands-on/ci-lab' }
+    ]
+  }
+]
+
 export default withMermaid({
   title: 'nakamura-git-tutorial',
   description,
@@ -30,37 +48,43 @@ export default withMermaid({
     logo: '/logo.svg',
     nav: [
       { text: 'ホーム', link: '/' },
-      { text: 'はじめに', link: '/guide/introduction' }
+      { text: 'ガイド', link: '/guide/introduction', activeMatch: '^/guide/' },
+      { text: '実習', link: '/hands-on/', activeMatch: '^/(hands-on|practice)/' }
     ],
-    sidebar: [
-      {
-        text: 'はじめに・基礎',
-        items: [
-          { text: 'Git / GitHub とは', link: '/guide/introduction' },
-          { text: 'セットアップ', link: '/guide/setup' },
-          { text: 'Git の基本', link: '/guide/basics' }
-        ]
-      },
-      {
-        text: 'チーム開発',
-        items: [
-          { text: 'ブランチとマージ', link: '/guide/branching' },
-          { text: 'リモートと GitHub', link: '/guide/remote' },
-          { text: 'GitHub Flow', link: '/guide/github-flow' },
-          { text: 'プルリクエストとレビュー', link: '/guide/pull-request' },
-          { text: 'コンフリクト解決', link: '/guide/conflicts' },
-          { text: 'rebase と履歴整理', link: '/guide/rebase' },
-          { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' }
-        ]
-      },
-      {
-        text: '付録',
-        items: [
-          { text: 'コマンド早見表', link: '/guide/commands' },
-          { text: 'トラブルシューティング', link: '/guide/troubleshooting' }
-        ]
-      }
-    ],
+    // パス別サイドバー: ガイドと実習でメニューを切り替える
+    sidebar: {
+      '/guide/': [
+        {
+          text: 'はじめに・基礎',
+          items: [
+            { text: 'Git / GitHub とは', link: '/guide/introduction' },
+            { text: 'セットアップ', link: '/guide/setup' },
+            { text: 'Git の基本', link: '/guide/basics' }
+          ]
+        },
+        {
+          text: 'チーム開発',
+          items: [
+            { text: 'ブランチとマージ', link: '/guide/branching' },
+            { text: 'リモートと GitHub', link: '/guide/remote' },
+            { text: 'GitHub Flow', link: '/guide/github-flow' },
+            { text: 'プルリクエストとレビュー', link: '/guide/pull-request' },
+            { text: 'コンフリクト解決', link: '/guide/conflicts' },
+            { text: 'rebase と履歴整理', link: '/guide/rebase' },
+            { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' }
+          ]
+        },
+        {
+          text: '付録',
+          items: [
+            { text: 'コマンド早見表', link: '/guide/commands' },
+            { text: 'トラブルシューティング', link: '/guide/troubleshooting' }
+          ]
+        }
+      ],
+      '/hands-on/': handsOnSidebar,
+      '/practice/': handsOnSidebar
+    },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial' }
     ],
