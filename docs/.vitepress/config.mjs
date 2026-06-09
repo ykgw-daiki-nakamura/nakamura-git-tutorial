@@ -4,6 +4,8 @@ export default withMermaid({
   title: 'nakamura-git-tutorial',
   description: 'Git / GitHub 実践チュートリアル',
   lang: 'ja-JP',
+  // プロジェクトページ（https://<user>.github.io/nakamura-git-tutorial/）用の base
+  base: '/nakamura-git-tutorial/',
   themeConfig: {
     nav: [
       { text: 'ホーム', link: '/' },
