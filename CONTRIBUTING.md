@@ -12,7 +12,7 @@
 git clone https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial.git
 cd nakamura-git-tutorial
 npm install
-npm run docs:dev   # http://localhost:5173/ でプレビュー
+npm run docs:dev   # 表示される URL（既定では http://localhost:5173/）でプレビュー
 ```
 
 ## コントリビュートの流れ（GitHub Flow）
