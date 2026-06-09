@@ -102,5 +102,16 @@ export default withMermaid({
     sidebarMenuLabel: 'メニュー',
     returnToTopLabel: 'トップへ戻る'
   },
-  mermaid: {}
+  mermaid: {},
+  // ビルド出力の最適化:
+  // Mermaid は各図種のレンダラを動的 import で個別チャンクへ遅延読み込みしており、
+  // 常時読み込まれる app チャンク（約 610KB / Mermaid コア相当）だけが 500KB の
+  // 既定しきい値を超えて警告を出していた。manualChunks で束ねると Mermaid 本来の
+  // 遅延分割を潰し巨大な単一チャンク化してしまうため、ここではしきい値のみを
+  // 妥当な値へ引き上げて警告を解消する（分割構成はそのまま温存する）。
+  vite: {
+    build: {
+      chunkSizeWarningLimit: 700
+    }
+  }
 })
