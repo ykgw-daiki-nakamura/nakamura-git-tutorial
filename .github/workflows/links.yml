@@ -1,0 +1,42 @@
+name: Link Check
+
+# 外部リンクの死活を定期チェックする。
+# ネットワーク/レート制限で不安定になりやすいため PR ゲートには含めず、
+# 週次スケジュール + 手動実行に分離している。
+on:
+  schedule:
+    # 毎週月曜 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check links with lychee
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Markdown 内のリンクを検査（一時障害に備えてリトライ）
+          args: >-
+            --no-progress
+            --max-retries 3
+            --retry-wait-time 2
+            --timeout 20
+            './**/*.md'
+          # 失敗してもステップ自体は通し、結果に応じて Issue を起票する
+          fail: false
+
+      - name: Create issue on broken links
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: 'リンク切れを検出しました (Link Check)'
+          content-filepath: ./lychee/out.md
+          labels: link-check, automated

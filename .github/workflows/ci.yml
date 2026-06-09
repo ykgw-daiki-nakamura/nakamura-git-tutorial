@@ -17,6 +17,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ビルドが通るかを検証（リンク切れ・Mermaid 構文エラーなどを検知）
+      # ビルドが通るかを検証（内部リンク切れ・Mermaid 構文エラーなどを検知）
       - name: Build with VitePress
         run: npm run docs:build
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Markdown の文体・整形の一貫性を検証
+      - name: Lint Markdown
+        run: npm run lint:md
