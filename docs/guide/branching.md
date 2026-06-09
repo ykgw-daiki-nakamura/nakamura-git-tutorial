@@ -1,0 +1,94 @@
+# ブランチとマージ
+
+ブランチは Git の最大の武器です。**作業を分離し、並行開発を可能にする**ことで、チーム開発が成立します。
+
+## ブランチとは
+
+ブランチは「コミットの履歴の流れ」を分岐させる仕組みです。`main` から枝分かれして作業し、完成したら戻す（マージする）のが基本パターンです。
+
+```mermaid
+gitGraph
+    commit id: "init"
+    commit id: "A"
+    branch feature/login
+    checkout feature/login
+    commit id: "B"
+    commit id: "C"
+    checkout main
+    merge feature/login id: "merge"
+    commit id: "D"
+```
+
+機能ごとにブランチを切ることで、`main` を常に動作する状態に保ちながら、複数人が同時に別々の機能を開発できます。
+
+## ブランチの基本操作
+
+```bash
+# ブランチ一覧
+git branch
+
+# ブランチを作成して切り替え（推奨: 一発で行う）
+git switch -c feature/login
+# 旧来の書き方: git checkout -b feature/login
+
+# 既存ブランチへ切り替え
+git switch main
+
+# ブランチを削除（マージ済み）
+git branch -d feature/login
+```
+
+::: tip ブランチ命名規則
+チームでは `feature/`, `fix/`, `hotfix/`, `chore/` などの接頭辞を付けると整理しやすくなります。例: `feature/user-profile`, `fix/login-error`
+:::
+
+## マージの 2 つの形
+
+### Fast-forward マージ
+
+分岐元に新しいコミットがない場合、ポインタを進めるだけで済みます。履歴は一直線になります。
+
+```mermaid
+gitGraph
+    commit id: "A"
+    branch feature
+    checkout feature
+    commit id: "B"
+    commit id: "C"
+    checkout main
+    merge feature
+```
+
+### 3-way マージ（マージコミット）
+
+分岐後に**両方のブランチが進んでいる**場合、両者を統合する「マージコミット」が作られます。
+
+```mermaid
+gitGraph
+    commit id: "A"
+    branch feature
+    checkout feature
+    commit id: "B"
+    checkout main
+    commit id: "C"
+    merge feature id: "M"
+```
+
+```bash
+# main に feature を取り込む
+git switch main
+git merge feature/login
+
+# 常にマージコミットを作りたい場合
+git merge --no-ff feature/login
+```
+
+::: info `--no-ff` の使いどころ
+`--no-ff` を付けると fast-forward 可能な場合でも必ずマージコミットを作ります。「どの機能ブランチがいつ統合されたか」を履歴に残せるため、チームによってはこれを標準にしています。
+:::
+
+## マージとリベースの違い（予告）
+
+履歴を一直線に整えたい場合は `merge` ではなく `rebase` を使う選択肢もあります。これは [rebase と履歴整理](./rebase) で詳しく扱います。
+
+次は、ローカルのブランチを GitHub と同期する [リモートと GitHub](./remote) です。
