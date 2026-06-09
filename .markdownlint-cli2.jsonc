@@ -1,0 +1,21 @@
+{
+  // Markdown の文体・整形の一貫性チェック設定
+  // ルール一覧: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+  "config": {
+    "default": true,
+    // 行長: 日本語の長文や URL が多いため無効化
+    "MD013": false,
+    // インライン HTML: VitePress の拡張記法に配慮し許可
+    "MD033": false,
+    // 先頭行の H1: frontmatter ベースの index.md に配慮し無効化
+    "MD041": false,
+    // 重複見出し: 別セクション配下での重複は許可
+    "MD024": { "siblings_only": true }
+  },
+  "globs": ["**/*.md"],
+  "ignores": [
+    "node_modules",
+    "docs/.vitepress/cache",
+    "docs/.vitepress/dist"
+  ]
+}
