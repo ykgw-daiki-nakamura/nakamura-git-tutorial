@@ -6,7 +6,8 @@
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "lint:md": "markdownlint-cli2"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial#readme",
   "devDependencies": {
+    "markdownlint-cli2": "^0.22.1",
     "mermaid": "^11.15.0",
     "vitepress": "^1.6.4",
     "vitepress-plugin-mermaid": "^2.0.17"
