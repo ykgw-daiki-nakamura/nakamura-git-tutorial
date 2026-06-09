@@ -1,7 +1,7 @@
 {
   "name": "nakamura-git-tutorial",
   "version": "1.0.0",
-  "description": "",
+  "description": "Git / GitHub をチーム開発で実践的に学ぶための図解付きチュートリアルサイト（VitePress + Mermaid）",
   "main": "index.js",
   "scripts": {
     "docs:dev": "vitepress dev docs",
@@ -13,8 +13,8 @@
     "url": "git+https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Daiki Nakamura",
+  "license": "MIT",
   "type": "module",
   "bugs": {
     "url": "https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/issues"
