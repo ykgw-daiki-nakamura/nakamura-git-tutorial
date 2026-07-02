@@ -91,4 +91,4 @@ git pull --rebase
 git config --global pull.rebase true
 ```
 
-なお、PR 画面に出る **「Update with merge commit」/「Update with rebase」** の選び方は [ブランチ更新: merge か rebase か](./update-branch) で詳しく解説します。
+次は、PR 画面に出る **「Update with merge commit」/「Update with rebase」** の選び方を [ブランチ更新: merge か rebase か](./update-branch) で見ていきます。
