@@ -7,9 +7,16 @@ on:
 permissions:
   contents: read
 
+# 同一 PR へ連続 push した場合、進行中の古い実行をキャンセルして無駄を省く
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    # 通常は1分未満で完了。ハング時の暴走・課金を防ぐため上限を設定
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -29,6 +36,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
@@ -45,3 +53,18 @@ jobs:
       # Markdown の文体・整形の一貫性を検証
       - name: Lint Markdown
         run: npm run lint:md
+
+  # PR で新たに追加/更新される依存に既知の脆弱性が無いか検査する
+  dependency-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          # high 以上の脆弱性で失敗させる
+          fail-on-severity: high
