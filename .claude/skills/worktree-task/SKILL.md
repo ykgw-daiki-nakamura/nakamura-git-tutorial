@@ -113,7 +113,7 @@ git worktree list   # 作成を確認
 1. `git -C <worktree> status` と `git -C <worktree> diff` で変更内容を確認・提示する。
 2. **Conventional Commits 準拠**のメッセージでコミットする（`type(scope): 要約`）。
    このリポジトリの規約（[Conventional Commits](https://www.conventionalcommits.org/ja/v1.0.0/)）に従う。
-3. **push は事前確認不要**。コミット後そのまま `git -C <worktree> push -u origin <branch>` してよい
+3. **push は事前確認不要**。コミット後そのまま `git -C <worktree> push -u origin <type>/<kebab-summary>` してよい
    （変更内容は提示するが、push の許可待ちはしない）。
 
 ```bash
@@ -179,7 +179,8 @@ git -C <main-worktree> worktree list          # 撤去を確認
 - **PR は必ず該当 Issue をリンクする**（既定は closing keyword で自動クローズ連動）。
 - **すべての編集・コミットは worktree 内で行う。** メインの作業ツリーや他ブランチを変更しない。
 - Issue 作成前は計画を提示して確認を取る。**push・PR 作成は事前確認不要**でそのまま進めてよい
-  （マージ／Issue クローズなどさらに外向きの操作は状況に応じて確認する）。
+  （マージ／Issue クローズなどさらに外向きの操作は状況に応じて確認する）。これは本リポジトリ
+  オーナーの運用方針としての既定。他リポジトリで使う場合は、その場の方針に合わせて確認要否を判断する。
 - ブランチ名・コミットメッセージ・PR/Issue タイトルは [Conventional Commits](https://www.conventionalcommits.org/ja/v1.0.0/) に従う。
 - `git worktree remove` は未コミット変更があると失敗する（安全側）。強制削除 `--force` は
   変更破棄を伴うため、ユーザーの明示確認なしに使わない。
