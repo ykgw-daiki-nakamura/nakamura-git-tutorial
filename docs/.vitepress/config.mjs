@@ -73,7 +73,8 @@ export default withMermaid({
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
             { text: 'rebase と履歴整理', link: '/guide/rebase' },
             { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' },
-            { text: 'リリースとバージョン管理', link: '/guide/release' }
+            { text: 'リリースとバージョン管理', link: '/guide/release' },
+            { text: '顧客カスタマイズとバージョン運用', link: '/guide/customization' }
           ]
         },
         {
