@@ -91,4 +91,4 @@ git pull --rebase
 git config --global pull.rebase true
 ```
 
-履歴管理ができたら、最後の仕上げは自動化です。次は [CI 連携 (GitHub Actions)](./ci) に進みます。
+なお、PR 画面に出る **「Update with merge commit」/「Update with rebase」** の選び方は [ブランチ更新: merge か rebase か](./update-branch) で詳しく解説します。
