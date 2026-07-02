@@ -1,3 +1,6 @@
 node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+
+# worktree-task skill が作業用 worktree を作る場所（実体はコミット対象外にする）
+.claude/worktrees/
