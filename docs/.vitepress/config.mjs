@@ -16,7 +16,8 @@ const handsOnSidebar = [
       { text: '④ rebase で履歴を整える', link: '/hands-on/rebase-lab' },
       { text: '⑤ GitHub にリモート連携', link: '/hands-on/remote-lab' },
       { text: '⑥ GitHub Flow を一周する', link: '/hands-on/github-flow-lab' },
-      { text: '⑦ CI を動かす', link: '/hands-on/ci-lab' }
+      { text: '⑦ CI を動かす', link: '/hands-on/ci-lab' },
+      { text: '⑧ タグとリリース', link: '/hands-on/release-lab' }
     ]
   }
 ]
@@ -71,7 +72,8 @@ export default withMermaid({
             { text: 'プルリクエストとレビュー', link: '/guide/pull-request' },
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
             { text: 'rebase と履歴整理', link: '/guide/rebase' },
-            { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' }
+            { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' },
+            { text: 'リリースとバージョン管理', link: '/guide/release' }
           ]
         },
         {

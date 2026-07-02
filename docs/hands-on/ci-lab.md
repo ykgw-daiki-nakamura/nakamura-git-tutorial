@@ -1,6 +1,6 @@
 # ⑦ CI を動かす
 
-最後の実習では、このリポジトリに**もとから用意されている CI（GitHub Actions）** を、共有リポジトリで実際に動かします。新しくワークフローを書く必要はありません——PR を出せば、[.github/workflows/ci.yml](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.github/workflows/ci.yml) が自動で走り、あの「緑のチェック」が付きます。対応する解説は [CI 連携 (GitHub Actions)](../guide/ci) です。
+この実習では、このリポジトリに**もとから用意されている CI（GitHub Actions）** を、共有リポジトリで実際に動かします。新しくワークフローを書く必要はありません——PR を出せば、[.github/workflows/ci.yml](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.github/workflows/ci.yml) が自動で走り、あの「緑のチェック」が付きます。対応する解説は [CI 連携 (GitHub Actions)](../guide/ci) です。
 
 ## 🎯 この実習のゴール
 
@@ -122,11 +122,8 @@ git branch -d practice/<あなた>-ci
 - CI は成功＝緑、失敗＝赤。ブランチ保護と組み合わせると「CI が通った変更だけマージ」を強制できる
 - push 済みの変更を打ち消すときは `git revert` が安全
 
-## 🎉 実習はここまで
+CI が緑になり、マージまでの安全網を体験できました。最後は、この `main` を「出荷」として確定する [⑧ タグとリリース](./release-lab) に進みましょう。
 
-おつかれさまでした。共有リポジトリの clone から始めて、基本操作・ブランチ・コンフリクト・rebase・リモート・GitHub Flow・CI まで、本物のリポジトリで一通り手を動かせました。
-
-- 操作を忘れたら [コマンド早見表](../guide/commands)
-- 困ったときは [トラブルシューティング](../guide/troubleshooting)
-
-ここで身につけた GitHub Flow は、そのまま実際の OSS 貢献にも使えます。[CONTRIBUTING](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/CONTRIBUTING.md) を読んで、本家への改善 PR に挑戦してみるのも良い練習になります。
+::: tip ここまでの流れ
+共有リポジトリの clone から始めて、基本操作・ブランチ・コンフリクト・rebase・リモート・GitHub Flow・CI まで、本物のリポジトリで一通り手を動かせました。ここで身につけた GitHub Flow は、そのまま実際の OSS 貢献にも使えます。[CONTRIBUTING](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/CONTRIBUTING.md) を読んで、本家への改善 PR に挑戦してみるのも良い練習になります。
+:::
