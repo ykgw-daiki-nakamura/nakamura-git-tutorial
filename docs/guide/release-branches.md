@@ -69,9 +69,9 @@ gitGraph
     checkout main
     commit id: "バグ修正(main-first)" type: HIGHLIGHT
     checkout release-1.29
-    commit id: "cherry-pick" tag: "v1.29.1"
+    commit id: "cherry-pick→1.29" tag: "v1.29.1"
     checkout release-1.28
-    commit id: "cherry-pick " tag: "v1.28.1"
+    commit id: "cherry-pick→1.28" tag: "v1.28.1"
 ```
 
 ::: warning なぜ「main-first」なのか
@@ -89,7 +89,7 @@ gitGraph
 | **PostgreSQL** | `REL_16_STABLE` | メジャーごとの安定枝に back-patch。5 年サポート |
 | **Linux（stable）** | `linux-6.6.y` | 安定版メンテナが修正だけを取り込む。mainline とは別管理 |
 | **Chromium / Firefox** | マイルストーン枝（`M120` 等） | 時期でブランチを切る「リリーストレイン」型 |
-| **GitLab** | `16-7-stable` | 月次リリース。セキュリティ修正を各 stable 枝へ back-port |
+| **GitLab** | `16-7-stable` | 月次リリース。セキュリティ修正を各 stable 枝へ back-patch |
 
 共通点は明確です——**タグは枝の上で打たれ、枝はサポート期間中ずっと生き続ける**。「リリースを作るための使い捨てブランチ」ではなく、**バージョン系列そのものを表す住所**として機能します。
 
