@@ -2,9 +2,10 @@
 name: pr-watch
 description: >-
   自分が出した Pull Request を一定間隔で監視し、(1) レビューコメントが付いたら修正案を作成して
-  push 前に確認を取り、(2) マージ/クローズされたら連動 Issue をクローズして監視を終了する。
+  push 前に確認を取り、(2) マージ/クローズされたら連動 Issue（PR 本文の closing keywords で
+  GitHub が自動クローズ）の状況を検証して監視を終了する。
   「PR を監視して」「レビューが付いたら直して」「マージされたら Issue を閉じて」等の依頼で使う。
-  PR watch loop: poll a PR, fix review comments (confirm before push), close linked issues on merge.
+  PR watch loop: poll a PR, fix review comments (confirm before push), verify auto-closed linked issues on merge.
 ---
 
 # pr-watch — Pull Request 監視ループ
@@ -49,8 +50,9 @@ gh pr view <PR> --json state,mergedAt,closedAt
 **B. 新規の対応必要なレビューコメント/変更要求がある**
 → 下記「レビュー対応」を実行。処理済みコメントを既読に追加し、監視を継続。
 
-**C. state が MERGED または CLOSED**
+**C. マージ済み（`mergedAt` が非 null。`gh` の `state` は `MERGED` を返す）または CLOSED**
 → 下記「マージ/クローズ後処理」を実行し、監視を**終了**（ScheduleWakeup を呼ばない）。
+判定は `mergedAt`（マージ）と `closedAt`/`state`（クローズ）で行う。
 
 起動時に、関連 Issue が PR 本文の closing keywords で連動しているか
 `gh pr view <PR> --json closingIssuesReferences` で確認し、抜けていれば
@@ -70,8 +72,8 @@ gh pr view <PR> --json state,mergedAt,closedAt
 ### 4. マージ/クローズ後処理
 
 - **MERGED の場合** — closing keywords により関連 Issue は GitHub が**自動クローズ**する。
-  手動でクローズしない。`gh issue view <N> --json state` で実際に CLOSED になったか
-  **検証だけ**行い、万一閉じ残りがあれば理由を添えて手動クローズする。
+  手動ではクローズしない。`gh issue view <N> --json state` で実際に CLOSED になったか
+  **検証のみ**行う。万一閉じ残りがあれば、手動クローズせずユーザーに報告して指示を仰ぐ。
   ```bash
   gh issue view <N> --json number,state -q '"#\(.number): \(.state)"'
   ```
