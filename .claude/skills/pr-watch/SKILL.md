@@ -79,10 +79,12 @@ CI が pending の間は「実行中」と報告して継続監視する。
 ### 3b. CI 失敗対応
 
 1. 失敗したチェックを特定する。
+
    ```bash
    gh pr checks <PR>                       # どのチェックが fail か
    gh run view <run-id> --log-failed       # 失敗ジョブのログ（run-id は checks の URL / gh run list から）
    ```
+
 2. 原因を切り分ける。
    - **自分の変更が原因**（lint/test/build 失敗など）→ 作業ツリーで修正する。
    - **一時障害/フレーキー**（ネットワーク・レート制限等）→ `gh run rerun <run-id> --failed` で再実行し、
@@ -96,9 +98,11 @@ CI が pending の間は「実行中」と報告して継続監視する。
 - **MERGED の場合** — closing keywords により関連 Issue は GitHub が**自動クローズ**する。
   手動ではクローズしない。`gh issue view <N> --json state` で実際に CLOSED になったか
   **検証のみ**行う。万一閉じ残りがあれば、手動クローズせずユーザーに報告して指示を仰ぐ。
+
   ```bash
   gh issue view <N> --json number,state -q '"#\(.number): \(.state)"'
   ```
+
 - **CLOSED（未マージ）の場合** — PR が却下された可能性があるため Issue は自動クローズされない。
   Issue を触るべきか一度ユーザーに確認する。
 - 監視終了をユーザーへ報告（PR の最終状態・Issue の連動結果を明記）。
