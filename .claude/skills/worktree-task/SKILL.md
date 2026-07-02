@@ -3,7 +3,7 @@ name: worktree-task
 description: >-
   作業指示を受けたら、まず計画を GitHub Issue にまとめてから、その作業専用の git worktree を
   新しいブランチで作成し、その中だけでファイルを編集・コミットして作業する skill。既存の作業ツリーや
-  他ブランチを汚さずに独立して進められる。作業後は差分提示 → 確認の上で push / PR まで対応し
+  他ブランチを汚さずに独立して進められる。作業後は差分を提示しつつ push / PR まで対応し
   （PR には該当 Issue をリンク）、不要になった worktree を後片付けする。
   1 PR は約 400 行を目安にし、大きくなる場合は Issue の分割を検討する。
   「worktree で作業して」「worktree を切ってこのタスクをやって」「隔離環境で〜を実装して」等で使う。
@@ -108,14 +108,13 @@ git worktree list   # 作成を確認
 - 必要に応じてビルド/テスト/lint をその worktree 内で実行し、成否を確認する（例 `npm run build`）。
 - 計画のステップが進んだら Issue のチェックリストを更新してよい（`gh issue edit <ISSUE>` 等）。
 
-### 5. コミット（push 前に確認）
+### 5. コミット・push
 
 1. `git -C <worktree> status` と `git -C <worktree> diff` で変更内容を確認・提示する。
 2. **Conventional Commits 準拠**のメッセージでコミットする（`type(scope): 要約`）。
    このリポジトリの規約（[Conventional Commits](https://www.conventionalcommits.org/ja/v1.0.0/)）に従う。
-3. push は outward-facing。**push の前にユーザーへ確認**を取る。
-   - 承認されたら: `git -C <worktree> push -u origin <branch>`。
-   - 保留なら: コミットを保持したまま指示を待つ。
+3. **push は事前確認不要**。コミット後そのまま `git -C <worktree> push -u origin <type>/<kebab-summary>` してよい
+   （変更内容は提示するが、push の許可待ちはしない）。
 
 ```bash
 git -C <worktree> add -A
@@ -130,7 +129,7 @@ push 後、PR を作成する。**PR には必ず該当 Issue をリンクする
 - PR 本文に **closing keywords**（`Closes #<ISSUE>` / `Fixes #<ISSUE>`）を記載し、
   マージ時に Issue が GitHub のネイティブ機能で自動クローズされるようにする。
 - 単に参照だけしたい（マージでは閉じたくない）場合は `Refs #<ISSUE>` を使う。
-- PR 作成も outward-facing。本文・リンク先 Issue をユーザーに提示し、**作成前に確認**を取る。
+- **PR 作成も事前確認不要**。push 後そのまま作成してよい（本文とリンク先 Issue は結果として提示する）。
 
 ```bash
 gh pr create \
@@ -179,7 +178,9 @@ git -C <main-worktree> worktree list          # 撤去を確認
 - **1 タスク（1 PR）の変更は約 400 行を目安**にし、超える見込みなら Issue / PR の分割を検討する。
 - **PR は必ず該当 Issue をリンクする**（既定は closing keyword で自動クローズ連動）。
 - **すべての編集・コミットは worktree 内で行う。** メインの作業ツリーや他ブランチを変更しない。
-- Issue 作成・push・PR 作成は outward-facing。手順どおり事前確認を挟む。
+- Issue 作成前は計画を提示して確認を取る。**push・PR 作成は事前確認不要**でそのまま進めてよい
+  （マージ／Issue クローズなどさらに外向きの操作は状況に応じて確認する）。これは本リポジトリ
+  オーナーの運用方針としての既定。他リポジトリで使う場合は、その場の方針に合わせて確認要否を判断する。
 - ブランチ名・コミットメッセージ・PR/Issue タイトルは [Conventional Commits](https://www.conventionalcommits.org/ja/v1.0.0/) に従う。
 - `git worktree remove` は未コミット変更があると失敗する（安全側）。強制削除 `--force` は
   変更破棄を伴うため、ユーザーの明示確認なしに使わない。
