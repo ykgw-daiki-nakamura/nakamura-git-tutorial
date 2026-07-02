@@ -75,6 +75,7 @@ export default withMermaid({
             { text: 'ブランチ更新: merge か rebase か', link: '/guide/update-branch' },
             { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' },
             { text: 'リリースとバージョン管理', link: '/guide/release' },
+            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' },
             { text: '顧客カスタマイズとバージョン運用', link: '/guide/customization' }
           ]
         },
