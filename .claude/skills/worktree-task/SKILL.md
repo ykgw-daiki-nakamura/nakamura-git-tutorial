@@ -5,6 +5,7 @@ description: >-
   新しいブランチで作成し、その中だけでファイルを編集・コミットして作業する skill。既存の作業ツリーや
   他ブランチを汚さずに独立して進められる。作業後は差分提示 → 確認の上で push / PR まで対応し
   （PR には該当 Issue をリンク）、不要になった worktree を後片付けする。
+  1 PR は約 400 行を目安にし、大きくなる場合は Issue の分割を検討する。
   「worktree で作業して」「worktree を切ってこのタスクをやって」「隔離環境で〜を実装して」等で使う。
   Plan in a GitHub Issue first, then create a dedicated git worktree on a new branch, do all work inside it,
   open a PR linked to the Issue, then clean up.
@@ -48,7 +49,11 @@ git branch --list '<type>/<kebab-summary>'
 
 - 既存の計画 Issue が指定されていればそれを使う。無ければ新規作成する。
 - Issue には次を書く: **目的 / 背景・スコープ / 作業計画（チェックリスト） / 完了条件（受け入れ基準）**。
-- 作成は outward-facing。本文（特に計画内容）をユーザーに提示し、**Issue を立てる前に確認**を取る。
+- **規模の見積もりをこの段階で行う。** 1 タスク（= 1 PR）の変更は **約 400 行を目安**に収める。
+  超えそうなら、**Issue（および PR）の分割**を検討し、独立して着手・レビューできる単位に割る。
+  分割する場合は親 Issue に全体像とサブ Issue へのリンク（タスクリスト）を書き、各サブ Issue ごとに
+  本 skill を回す（1 サブ Issue = 1 worktree = 1 ブランチ = 1 PR）。分割方針はユーザーに提示して合意を取る。
+- 作成は outward-facing。本文（特に計画内容・分割方針）をユーザーに提示し、**Issue を立てる前に確認**を取る。
 
 ```bash
 gh issue create \
@@ -163,6 +168,7 @@ git worktree list                      # 撤去を確認
 ## 注意
 
 - **着手前に計画 Issue を必ず作る**（既存 Issue 指定時はそれを使う）。行き当たりばったりで作業を始めない。
+- **1 タスク（1 PR）の変更は約 400 行を目安**にし、超える見込みなら Issue / PR の分割を検討する。
 - **PR は必ず該当 Issue をリンクする**（既定は closing keyword で自動クローズ連動）。
 - **すべての編集・コミットは worktree 内で行う。** メインの作業ツリーや他ブランチを変更しない。
 - Issue 作成・push・PR 作成は outward-facing。手順どおり事前確認を挟む。
