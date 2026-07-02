@@ -4,7 +4,7 @@ description: >-
   自分が出した Pull Request を一定間隔で監視し、(1) レビューコメントが付いたら修正案を作成して
   push 前に確認を取り、(2) マージ/クローズされたら連動 Issue（PR 本文の closing keywords で
   GitHub が自動クローズ）の状況を検証して監視を終了する。
-  「PR を監視して」「レビューが付いたら直して」「マージされたら Issue を閉じて」等の依頼で使う。
+  「PR を監視して」「レビューが付いたら直して」「マージされたら連動 Issue の自動クローズを確認して」等の依頼で使う。
   PR watch loop: poll a PR, fix review comments (confirm before push), verify auto-closed linked issues on merge.
 ---
 
@@ -64,6 +64,8 @@ CI が pending の間は「実行中」と報告して継続監視する。
 起動時に、関連 Issue が PR 本文の closing keywords で連動しているか
 `gh pr view <PR> --json closingIssuesReferences` で確認し、抜けていれば
 `gh pr edit <PR> --body ...` で `Closes #N` を追記しておく（マージ前に済ませる）。
+`gh pr edit`（PR 本文編集）は outward-facing な操作なので、push と同様に
+**実行前にユーザー確認を挟む**。
 
 ### 3. レビュー対応（confirm before push）
 
@@ -109,8 +111,8 @@ CI が pending の間は「実行中」と報告して継続監視する。
 
 ## 注意
 
-- push・PR コメント・Issue クローズは outward-facing。手順どおり、push は事前確認、
-  未マージ CLOSED の Issue 操作も確認を挟む。
+- push・PR コメント・PR 本文編集（`gh pr edit`）・Issue クローズは outward-facing。
+  手順どおり、push と PR 本文編集は事前確認、未マージ CLOSED の Issue 操作も確認を挟む。
 - 監視は自走ループ。ユーザーが「止めて」と言ったら ScheduleWakeup を呼ばず終了する。
 - ポーリングは GitHub の外部状態が対象で harness からの自動通知が無いため、
   ScheduleWakeup による能動的な再確認が必要。
