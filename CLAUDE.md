@@ -79,6 +79,8 @@ PreToolUse フックで、コミットの衛生を機械的に担保する（設
 4. `git push -u origin <branch>` して Pull Request を作成する（テンプレートが自動挿入される）。**PR 本文に `Closes #<Issue>` を記載して連動 Issue にリンクする**（マージ時に GitHub が自動クローズ）。
 5. CI が通り、レビューで承認されたらマージする。
 
+Issue / PR には GitHub テンプレートが用意されている。Issue は [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/)（計画 Issue: `plan.md` ／ バグ報告: `bug.md`）から選ぶと、上記の「目的・スコープ・作業計画・完了条件」が雛形として入る。PR は [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) が自動挿入され、`Closes #<Issue>` 欄と提出前チェックリスト（`docs:build` / `lint:md`）が最初から並ぶ。
+
 > **エージェント補足**: コミットを伴う作業は原則 `.claude/skills/worktree-task` を既定経路にすると、この「Issue 化 → ブランチ → PR リンク」を手順として踏み外さない。行き当たりばったりで素手編集を始めない。
 
 ### コミットメッセージ（Conventional Commits）
