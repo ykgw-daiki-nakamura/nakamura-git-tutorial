@@ -61,7 +61,8 @@ export default withMermaid({
             { text: 'ガイドの歩き方（全体像）', link: '/guide/' },
             { text: 'Git / GitHub とは', link: '/guide/introduction' },
             { text: 'セットアップ', link: '/guide/setup' },
-            { text: 'Git の基本', link: '/guide/basics' }
+            { text: 'Git の基本', link: '/guide/basics' },
+            { text: '.gitignore で追跡除外', link: '/guide/gitignore' }
           ]
         },
         {
@@ -87,7 +88,8 @@ export default withMermaid({
           items: [
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
             { text: 'rebase と履歴整理', link: '/guide/rebase' },
-            { text: 'ブランチ更新: merge か rebase か', link: '/guide/update-branch' }
+            { text: 'ブランチ更新: merge か rebase か', link: '/guide/update-branch' },
+            { text: 'git stash で一時退避', link: '/guide/stash' }
           ]
         },
         {
