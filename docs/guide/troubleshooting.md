@@ -95,3 +95,7 @@ git push
 | push が rejected | `git pull --rebase` してから push |
 
 困ったら、まず `git status` と `git reflog` で現状を把握することが解決への近道です。
+
+---
+
+関連: [ガイドの歩き方](./)（全体像） / [コマンド早見表](./commands)（コマンドの逆引き）

@@ -49,7 +49,7 @@ export default withMermaid({
     logo: '/logo.svg',
     nav: [
       { text: 'ホーム', link: '/' },
-      { text: 'ガイド', link: '/guide/introduction', activeMatch: '^/guide/' },
+      { text: 'ガイド', link: '/guide/', activeMatch: '^/guide/' },
       { text: '実習', link: '/hands-on/', activeMatch: '^/(hands-on|practice)/' }
     ],
     // パス別サイドバー: ガイドと実習でメニューを切り替える
@@ -58,24 +58,40 @@ export default withMermaid({
         {
           text: 'はじめに・基礎',
           items: [
+            { text: 'ガイドの歩き方（全体像）', link: '/guide/' },
             { text: 'Git / GitHub とは', link: '/guide/introduction' },
             { text: 'セットアップ', link: '/guide/setup' },
             { text: 'Git の基本', link: '/guide/basics' }
           ]
         },
         {
-          text: 'チーム開発',
+          text: 'チーム開発の基本フロー',
           items: [
             { text: 'ブランチとマージ', link: '/guide/branching' },
             { text: 'リモートと GitHub', link: '/guide/remote' },
             { text: 'GitHub Flow', link: '/guide/github-flow' },
-            { text: 'プルリクエストとレビュー', link: '/guide/pull-request' },
+            { text: 'プルリクエストとレビュー', link: '/guide/pull-request' }
+          ]
+        },
+        {
+          text: '履歴とコンフリクトの扱い',
+          items: [
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
             { text: 'rebase と履歴整理', link: '/guide/rebase' },
-            { text: 'ブランチ更新: merge か rebase か', link: '/guide/update-branch' },
+            { text: 'ブランチ更新: merge か rebase か', link: '/guide/update-branch' }
+          ]
+        },
+        {
+          text: '自動化とリリース',
+          items: [
             { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' },
             { text: 'リリースとバージョン管理', link: '/guide/release' },
-            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' },
+            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' }
+          ]
+        },
+        {
+          text: '発展',
+          items: [
             { text: '顧客カスタマイズとバージョン運用', link: '/guide/customization' }
           ]
         },
