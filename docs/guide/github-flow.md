@@ -71,8 +71,8 @@ gitGraph
 
 **小さく作って、早くマージする**——これが GitHub Flow をうまく回すコツです。
 
-::: tip GitHub Flow と Git Flow
-`develop` / `release` ブランチを使う「Git Flow」もありますが、Web サービスのように継続的にデプロイする現場では、シンプルな **GitHub Flow** が扱いやすいです。基本は `main` 一本で回せますが、**すでに出荷したバージョンを保守する必要が出たら release ブランチを使います**。タグ付け・バージョニング・hotfix は [リリースとバージョン管理](./release) で扱います。
+::: tip 他のブランチ戦略もある
+`develop` / `release` ブランチを使う [Git Flow](./git-flow) や、環境／リリースブランチを足す [GitLab Flow](./gitlab-flow) もあります。Web サービスのように継続的にデプロイする現場では、シンプルな **GitHub Flow** が扱いやすいですが、プロダクトによって向き不向きがあります。どれを選ぶかは [ブランチ戦略の使い分け](./branching-strategies) を参照してください。タグ付け・バージョニング・hotfix は [リリースとバージョン管理](./release) で扱います。
 :::
 
 次は、フローの中心である [プルリクエストとレビュー](./pull-request) を掘り下げます。
