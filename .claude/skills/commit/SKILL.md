@@ -3,7 +3,7 @@ name: commit
 description: >-
   ステージ済みの差分から Conventional Commits 準拠のメッセージを生成し、提出前チェック
   （lint / build）を通してからコミットする skill。保護ブランチ（既定 main）上では直接
-  コミットせずブランチ作成を促す。type 一覧・保護ブランチ名は checks.json があれば読む。
+  コミットせずブランチ作成を促す。type 一覧・保護ブランチ名は checks.json に該当キーがあれば読む。
   「コミットして」「ステージした変更をコミット」「Conventional Commit を作って」等で使う。
   Generate a Conventional Commits message from staged changes, run pre-submit checks, then commit.
 ---
@@ -16,7 +16,7 @@ description: >-
 
 ## 引数
 
-`args` は自由記述。以下を読み取る（省略時は解決）。
+`args` は自由記述。以下を読み取る（省略時は既定値／会話文脈から解決）。
 
 - **type / scope** — 明示されていればそれを使う。無ければ差分から推定する。
 - **保護ブランチ** — 直接コミットを避けるブランチ。省略時は checks.json の `protectedBranches`、
@@ -54,6 +54,7 @@ type(scope): 要約（命令形・簡潔）
 生成したメッセージが Conventional Commits に合致するか確認する。
 
 ```bash
+subject="feat(scope): 要約"   # ← 生成した1行目を入れる
 printf '%s' "$subject" | grep -Eq \
   '^(feat|fix|docs|chore|ci|build|refactor|test|perf|style|revert)(\([^)]+\))?!?: .+' \
   && echo OK || echo "NG: type を見直す"
@@ -78,8 +79,7 @@ git commit -m "type(scope): 要約"
 ```
 
 - 署名（`Co-Authored-By` 等）はリポジトリの方針に従って付す。
-- コミット後、続けて push / PR に進むなら [worktree-task](../worktree-task/SKILL.md) /
-  [pr-desc](../pr-desc/SKILL.md) と接続する。
+- コミット後、続けて push / PR に進むなら [worktree-task](../worktree-task/SKILL.md) と接続する。
 
 ## 注意
 
