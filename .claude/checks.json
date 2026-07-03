@@ -13,8 +13,17 @@
       "types": ["feat", "fix", "docs", "chore", "ci", "build", "refactor", "test", "perf", "style", "revert"]
     }
   },
-  "//protectedBranches": "guard-branch.sh が読む保護ブランチ。これらのブランチ上での直接 commit / push を阻止する。",
+  "//protectedBranches": "guard-branch.sh / guard-dangerous.sh が読む保護ブランチ。直接 commit / push や保護ブランチへの force push を阻止する。",
   "protectedBranches": ["main"],
+  "//guard": "guard-dangerous.sh / guard-secrets.sh の除外設定。allow は正規表現の配列で、一致したコマンド（dangerous）または該当行/ファイル名（secrets）は阻止せず通す（誤検知の逃がし弁）。既定は空。",
+  "guard": {
+    "dangerous": {
+      "allow": []
+    },
+    "secrets": {
+      "allow": []
+    }
+  },
   "//docsSync": "docs-sync-reminder.sh が読む対応表。構造ファイル（glob）を編集したら remind の文言で関連ドキュメントの更新を促す（非ブロッキングの注意喚起）。",
   "docsSync": [
     {

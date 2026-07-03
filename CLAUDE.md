@@ -57,19 +57,30 @@ docs/
 - 設定を変えるだけで検査を足せるよう、ロジック（フック）とプロジェクト固有の対応表（`checks.json`）を分離している。
 - 構造ファイル（例: `config.mjs`）を編集したら関連ドキュメントの更新を促す `docs-sync-reminder.sh` も同様に checks.json の `docsSync`（`{ glob, remind }`）を読む。こちらは `exit 2`（ブロック）ではなく注意喚起（additionalContext）に留める。
 
-## コミット/PR 衛生（guard フック）
+## コミット/PR 衛生・安全ガード（guard フック）
 
-PreToolUse フックで、コミットの衛生を機械的に担保する（設定源は [.claude/checks.json](.claude/checks.json)）。
+PreToolUse フックで、コミットの衛生と危険操作の抑止を機械的に担保する（設定源は [.claude/checks.json](.claude/checks.json)）。
 
 - **`guard-commit.sh`**: `git commit -m <msg>` のメッセージを Conventional Commits 正規表現で検証。
   非準拠なら `exit 2`。許可 type は `checks.json` の `commit.conventional.types`。
   コマンド置換（`$(...)`）や `-F`・エディタ起動など**静的判定できない**ケースは fail-open。
 - **`guard-branch.sh`**: 保護ブランチ（`checks.json` の `protectedBranches`、既定 `main`）上での
   直接 `commit` / `push` を `exit 2` で阻止し、作業ブランチの作成を促す。
+- **`guard-dangerous.sh`**: 明確に破壊的・危険な Bash コマンドを `exit 2` で阻止する。対象は
+  ルート/ホーム近傍の再帰削除（`rm -rf /`・`~`・`--no-preserve-root`）、保護ブランチへの
+  `git push --force` / `--force-with-lease`、`curl … | bash` 等の未検証スクリプト実行、
+  未コミット変更がある状態での `git reset --hard`。誤検知は `checks.json` の
+  `guard.dangerous.allow`（正規表現）で通せる。
+- **`guard-secrets.sh`**: `git add` / `git commit` 時にシークレット混入を阻止する。ステージ差分の
+  追加行と対象ファイル名を走査し、秘密鍵ヘッダ・AWS/GitHub/Slack/Google/Stripe のキー形式・
+  `.env` 等の秘匿ファイル（`.env.example` 等のサンプルは除外）を検出したら `exit 2`。
+  `git add .` / `-A` のように対象を列挙できない場合は commit 時の走査が最終防波堤になる。
+  誤検知は `checks.json` の `guard.secrets.allow`（正規表現）で通せる。
 
-配線は [.claude/settings.json](.claude/settings.json) の `hooks.PreToolUse`。type 一覧・保護ブランチ名は
-`checks.json` を編集するだけで変えられる（ロジックと設定の分離）。ステージ差分からの
-コミット生成は `.claude/skills/commit` を使う。
+配線は [.claude/settings.json](.claude/settings.json) の `hooks.PreToolUse`。type 一覧・保護ブランチ名・
+除外パターンは `checks.json` を編集するだけで変えられる（ロジックと設定の分離）。いずれのガードも
+依存（`jq`/`node`/`git`）が無い環境では fail-open で作業を止めない。**ガードは正当な理由なく
+迂回しない**こと。ステージ差分からのコミット生成は `.claude/skills/commit` を使う。
 
 ## 開発フロー（GitHub Flow）
 
