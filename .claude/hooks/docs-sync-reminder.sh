@@ -30,9 +30,13 @@ file=$(extract_file_path)
 cd "$proj" || exit 0
 # $proj プレフィックスを長さベースで安全に除去する（パラメータ展開の #pattern は
 # $proj に glob 文字（* [ ] ?）が含まれると誤マッチするため使わない）。
+# 境界が "/" のとき（= "$proj/..."）または file が $proj と完全一致のときだけ除去する。
+# 例: proj="/tmp/proj" が file="/tmp/proj2/a" を誤って剥がさないようにする。
 rel="$file"
 plen=${#proj}
-[ "${file:0:plen}" = "$proj" ] && rel="${file:plen}"
+if [ "${file:0:plen}" = "$proj" ] && { [ "${#file}" -eq "$plen" ] || [ "${file:plen:1}" = "/" ]; }; then
+  rel="${file:plen}"
+fi
 rel="${rel#/}"; rel="${rel#./}"
 
 # 一致した docsSync エントリの remind 文言を集める（glob 照合は node があれば完全対応）
