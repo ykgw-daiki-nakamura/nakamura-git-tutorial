@@ -31,9 +31,11 @@ case "$cmd" in
   *) exit 0 ;;
 esac
 
-# 最初の -m / --message の値を取り出す。無ければ（エディタ起動や -F 等）検証不能 → fail-open
-msg=$(printf '%s' "$cmd" | grep -oE "(-m|--message)[= ]+('[^']*'|\"[^\"]*\"|[^[:space:]]+)" | head -n1 \
-  | sed -E "s/^(-m|--message)[= ]+//; s/^['\"]//; s/['\"]$//")
+# 最初の -m / --message の値を取り出す。-am のような短縮オプション束（末尾が m）も対象にする。
+# 無ければ（エディタ起動や -F 等）検証不能 → fail-open。--amend 等は m の直後に区切りが
+# 来ないためマッチしない（誤検知しない）。
+msg=$(printf '%s' "$cmd" | grep -oE "(--message|-[A-Za-z]*m)[= ]+('[^']*'|\"[^\"]*\"|[^[:space:]]+)" | head -n1 \
+  | sed -E "s/^(--message|-[A-Za-z]*m)[= ]+//; s/^['\"]//; s/['\"]$//")
 [ -n "$msg" ] || exit 0
 
 # コマンド置換を含む（= 実行時に生成される）メッセージは静的判定できない → fail-open
