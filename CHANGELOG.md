@@ -36,5 +36,8 @@ _次のリリースに向けた変更をここに追記する。_
 - VitePress ビルド時の chunk size 警告を解消。
 - Git Flow の hotfix 図に、既存 `develop` ブランチであることを示す注釈を追加。
 
-[Unreleased]: https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/releases/tag/v1.0.0
+<!--
+リリースのタグ（例: v1.0.0）を打ったら、Keep a Changelog の慣例に従って
+各バージョン見出しへの比較リンク（compare / releases-tag）をここに追加する。
+タグ未作成の現時点では 404 になる（links.yml が誤検出する）ため、あえて張らない。
+-->
