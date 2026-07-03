@@ -50,10 +50,13 @@ docs/
 
 ## 開発フロー（GitHub Flow）
 
-1. 最新の `main` からブランチを切る。接頭辞は `feat/` `fix/` `docs/` `chore/` `ci/`。
-2. 変更してコミットする（下記のコミット規約）。
-3. `git push -u origin <branch>` して Pull Request を作成する（テンプレートが自動挿入される）。
-4. CI が通り、レビューで承認されたらマージする。
+1. **着手前に計画を GitHub Issue にまとめる。** 数行の docs 修正など些細な変更でも例外にしない。目的・スコープ・作業計画（チェックリスト）・完了条件を書く。既存の計画 Issue があればそれを使う。
+2. 最新の `main` からブランチを切る。接頭辞は `feat/` `fix/` `docs/` `chore/` `ci/`。
+3. 変更してコミットする（下記のコミット規約）。
+4. `git push -u origin <branch>` して Pull Request を作成する（テンプレートが自動挿入される）。**PR 本文に `Closes #<Issue>` を記載して連動 Issue にリンクする**（マージ時に GitHub が自動クローズ）。
+5. CI が通り、レビューで承認されたらマージする。
+
+> **エージェント補足**: コミットを伴う作業は原則 `.claude/skills/worktree-task` を既定経路にすると、この「Issue 化 → ブランチ → PR リンク」を手順として踏み外さない。行き当たりばったりで素手編集を始めない。
 
 ### コミットメッセージ（Conventional Commits）
 
