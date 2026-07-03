@@ -84,6 +84,19 @@ BODY
 - 作成した Issue 番号を控える（以降 `<ISSUE>` と表記）。ブランチ名・派生元・後片付け方針とあわせて記憶しておく。
 - 大きなタスクは Issue 内チェックリストで進捗を可視化する（作業に応じて `gh issue edit` で更新）。
 
+**着手を宣言する。** Issue を確定したら、対象 Issue に `status: in-progress` ラベルを付与し、
+自分をアサインする。これにより一覧で「着手中」を一目で判別でき、複数エージェント／担当が
+Issue を分担する際の二重着手を防げる（`status: in-progress` ラベルは作成済み。無いリポジトリでは
+先に `gh label create "status: in-progress" --color fbca04` で用意する）。
+
+```bash
+gh issue edit <ISSUE> --add-label "status: in-progress" --add-assignee @me
+```
+
+- 完了時の扱い: PR 本文の `Closes #<ISSUE>` によりマージ時に Issue は自動クローズされる。
+  ラベルはクローズしても自動では外れないため、運用上残したくなければ手順 6 以降で
+  `gh issue edit <ISSUE> --remove-label "status: in-progress"` を実行して除去してよい（任意）。
+
 ### 3. worktree を作成
 
 派生元は最新のリモート追跡ブランチ（既定 `origin/main`）から切る。`git fetch` だけでは
