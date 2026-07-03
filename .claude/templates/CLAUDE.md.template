@@ -35,7 +35,8 @@
 ## 開発フロー（GitHub Flow）
 
 1. **着手前に計画を GitHub Issue にまとめる**（目的・スコープ・作業計画・完了条件）。
-   着手したら `status: in-progress` ラベルを付与し自分をアサインする（二重着手の防止）。
+   着手したら着手中ラベル（`<in-progress ラベル>`。例: `status: in-progress`）を付与し
+   自分をアサインする（二重着手の防止）。ラベル名はコピー先の運用に合わせて置き換える。
 2. 最新の `main` からブランチを切る。接頭辞は `feat/` `fix/` `docs/` `chore/` `ci/` `refactor/`。
 3. 変更してコミットする（下記のコミット規約）。
 4. `git push -u origin <branch>` して PR を作成し、本文に `Closes #<Issue>` を記載して連動させる。
