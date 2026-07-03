@@ -70,6 +70,9 @@ export default withMermaid({
             { text: 'ブランチとマージ', link: '/guide/branching' },
             { text: 'リモートと GitHub', link: '/guide/remote' },
             { text: 'GitHub Flow', link: '/guide/github-flow' },
+            { text: 'Git Flow', link: '/guide/git-flow' },
+            { text: 'GitLab Flow', link: '/guide/gitlab-flow' },
+            { text: 'ブランチ戦略の使い分け', link: '/guide/branching-strategies' },
             { text: 'プルリクエストとレビュー', link: '/guide/pull-request' }
           ]
         },
