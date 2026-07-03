@@ -56,6 +56,20 @@ docs/
 - 違反があれば `exit 2` で Claude にフィードバックされる。対応 glob が無いファイルや、検査コマンド未導入（依存なし）の場合は**作業を止めない**（fail-open）。
 - 設定を変えるだけで検査を足せるよう、ロジック（フック）とプロジェクト固有の対応表（`checks.json`）を分離している。
 
+## コミット/PR 衛生（guard フック）
+
+PreToolUse フックで、コミットの衛生を機械的に担保する（設定源は [.claude/checks.json](.claude/checks.json)）。
+
+- **`guard-commit.sh`**: `git commit -m <msg>` のメッセージを Conventional Commits 正規表現で検証。
+  非準拠なら `exit 2`。許可 type は `checks.json` の `commit.conventional.types`。
+  コマンド置換（`$(...)`）や `-F`・エディタ起動など**静的判定できない**ケースは fail-open。
+- **`guard-branch.sh`**: 保護ブランチ（`checks.json` の `protectedBranches`、既定 `main`）上での
+  直接 `commit` / `push` を `exit 2` で阻止し、作業ブランチの作成を促す。
+
+配線は [.claude/settings.json](.claude/settings.json) の `hooks.PreToolUse`。type 一覧・保護ブランチ名は
+`checks.json` を編集するだけで変えられる（ロジックと設定の分離）。ステージ差分からの
+コミット生成は `.claude/skills/commit` を使う。
+
 ## 開発フロー（GitHub Flow）
 
 1. **着手前に計画を GitHub Issue にまとめる。** 数行の docs 修正など些細な変更でも例外にしない。目的・スコープ・作業計画（チェックリスト）・完了条件を書く。既存の計画 Issue があればそれを使う。**着手したら Issue に `status: in-progress` ラベルを付与し自分をアサインする**（`gh issue edit <Issue> --add-label "status: in-progress" --add-assignee @me`）。一覧で着手中を判別でき、複数人／エージェントでの二重着手を防げる。
