@@ -6,7 +6,7 @@
 
 Git / GitHub を**チーム開発で実践的に使いこなす**ための、図解付きチュートリアルサイトです。
 
-- **技術スタック**: [VitePress](https://vitepress.dev/)（静的サイト）、Mermaid（ダイアグラム）、Node.js 18 以上、npm
+- **技術スタック**: [VitePress](https://vitepress.dev/)（静的サイト）、Mermaid（ダイアグラム）、Node.js 20 以上、npm
 - **コンテンツ言語**: 日本語
 - **公開先**: GitHub Pages（<https://ykgw-daiki-nakamura.github.io/nakamura-git-tutorial/>）
 - **性質**: このリポジトリ自体が **GitHub Flow の教材**であり、運用も GitHub Flow に揃えている
@@ -55,6 +55,21 @@ docs/
 - `checks.json` の `onEdit` に `{ glob, run, label }` を追加すれば検査を増やせる。`run` 内の `{file}` は編集ファイルのパスに置換され、コマンドはリポジトリ直下で実行される。
 - 違反があれば `exit 2` で Claude にフィードバックされる。対応 glob が無いファイルや、検査コマンド未導入（依存なし）の場合は**作業を止めない**（fail-open）。
 - 設定を変えるだけで検査を足せるよう、ロジック（フック）とプロジェクト固有の対応表（`checks.json`）を分離している。
+- 構造ファイル（例: `config.mjs`）を編集したら関連ドキュメントの更新を促す `docs-sync-reminder.sh` も同様に checks.json の `docsSync`（`{ glob, remind }`）を読む。こちらは `exit 2`（ブロック）ではなく注意喚起（additionalContext）に留める。
+
+## コミット/PR 衛生（guard フック）
+
+PreToolUse フックで、コミットの衛生を機械的に担保する（設定源は [.claude/checks.json](.claude/checks.json)）。
+
+- **`guard-commit.sh`**: `git commit -m <msg>` のメッセージを Conventional Commits 正規表現で検証。
+  非準拠なら `exit 2`。許可 type は `checks.json` の `commit.conventional.types`。
+  コマンド置換（`$(...)`）や `-F`・エディタ起動など**静的判定できない**ケースは fail-open。
+- **`guard-branch.sh`**: 保護ブランチ（`checks.json` の `protectedBranches`、既定 `main`）上での
+  直接 `commit` / `push` を `exit 2` で阻止し、作業ブランチの作成を促す。
+
+配線は [.claude/settings.json](.claude/settings.json) の `hooks.PreToolUse`。type 一覧・保護ブランチ名は
+`checks.json` を編集するだけで変えられる（ロジックと設定の分離）。ステージ差分からの
+コミット生成は `.claude/skills/commit` を使う。
 
 ## 開発フロー（GitHub Flow）
 

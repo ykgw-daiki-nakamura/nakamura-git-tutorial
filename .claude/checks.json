@@ -6,5 +6,21 @@
       "glob": "**/*.md",
       "run": "node_modules/.bin/markdownlint-cli2 {file}"
     }
+  ],
+  "//commit": "guard-commit.sh が読むコミットメッセージ検証設定。types が Conventional Commits の許可 type 一覧。",
+  "commit": {
+    "conventional": {
+      "types": ["feat", "fix", "docs", "chore", "ci", "build", "refactor", "test", "perf", "style", "revert"]
+    }
+  },
+  "//protectedBranches": "guard-branch.sh が読む保護ブランチ。これらのブランチ上での直接 commit / push を阻止する。",
+  "protectedBranches": ["main"],
+  "//docsSync": "docs-sync-reminder.sh が読む対応表。構造ファイル（glob）を編集したら remind の文言で関連ドキュメントの更新を促す（非ブロッキングの注意喚起）。",
+  "docsSync": [
+    {
+      "label": "sidebar",
+      "glob": "docs/.vitepress/config.mjs",
+      "remind": "サイト構成（nav / sidebar）を変更しました。新規ページの sidebar 登録漏れや、リンク切れが無いか確認してください（`npm run docs:build` で検証）。"
+    }
   ]
 }
