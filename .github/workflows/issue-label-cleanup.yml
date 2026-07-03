@@ -1,0 +1,35 @@
+name: Issue label cleanup
+
+# Issue がクローズされたら「status: in-progress」ラベルを自動で外す。
+# 着手中ラベルはクローズしても自動では外れないため、閉じた Issue に
+# 着手中ラベルが残る不整合をこのワークフローで解消する。
+on:
+  issues:
+    types: [closed]
+
+# 既定は読み取りのみ。ラベル編集に必要な issues:write だけを付与（最小権限）。
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  remove-in-progress-label:
+    runs-on: ubuntu-latest
+    # 通常は数秒で完了。ハング時の暴走・課金を防ぐため上限を設定。
+    timeout-minutes: 5
+    steps:
+      # 付いている場合のみ外す（未付与だと gh issue edit --remove-label が失敗するため事前判定）。
+      - name: 'Remove status: in-progress label if present'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ISSUE: ${{ github.event.issue.number }}
+          LABEL: "status: in-progress"
+        run: |
+          if gh issue view "$ISSUE" --repo "$REPO" --json labels \
+              --jq '.labels[].name' | grep -Fxq "$LABEL"; then
+            gh issue edit "$ISSUE" --repo "$REPO" --remove-label "$LABEL"
+            echo "Removed '$LABEL' from issue #$ISSUE."
+          else
+            echo "Issue #$ISSUE has no '$LABEL' label; nothing to do."
+          fi
