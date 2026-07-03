@@ -28,7 +28,16 @@ file=$(extract_file_path)
 [ -n "$file" ] || exit 0
 
 cd "$proj" || exit 0
-rel="${file#"$proj"/}"; rel="${rel#./}"
+# $proj プレフィックスを長さベースで安全に除去する（パラメータ展開の #pattern は
+# $proj に glob 文字（* [ ] ?）が含まれると誤マッチするため使わない）。
+# 境界が "/" のとき（= "$proj/..."）または file が $proj と完全一致のときだけ除去する。
+# 例: proj="/tmp/proj" が file="/tmp/proj2/a" を誤って剥がさないようにする。
+rel="$file"
+plen=${#proj}
+if [ "${file:0:plen}" = "$proj" ] && { [ "${#file}" -eq "$plen" ] || [ "${file:plen:1}" = "/" ]; }; then
+  rel="${file:plen}"
+fi
+rel="${rel#/}"; rel="${rel#./}"
 
 # 一致した docsSync エントリの remind 文言を集める（glob 照合は node があれば完全対応）
 reminders() {
@@ -49,10 +58,15 @@ reminders() {
     '
     return
   fi
-  # node が無い環境: jq でエントリを取り出し、完全一致のみ照合（fail-open 優先）
+  # node が無い環境: jq でエントリを取り出し、完全一致／末尾一致のみ照合する。
+  # ワイルドカード（* ?）を含む glob は case で * が / も跨いで誤検知するため、
+  # 保守的にスキップする（fail-open 優先。node があれば上の完全な glob 照合を使う）。
   command -v jq >/dev/null 2>&1 || return
   jq -r '.docsSync[]? | select(.glob and .remind) | "\(.glob)\t\(.remind)"' "$checks" 2>/dev/null |
   while IFS=$'\t' read -r glob remind; do
+    case "$glob" in
+      *'*'*|*'?'*) continue ;;
+    esac
     case "$rel" in
       "$glob"|*"/$glob") printf '%s\n' "$remind" ;;
     esac
