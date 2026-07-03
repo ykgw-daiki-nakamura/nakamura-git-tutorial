@@ -4,3 +4,7 @@ docs/.vitepress/cache/
 
 # worktree-task skill が作業用 worktree を作る場所（実体はコミット対象外にする）
 .claude/worktrees/
+
+# ランタイム生成物・個人用ローカル設定（コミット対象外）
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
