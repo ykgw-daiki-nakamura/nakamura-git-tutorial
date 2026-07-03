@@ -72,6 +72,10 @@ gh release create v1.2.0 --generate-notes
 
 ブラウザの場合は、リポジトリの **Releases → Draft a new release** から、タグを選び **Generate release notes** を押すと、前回のリリース以降にマージされた PR からノートが自動生成されます。
 
+::: tip CHANGELOG.md で変更履歴を残す
+自動生成のリリースノートに加えて、リポジトリに `CHANGELOG.md` を置き、**人が読む変更履歴**を [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 形式でまとめておくと親切です。PR をマージするたびに `Unreleased` へ 1 行足し、リリース時にバージョン見出しへ繰り上げます。**このリポジトリ自身の [CHANGELOG.md](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/CHANGELOG.md) が実例**です。
+:::
+
 ## release ブランチと hotfix
 
 GitHub Flow では基本的に `main` 一本で回せますが、**すでに出荷したバージョンを、`main` の未完成な変更を巻き込まずに直したい**場面が出てきます。たとえば、本番は `v1.2.0` で動いているのに、`main` はすでに次の `1.3` に向けて進んでいる——そんなときに緊急のバグ修正（**hotfix**）を安全に出すために **release ブランチ**を使います。
