@@ -42,6 +42,12 @@
       "Bash(npm run docs:build)",
       "Bash(npm run docs:preview)",
       "Bash(npx markdownlint-cli2 *)"
+    ],
+    "deny": [
+      "Bash(git diff *--output*)",
+      "Bash(git diff *-o *)",
+      "Bash(git show *--output*)",
+      "Bash(git show *-o *)"
     ]
   },
   "hooks": {
