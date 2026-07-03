@@ -12,8 +12,10 @@ description: >-
 リポジトリに **新しく作成された PR** を自走で監視し、検知したらレビューして結果を
 PR コメントに投稿する skill。ScheduleWakeup で一定間隔ごとに自分を再起動して監視を継続する。
 
-自分の 1 つの PR に付いたレビューコメントへ対応する用途は [pr-watch](../pr-watch/SKILL.md) を使う。
-本 skill は「他者・自分が新規に立てた PR を検知してレビューする側」を担当する。
+本 skill は「**新規に立った PR を検知してレビューを投稿する側**」を担当する。逆に、自分が出した
+1 つの PR に付いたレビューコメントへ対応する（修正・マージ後処理）用途は
+[pr-watch](../pr-watch/SKILL.md) を使う。隔離ワークツリーで作業して PR を作る流れは
+[worktree-task](../worktree-task/SKILL.md)。各 skill の棲み分けは [skills の一覧](../README.md) を参照。
 
 ## 引数
 
