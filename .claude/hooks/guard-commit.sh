@@ -34,8 +34,24 @@ esac
 # 最初の -m / --message の値を取り出す。-am のような短縮オプション束（末尾が m）も対象にする。
 # 無ければ（エディタ起動や -F 等）検証不能 → fail-open。--amend 等は m の直後に区切りが
 # 来ないためマッチしない（誤検知しない）。
-msg=$(printf '%s' "$cmd" | grep -oE "(--message|-[A-Za-z]*m)[= ]+('[^']*'|\"[^\"]*\"|[^[:space:]]+)" | head -n1 \
-  | sed -E "s/^(--message|-[A-Za-z]*m)[= ]+//; s/^['\"]//; s/['\"]$//")
+# 複数行メッセージ（引用符が改行をまたぐ）にも対応するため node を優先で使う（文字クラスは
+# 改行にマッチする）。node が無ければ行指向の grep にフォールバックする（1 行目 subject 検証には十分）。
+if command -v node >/dev/null 2>&1; then
+  msg=$(CMD="$cmd" node -e '
+    const s=process.env.CMD||"";
+    const m=s.match(/(?:--message|-[A-Za-z]*m)[= ]+("(?:[^"\\]|\\.)*"|\x27[^\x27]*\x27|[^\s]+)/);
+    let out="";
+    if(m){
+      let v=m[1];
+      if((v[0]==="\""&&v[v.length-1]==="\"")||(v[0]==="\x27"&&v[v.length-1]==="\x27")) v=v.slice(1,-1);
+      out=v;
+    }
+    process.stdout.write(out);
+  ')
+else
+  msg=$(printf '%s' "$cmd" | grep -oE "(--message|-[A-Za-z]*m)[= ]+('[^']*'|\"[^\"]*\"|[^[:space:]]+)" | head -n1 \
+    | sed -E "s/^(--message|-[A-Za-z]*m)[= ]+//; s/^['\"]//; s/['\"]$//")
+fi
 [ -n "$msg" ] || exit 0
 
 # コマンド置換を含む（= 実行時に生成される）メッセージは静的判定できない → fail-open

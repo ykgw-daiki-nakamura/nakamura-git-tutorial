@@ -31,8 +31,19 @@ case "$cmd" in
   *) exit 0 ;;
 esac
 
+# コミット/プッシュの対象ディレクトリを推定する。
+# worktree 運用では実際の作業ブランチは対象 worktree 側にあり、$proj（メイン作業
+# ツリー）は常に main のことが多い。コマンド中の `git -C <dir>` または先頭付近の
+# `cd <dir>` を優先して解決し、見つからなければ $proj にフォールバックする。
+target="$proj"
+if [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+\"?([^\"[:space:]]+) ]]; then
+  target="${BASH_REMATCH[1]}"
+elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+\"?([^\"[:space:]\;\&\|]+) ]]; then
+  target="${BASH_REMATCH[2]}"
+fi
+
 # 現在ブランチ（detached HEAD や非 git は fail-open）
-branch=$(git -C "$proj" rev-parse --abbrev-ref HEAD 2>/dev/null) || exit 0
+branch=$(git -C "$target" rev-parse --abbrev-ref HEAD 2>/dev/null) || exit 0
 [ -n "$branch" ] && [ "$branch" != "HEAD" ] || exit 0
 
 # 保護ブランチ一覧（無ければ既定 main）
