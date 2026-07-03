@@ -9,8 +9,8 @@
 
 ## 関連 Issue
 
-<!-- マージ時に自動クローズするには closing keyword を使う。参照だけなら Refs #123 -->
-Closes #
+<!-- 下の NNN を Issue 番号に置き換える。参照だけなら Closes を Refs に変える。連動が不要なら行ごと削除 -->
+Closes #NNN
 
 ## 確認方法
 
