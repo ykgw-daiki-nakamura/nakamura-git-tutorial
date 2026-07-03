@@ -6,7 +6,7 @@
 
 ## 開発環境のセットアップ
 
-前提: [Node.js](https://nodejs.org/) 18 以上。
+前提: [Node.js](https://nodejs.org/) 20 以上。
 
 ```bash
 git clone https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial.git
