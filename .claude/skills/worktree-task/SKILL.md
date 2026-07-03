@@ -94,8 +94,8 @@ gh issue edit <ISSUE> --add-label "status: in-progress" --add-assignee @me
 ```
 
 - 完了時の扱い: PR 本文の `Closes #<ISSUE>` によりマージ時に Issue は自動クローズされる。
-  ラベルはクローズしても自動では外れないため、運用上残したくなければ手順 6 以降で
-  `gh issue edit <ISSUE> --remove-label "status: in-progress"` を実行して除去してよい（任意）。
+  `status: in-progress` ラベルは **Issue クローズ時に GitHub Actions（`.github/workflows/issue-label-cleanup.yml`）が
+  自動で除去する**ため、手動で外す必要はない（閉じた Issue に着手中ラベルが残らない）。
 
 ### 3. worktree を作成
 
