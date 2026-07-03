@@ -18,13 +18,21 @@
 リポジトリのルートに `.gitignore` というファイルを置き、1 行に 1 パターンを書きます。
 
 ```gitignore
-# コメントは # で始める
-node_modules/      # ディレクトリ（末尾 / でディレクトリのみ対象）
-*.log              # 拡張子でまとめて（ワイルドカード *）
-dist/              # ビルド生成物
-.env               # 秘密情報
-!.env.example      # ! で「除外の例外」（これは追跡する）
+# コメントは行頭に書く（末尾 / でディレクトリのみ対象）
+node_modules/
+# 拡張子でまとめて（ワイルドカード *）
+*.log
+# ビルド生成物
+dist/
+# 秘密情報
+.env
+# ! で「除外の例外」（これは追跡する）
+!.env.example
 ```
+
+::: warning コメントは必ず独立行に
+`.gitignore` の `#` コメントは**行頭でのみ有効**です。`node_modules/  # 依存` のようにパターンと同じ行へ書くと、`#` 以降も含めて 1 つのパターンとして扱われ、**その行の無視が効かなくなります**。コメントは必ずパターンとは別の行に書いてください。効いているかは `git check-ignore -v <ファイル>` で確認できます。
+:::
 
 パターンの要点は次のとおりです。
 
@@ -32,7 +40,7 @@ dist/              # ビルド生成物
 | --- | --- |
 | `名前/` | 末尾の `/` でディレクトリのみにマッチ |
 | `*.log` | `*` は任意の文字列（`/` を除く）にマッチ |
-| `!パターン` | 先頭の `!` で、いったん無視した対象を**除外の例外**にする |
+| `!パターン` | 先頭の `!` で、いったん無視した対象を**除外の例外**にする（ただし親ディレクトリ自体を無視している場合は再包含できない） |
 | `/名前` | 先頭の `/` でリポジトリ直下のみに限定（サブディレクトリは対象外） |
 | `**/名前` | 任意の階層にマッチ（例: `**/tmp`） |
 
@@ -64,17 +72,22 @@ git config --global core.excludesfile ~/.gitignore_global
 
 ## 実例：このリポジトリの .gitignore
 
-このチュートリアルサイト自身の [.gitignore](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.gitignore) は、生成物・ランタイム成果物・個人設定を的確に除外しています。以下は要点の**抜粋**です（実物にはコメント行なども含まれます）。
+このチュートリアルサイト自身の [.gitignore](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.gitignore) は、生成物・ランタイム成果物・個人設定を的確に除外しています。実ファイルの内容は次のとおりです。
 
 ```gitignore
-node_modules/                 # 依存（npm install で再生成）
-docs/.vitepress/dist/         # ビルド生成物
-docs/.vitepress/cache/        # VitePress のキャッシュ
-.claude/worktrees/            # 作業用 worktree の実体（共有しない）
-.claude/settings.local.json   # 個人用ローカル設定
+node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# worktree-task skill が作業用 worktree を作る場所（実体はコミット対象外にする）
+.claude/worktrees/
+
+# ランタイム生成物・個人用ローカル設定（コミット対象外）
+.claude/scheduled_tasks.lock
+.claude/settings.local.json
 ```
 
-「再生成できるもの・各自固有のもの・共有すべきでないもの」を外す、という判断基準がそのまま表れています。
+`node_modules/` や `dist/` は「再生成できるもの」、`.claude/worktrees/` や `.claude/settings.local.json` は「各自固有・共有すべきでないもの」——という判断基準がそのまま表れています。コメントもすべて独立行で書かれている点にも注目してください。
 
 ## よくある落とし穴
 
