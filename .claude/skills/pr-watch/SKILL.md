@@ -13,6 +13,12 @@ description: >-
 自分の PR を自走監視し、レビュー対応とマージ後処理を行う skill。
 ScheduleWakeup で一定間隔（既定 60 秒）ごとに自分を再起動して監視を継続する。
 
+本 skill は「**自分が出した 1 つの PR を追う側**」を担当する。逆に、新規に立った PR を検知して
+レビューを投稿する「レビューする側」は [pr-review-watch](../pr-review-watch/SKILL.md) を使う。
+PR を作るところから始めたい場合は [worktree-task](../worktree-task/SKILL.md) で PR を作成し、
+その PR をそのまま本 skill で監視する、という流れになる。各 skill の棲み分けは
+[skills の一覧](../README.md) を参照。
+
 ## 引数
 
 `args` は自由記述。以下を読み取る（省略時は既定値）。
