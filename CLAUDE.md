@@ -75,7 +75,9 @@ PreToolUse フックで、コミットの衛生と危険操作の抑止を機械
   追加行と対象ファイル名を走査し、秘密鍵ヘッダ・AWS/GitHub/Slack/Google/Stripe のキー形式・
   `.env` 等の秘匿ファイル（`.env.example` 等のサンプルは除外）を検出したら `exit 2`。
   `git add .` / `-A` のように対象を列挙できない場合は commit 時の走査が最終防波堤になる。
-  誤検知は `checks.json` の `guard.secrets.allow`（正規表現）で通せる。
+  検出時は **stderr へ値を出さず位置（行番号）のみ**を示す。教材として `.env`・API キーを扱う
+  `docs/`（`checks.json` の `guard.secrets.skipPaths`）配下と、`example` 等のプレースホルダ例は
+  過剰ブロックを避けるため走査対象外。誤検知は `guard.secrets.allow`（正規表現）で通せる。
 
 配線は [.claude/settings.json](.claude/settings.json) の `hooks.PreToolUse`。type 一覧・保護ブランチ名・
 除外パターンは `checks.json` を編集するだけで変えられる（ロジックと設定の分離）。いずれのガードも

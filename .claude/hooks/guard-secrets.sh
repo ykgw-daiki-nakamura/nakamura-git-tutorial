@@ -32,30 +32,51 @@ case "$cmd" in
   *) exit 0 ;;
 esac
 
-# 除外（allowlist）正規表現を checks.json から取得
-allow_res=""
+# 除外（allowlist）正規表現と走査除外パス（skipPaths）を checks.json から取得
+allow_res=""; skip_res=""
 if [ -f "$checks" ]; then
   if command -v jq >/dev/null 2>&1; then
     allow_res=$(jq -r '(.guard.secrets.allow // []) | .[]' "$checks" 2>/dev/null)
+    skip_res=$(jq -r '(.guard.secrets.skipPaths // ["docs/"]) | .[]' "$checks" 2>/dev/null)
   elif command -v node >/dev/null 2>&1; then
     allow_res=$(CHECKS="$checks" node -e 'try{((JSON.parse(require("fs").readFileSync(process.env.CHECKS,"utf8")).guard?.secrets?.allow)||[]).forEach(p=>console.log(p))}catch(e){}')
+    skip_res=$(CHECKS="$checks" node -e 'try{((JSON.parse(require("fs").readFileSync(process.env.CHECKS,"utf8")).guard?.secrets?.skipPaths)||["docs/"]).forEach(p=>console.log(p))}catch(e){}')
   fi
 fi
+[ -n "$skip_res" ] || skip_res="docs/"   # 既定: 教材ディレクトリは走査対象外
+
 is_allowed() { # $1 検査対象文字列 → allowlist に一致すれば 0
   local line="$1"
   while IFS= read -r re; do
     [ -n "$re" ] || continue
-    printf '%s' "$line" | grep -Eq "$re" && return 0
+    # `--` で `-` 始まりの正規表現がオプション扱いされるのを防ぐ
+    printf '%s' "$line" | grep -Eq -- "$re" && return 0
   done <<EOF
 $allow_res
 EOF
   return 1
 }
 
-block() { # $1 種別, $2 該当箇所
+is_skip_path() { # $1 パス → skipPaths の接頭辞に一致すれば 0（走査対象外）
+  local f="$1"
+  while IFS= read -r pre; do
+    [ -n "$pre" ] || continue
+    case "$f" in "$pre"*) return 0 ;; esac
+  done <<EOF
+$skip_res
+EOF
+  return 1
+}
+
+# 教材でありがちな明示プレースホルダ（本物の鍵ではない例示）を通すための判定
+looks_placeholder() { # $1 内容 → プレースホルダらしければ 0
+  printf '%s' "$1" | grep -Eqi 'example|dummy|placeholder|sample|changeme|your[-_]|x{4,}|redacted|<[a-z0-9_-]+>'
+}
+
+block() { # $1 種別, $2 位置情報（値は載せない — stderr へのシークレット漏えいを防ぐ）
   {
     echo "シークレットの混入を阻止しました: $1"
-    [ -n "${2:-}" ] && echo "  該当: $2"
+    [ -n "${2:-}" ] && echo "  位置: $2"
     echo "対応: 値を環境変数や Secrets Manager に移し、コミット対象から除外してください"
     echo "（.gitignore へ追加。既にステージ済みなら git restore --staged <file>）"
     echo "誤検知の場合は .claude/checks.json の guard.secrets.allow に正規表現を追加できます。"
@@ -69,8 +90,10 @@ sensitive_name() { # $1 パス → 秘匿ファイル名なら 0
   case "$f" in
     *.env.example|*.env.sample|*.env.template|*.env.dist) return 1 ;;
   esac
+  # .npmrc は名前だけでは判定しない（トークンを含まない正規のプロジェクト設定が多い）。
+  # トークンを含む場合は内容走査（generic パターンの token=... {20,}）側で捕捉する。
   printf '%s' "$f" | grep -Eq \
-    '(^|/)\.env(\.[A-Za-z0-9_]+)?$|(^|/)(id_rsa|id_dsa|id_ecdsa|id_ed25519)$|\.(pem|pfx|p12|key|keystore|jks)$|(^|/)(credentials|\.pgpass|\.netrc|\.npmrc)$'
+    '(^|/)\.env(\.[A-Za-z0-9_]+)?$|(^|/)(id_rsa|id_dsa|id_ecdsa|id_ed25519)$|\.(pem|pfx|p12|key|keystore|jks)$|(^|/)(credentials|\.pgpass|\.netrc)$'
 }
 
 # 追加行内の高確度シークレットパターン。マッチした行を返す（無ければ空）。
@@ -89,30 +112,34 @@ scan_secret_lines() { # $1: 走査テキスト → マッチ行を出力
 }
 
 report_content() { # $1 ソース表示名, $2 走査テキスト
-  local src="$1" hit
+  local src="$1" hit num content
   hit=$(scan_secret_lines "$2") || true
   [ -n "$hit" ] || return 0
   # パイプではなく here-doc で回すことで block の exit 2 が本体プロセスに効く
   while IFS= read -r line; do
     [ -n "$line" ] || continue
-    is_allowed "$line" && continue
-    block "高エントロピー文字列/鍵らしき値（$src）" "$line"
+    num=${line%%:*}        # grep -n の行番号
+    content=${line#*:}     # 一致行の内容（allowlist/placeholder 判定にのみ使い、外部へは出さない）
+    is_allowed "$content" && continue
+    looks_placeholder "$content" && continue
+    # stderr には値を出さず位置情報のみ（シークレット漏えい防止）
+    block "高エントロピー文字列/鍵らしき値（$src）" "${num} 行目（値はマスク）"
   done <<EOF
 $hit
 EOF
 }
 
 if printf '%s' "$cmd" | grep -Eq '\bgit[[:space:]]+commit\b'; then
-  # ステージ済みファイル名
+  # ステージ済みファイルを1件ずつ走査（skipPaths（既定 docs/）配下は教材として対象外）
   while IFS= read -r f; do
     [ -n "$f" ] || continue
+    is_skip_path "$f" && continue
     if sensitive_name "$f" && ! is_allowed "$f"; then
       block "秘匿ファイルのコミット" "$f"
     fi
+    added=$(git -C "$proj" diff --cached -U0 -- "$f" 2>/dev/null | grep -E '^\+' | grep -Ev '^\+\+\+')
+    report_content "ステージ: $f" "$added"
   done < <(git -C "$proj" diff --cached --name-only 2>/dev/null)
-  # ステージ済み追加行の内容
-  staged_added=$(git -C "$proj" diff --cached -U0 2>/dev/null | grep -E '^\+' | grep -Ev '^\+\+\+')
-  report_content "ステージ差分" "$staged_added"
 fi
 
 if printf '%s' "$cmd" | grep -Eq '\bgit[[:space:]]+add\b'; then
@@ -123,13 +150,15 @@ if printf '%s' "$cmd" | grep -Eq '\bgit[[:space:]]+add\b'; then
       -*) continue ;;        # フラグ
       .|--all|-A) continue ;; # 列挙不能（commit 時に走査）
     esac
+    is_skip_path "$tok" && continue   # docs 等の教材は対象外
     path="$proj/$tok"
     [ -f "$path" ] || path="$tok"
     [ -f "$path" ] || continue
     if sensitive_name "$tok" && ! is_allowed "$tok"; then
       block "秘匿ファイルの追加" "$tok"
     fi
-    filecontent=$(cat "$path" 2>/dev/null)
+    # 大きなファイルを丸ごと変数に載せないよう先頭 1MB に制限（commit 時走査が最終防波堤）
+    filecontent=$(head -c 1048576 "$path" 2>/dev/null)
     report_content "$tok" "$filecontent"
   done
 fi

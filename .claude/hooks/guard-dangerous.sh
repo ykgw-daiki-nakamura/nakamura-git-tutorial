@@ -26,6 +26,9 @@ extract_command() {
 cmd=$(extract_command)
 [ -n "$cmd" ] || exit 0
 
+# ERE メタ文字をエスケープ（checks.json 由来のブランチ名を正規表現に埋める前に使う）
+ere_escape() { printf '%s' "$1" | sed 's/[][(){}.^$*+?|\\]/\\&/g'; }
+
 # 除外（allowlist）に一致したら通す
 allow_res=""
 if [ -f "$checks" ]; then
@@ -37,7 +40,8 @@ if [ -f "$checks" ]; then
 fi
 while IFS= read -r re; do
   [ -n "$re" ] || continue
-  printf '%s' "$cmd" | grep -Eq "$re" && exit 0
+  # `--` で `-` 始まりの正規表現がオプション扱いされるのを防ぐ
+  printf '%s' "$cmd" | grep -Eq -- "$re" && exit 0
 done <<EOF
 $allow_res
 EOF
@@ -52,8 +56,9 @@ block() { # $1 理由, $2 代替
 }
 
 # 1) ルート/ホーム近傍の再帰削除
-if printf '%s' "$cmd" | grep -Eq '\brm\b[^|;&]*(-[[:alnum:]]*r[[:alnum:]]*f|-[[:alnum:]]*f[[:alnum:]]*r|-r[[:alnum:]]*[[:space:]]+-f|-f[[:alnum:]]*[[:space:]]+-r)'; then
-  if printf '%s' "$cmd" | grep -Eq '(^|[[:space:]])(/|~|\$HOME|\$\{HOME\})(/?\*)?([[:space:]]|$)' \
+# フラグは大小無視（-R は -r と等価、-F も同様）。末尾スラッシュ（/, ~/, $HOME/）も対象にする。
+if printf '%s' "$cmd" | grep -Eqi '\brm\b[^|;&]*(-[a-z]*r[a-z]*f|-[a-z]*f[a-z]*r|-r[a-z]*[[:space:]]+-f|-f[a-z]*[[:space:]]+-r)'; then
+  if printf '%s' "$cmd" | grep -Eq '(^|[[:space:]])(/|~|\$HOME|\$\{HOME\})/?(\*)?([[:space:]]|$)' \
      || printf '%s' "$cmd" | grep -Eq -- '--no-preserve-root'; then
     block "ルート/ホーム近傍の再帰削除" "対象を具体的なサブディレクトリに限定する（例: rm -rf ./build）"
   fi
@@ -73,10 +78,26 @@ if printf '%s' "$cmd" | grep -Eq '\bgit[[:space:]]+push\b' \
   fi
   [ -n "$protected" ] || protected="main"
   cur=$(git -C "$proj" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+  # `git push` 以降の明示ブランチ引数を抽出（先頭の非フラグ = リモート名は除く）。
+  # 明示ブランチがある場合はそれが push 先。無い（bare push）場合のみ現在ブランチが push 先。
+  push_args=$(printf '%s' "$cmd" | sed -E 's/.*\bgit[[:space:]]+push\b//')
+  branch_args=""; remote_seen=0
+  for tok in $push_args; do
+    case "$tok" in -*) continue ;; esac        # フラグは除外
+    if [ "$remote_seen" -eq 0 ]; then remote_seen=1; continue; fi  # 先頭非フラグ = リモート
+    branch_args="$branch_args $tok"
+  done
   while IFS= read -r p; do
     [ -n "$p" ] || continue
-    # コマンドに保護ブランチ名が現れる、または現在が保護ブランチ
-    if printf '%s' "$cmd" | grep -Eq "(^|[[:space:]/])${p}([[:space:]]|:|$)" || [ "$cur" = "$p" ]; then
+    esc=$(ere_escape "$p")
+    hit=0
+    if [ -n "$branch_args" ]; then
+      # 明示ブランチ（refspec の +src:dst や src:dst も考慮）に保護ブランチが現れるか
+      printf '%s' "$branch_args" | grep -Eq "(^|[[:space:]:+/])${esc}([[:space:]:]|$)" && hit=1
+    elif [ "$cur" = "$p" ]; then
+      hit=1   # bare push（対象未指定）で現在ブランチが保護対象
+    fi
+    if [ "$hit" -eq 1 ]; then
       block "保護ブランチ '$p' への force push" "共有履歴を壊す恐れがあります。通常の push か、対象ブランチを見直してください"
     fi
   done <<EOF

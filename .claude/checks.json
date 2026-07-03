@@ -15,13 +15,14 @@
   },
   "//protectedBranches": "guard-branch.sh / guard-dangerous.sh が読む保護ブランチ。直接 commit / push や保護ブランチへの force push を阻止する。",
   "protectedBranches": ["main"],
-  "//guard": "guard-dangerous.sh / guard-secrets.sh の除外設定。allow は正規表現の配列で、一致したコマンド（dangerous）または該当行/ファイル名（secrets）は阻止せず通す（誤検知の逃がし弁）。既定は空。",
+  "//guard": "guard-dangerous.sh / guard-secrets.sh の除外設定。allow は正規表現の配列で、一致したコマンド（dangerous）または該当行/ファイル名（secrets）は阻止せず通す（誤検知の逃がし弁）。secrets.skipPaths は走査対象外にするパス接頭辞（既定 docs/：本リポは .env/API キーを題材にする教材のため）。",
   "guard": {
     "dangerous": {
       "allow": []
     },
     "secrets": {
-      "allow": []
+      "allow": [],
+      "skipPaths": ["docs/"]
     }
   },
   "//docsSync": "docs-sync-reminder.sh が読む対応表。構造ファイル（glob）を編集したら remind の文言で関連ドキュメントの更新を促す（非ブロッキングの注意喚起）。",
