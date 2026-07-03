@@ -6,7 +6,7 @@
 
 Git / GitHub を**チーム開発で実践的に使いこなす**ための、図解付きチュートリアルサイトです。
 
-- **技術スタック**: [VitePress](https://vitepress.dev/)（静的サイト）、Mermaid（ダイアグラム）、Node.js 18 以上、npm
+- **技術スタック**: [VitePress](https://vitepress.dev/)（静的サイト）、Mermaid（ダイアグラム）、Node.js 20 以上、npm
 - **コンテンツ言語**: 日本語
 - **公開先**: GitHub Pages（<https://ykgw-daiki-nakamura.github.io/nakamura-git-tutorial/>）
 - **性質**: このリポジトリ自体が **GitHub Flow の教材**であり、運用も GitHub Flow に揃えている

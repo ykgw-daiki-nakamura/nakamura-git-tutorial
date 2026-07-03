@@ -13,7 +13,7 @@ Git / GitHub を**チーム開発で実践的に使いこなす**ための、図
 
 ## ローカルで動かす
 
-前提: [Node.js](https://nodejs.org/) 18 以上。
+前提: [Node.js](https://nodejs.org/) 20 以上。
 
 ```bash
 # 依存をインストール

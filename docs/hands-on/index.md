@@ -45,7 +45,7 @@ flowchart LR
 | GitHub アカウント | **必須** |
 | 共有リポジトリへのアクセス | 参加者はオーナーから**コラボレーター招待**を受ける（push 権限が必要） |
 | gh CLI | あると便利。Web 操作でも代替可 |
-| Node.js | 18 以上（`npm run docs:dev` でプレビューする場合） |
+| Node.js | 20 以上（`npm run docs:dev` でプレビューする場合） |
 
 まだ認証していない場合は、`gh auth login`、または SSH 鍵の設定（[セットアップ](../guide/setup)）を先に済ませてください。
 
