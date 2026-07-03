@@ -64,7 +64,7 @@ git config --global core.excludesfile ~/.gitignore_global
 
 ## 実例：このリポジトリの .gitignore
 
-このチュートリアルサイト自身の [.gitignore](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.gitignore) は、生成物・ランタイム成果物・個人設定を的確に除外しています。
+このチュートリアルサイト自身の [.gitignore](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.gitignore) は、生成物・ランタイム成果物・個人設定を的確に除外しています。以下は要点の**抜粋**です（実物にはコメント行なども含まれます）。
 
 ```gitignore
 node_modules/                 # 依存（npm install で再生成）
@@ -79,7 +79,7 @@ docs/.vitepress/cache/        # VitePress のキャッシュ
 ## よくある落とし穴
 
 - **コミット後に `.gitignore` へ足しても効かない** → 追跡済みなので `git rm --cached` が必要。
-- **`node_modules` と書いてもサブ階層が消えない** → ディレクトリは `node_modules/` のように書くと明確。
+- **末尾 `/` の有無で意味が変わる** → `node_modules` はファイルにもディレクトリにもマッチし配下もまとめて無視される。`node_modules/` と末尾に付けると「ディレクトリだけ」に限定でき、意図が明確になる。
 - **無視されているか確かめたい** → `git check-ignore -v <ファイル>` でどのパターンに当たったか分かる。
 - **空ディレクトリを残したい** → Git は空ディレクトリを追跡しないので、慣習的に `.gitkeep` を置く。
 
