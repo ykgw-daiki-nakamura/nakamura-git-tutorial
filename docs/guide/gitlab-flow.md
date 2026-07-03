@@ -1,6 +1,6 @@
 # GitLab Flow
 
-GitLab Flow は、[GitHub Flow](./github-flow) のシンプルさを保ちつつ、**「本番へどう反映するか」という現実**を補うブランチ運用モデルです。GitHub Flow（`main` 一本）と [Git Flow](./git-flow)（多数のブランチ）の中間に位置づけられます。
+GitLab Flow は、[GitHub Flow](./github-flow) のシンプルさを保ちつつ、**「本番へどう反映するか」という現実**を補うブランチ運用モデルです。GitHub Flow（`main` 一本）と [Git Flow](./git-flow)（多数のブランチ）の中間に位置づけられます。3 モデルの向き不向きは [ブランチ戦略の使い分け](./branching-strategies) で比較しています。
 
 中心にあるのは 2 つの原則です。
 

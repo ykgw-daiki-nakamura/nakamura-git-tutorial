@@ -61,7 +61,8 @@ export default withMermaid({
             { text: 'ガイドの歩き方（全体像）', link: '/guide/' },
             { text: 'Git / GitHub とは', link: '/guide/introduction' },
             { text: 'セットアップ', link: '/guide/setup' },
-            { text: 'Git の基本', link: '/guide/basics' }
+            { text: 'Git の基本', link: '/guide/basics' },
+            { text: '.gitignore で追跡除外', link: '/guide/gitignore' }
           ]
         },
         {
@@ -69,11 +70,17 @@ export default withMermaid({
           items: [
             { text: 'ブランチとマージ', link: '/guide/branching' },
             { text: 'リモートと GitHub', link: '/guide/remote' },
+            { text: 'プルリクエストとレビュー', link: '/guide/pull-request' }
+          ]
+        },
+        {
+          text: 'ブランチ戦略',
+          items: [
             { text: 'GitHub Flow', link: '/guide/github-flow' },
             { text: 'Git Flow', link: '/guide/git-flow' },
             { text: 'GitLab Flow', link: '/guide/gitlab-flow' },
             { text: 'ブランチ戦略の使い分け', link: '/guide/branching-strategies' },
-            { text: 'プルリクエストとレビュー', link: '/guide/pull-request' }
+            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' }
           ]
         },
         {
@@ -81,7 +88,8 @@ export default withMermaid({
           items: [
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
             { text: 'rebase と履歴整理', link: '/guide/rebase' },
-            { text: 'ブランチ更新: merge か rebase か', link: '/guide/update-branch' }
+            { text: 'ブランチ更新: merge か rebase か', link: '/guide/update-branch' },
+            { text: 'git stash で一時退避', link: '/guide/stash' }
           ]
         },
         {
@@ -89,7 +97,6 @@ export default withMermaid({
           items: [
             { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' },
             { text: 'リリースとバージョン管理', link: '/guide/release' },
-            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' },
             { text: 'デュアル配布（SaaS + セルフホスト）でのリリース運用', link: '/guide/dual-distribution' }
           ]
         },
