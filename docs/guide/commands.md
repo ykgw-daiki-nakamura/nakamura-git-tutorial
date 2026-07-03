@@ -85,3 +85,7 @@ gh pr list                             # PR 一覧
 gh pr checkout <number>                # PR をローカルにチェックアウト
 gh pr view --web                       # PR をブラウザで開く
 ```
+
+---
+
+関連: [ガイドの歩き方](./)（全体像） / [トラブルシューティング](./troubleshooting)（「困った」の対処）
