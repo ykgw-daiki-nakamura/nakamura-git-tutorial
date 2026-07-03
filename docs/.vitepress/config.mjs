@@ -89,7 +89,8 @@ export default withMermaid({
           items: [
             { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' },
             { text: 'リリースとバージョン管理', link: '/guide/release' },
-            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' }
+            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' },
+            { text: 'デュアル配布（SaaS + セルフホスト）でのリリース運用', link: '/guide/dual-distribution' }
           ]
         },
         {

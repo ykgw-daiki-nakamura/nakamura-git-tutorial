@@ -65,3 +65,4 @@ gitGraph
 - [Git Flow](./git-flow) — develop/release/hotfix を使う構成
 - [ブランチ戦略の使い分け](./branching-strategies) — どれを選ぶかの判断
 - [複数バージョンの保守（リリースブランチ）](./release-branches) — 安定ブランチ運用の実際
+- [デュアル配布（SaaS + セルフホスト）でのリリース運用](./dual-distribution) — SaaS と自ホスト版を単一 main で両立
