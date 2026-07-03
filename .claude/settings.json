@@ -57,7 +57,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/markdownlint.sh\""
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/on-edit-check.sh\""
           }
         ]
       },
