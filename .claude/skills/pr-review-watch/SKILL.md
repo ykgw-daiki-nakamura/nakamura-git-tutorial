@@ -2,7 +2,7 @@
 name: pr-review-watch
 description: >-
   リポジトリに新しく作成された Pull Request を一定間隔で監視し、検知したら diff を取得して
-  レビューし、結果を PR コメントとして投稿する自走ループ skill。Dependabot 等のボットが
+  レビューし、結果を Reviews API で（行単位の指摘はインラインで）投稿する自走ループ skill。Dependabot 等のボットが
   作成した PR は既定で対象外。「新しい PR が来たらレビューして」「PR 作成を監視して」等で使う。
   Watch for newly created PRs, review the diff, and post the review as a PR comment (bots excluded).
 ---
@@ -40,7 +40,7 @@ gh pr list --state open --json number \
   --jq '[.[].number] | max // 0'   # 現在の最大 PR 番号 = ベースライン（0 件なら 0）
 ```
 
-- ベースライン番号・監視間隔・除外対象・投稿方針を ScheduleWakeup の `prompt` 本文に埋め込み、
+- ベースライン番号・監視間隔・除外対象・投稿方針・**投稿方式（インライン Reviews API）**を ScheduleWakeup の `prompt` 本文に埋め込み、
   次回起動時の自分へ引き継ぐ（ループの状態保持）。
 - 既存のオープン PR は原則スキャン対象外（ユーザーが「既存の #N も見て」と言えばその番号は対象に含める）。
 
@@ -71,25 +71,46 @@ gh pr diff <PR>
 - 総評（Approve 相当 / 要修正 / 要議論）と、良い点・修正必須点・提案（ブロッカー可否を明記）を簡潔にまとめる。
 - コードを **変更・push はしない**。本 skill はレビューに徹する（修正対応は [pr-watch](../pr-watch/SKILL.md)）。
 
-### 4. 投稿
+### 4. 投稿（Reviews API・行アンカーはインライン）
 
-投稿方針に従う。
+**GitHub Reviews API で 1 レビューとして投稿する。** 全体所感は本文に、**行を特定できる指摘は
+diff の該当行へインラインコメント**として付ける。指摘箇所が一目で分かり、レビュー体験が実務水準になる。
 
-- **自動投稿**（既定）: レビュー結果を確認なしでそのまま PR コメントに投稿する。投稿後に内容を会話へ 1 行で報告する。
-- **確認してから投稿**: レビュー結果を会話に提示し、投稿してよいかユーザーに確認。承認後に投稿。
+**仕分け基準**:
 
-**署名は必須**。レビューが Claude によるものと分かるよう、コメント末尾に署名行を必ず付ける。
+- **総評・全体所感・複数ファイル横断の話** → レビュー**本文**（`body`、`event=COMMENT`）。
+- **「この行がバイパスする」「この行が誤検知」等の行単位の指摘** → `comments[]` のインライン
+  （`path` / `line` / `side` / `body`）。
+
+**行番号の求め方**: インラインの `line` は**変更後ファイル（RIGHT 側）の行番号**。`gh pr diff <PR>` の
+ハンクヘッダ `@@ -a,b +c,d @@` を読み、`+c` を起点に**追加行（`+`）・文脈行**を数えて算出する。
+**diff に含まれる行だけ**にアンカーする（diff 外の行はインライン不可）。範囲指摘は `start_line`＋`line`。
+
+**投稿方針に従う**:
+
+- **自動投稿**（既定）: 確認なしでそのまま投稿し、投稿後に内容を会話へ 1 行で報告する。
+- **確認してから投稿**: レビュー結果を会話に提示し、承認後に投稿する。
+
+**owner/repo** は `gh repo view --json owner,name -q '.owner.login+"/"+.name'` で得る。
+`comments[]` は指摘の数だけ並べる。**署名はレビュー本文（`body`）末尾に必ず付ける**。
 
 ```bash
-gh pr comment <PR> --body "$(cat <<'BODY'
-## レビュー結果: ...
-...
-
----
-🤖 **Claude** によるレビュー（Claude Code / Opus 4.8・自動レビュー skill `pr-review-watch`）
-BODY
-)"
+owner_repo=$(gh repo view --json owner,name -q '.owner.login+"/"+.name')
+gh api "repos/$owner_repo/pulls/<PR>/reviews" --input - <<'JSON'
+{
+  "event": "COMMENT",
+  "body": "## レビュー結果: ...\n（総評・全体所感）\n\n---\n🤖 **Claude** によるレビュー（Claude Code / Opus 4.8・自動レビュー skill `pr-review-watch`）",
+  "comments": [
+    { "path": ".claude/hooks/guard-secrets.sh", "line": 102, "side": "RIGHT", "body": "この行が …（行単位の指摘）" },
+    { "path": ".claude/hooks/guard-dangerous.sh", "line": 40, "side": "RIGHT", "body": "…" }
+  ]
+}
+JSON
 ```
+
+**フォールバック**: 行が diff 外・行番号が特定できない・API が 422 等でエラー（行不整合など）になる指摘は、
+その項目を**本文へ移して**（該当ファイル/行を文中に明記して）レビューを再投稿する。インライン投稿の失敗で
+レビュー全体を落とさない。
 
 既定は自動投稿。ユーザーが「確認してから」と指定した間は必ず確認を挟み、承認後に投稿する。
 「以降は自動で」と言われたら（あるいは既定のまま進める場合は）投稿方針 `自動投稿` として確認なしで投稿する。
@@ -106,4 +127,4 @@ BODY
   ScheduleWakeup による能動的な再確認が必要。Monitor では捕捉できない。
 - 間隔は 270 秒前後を既定とする。60 秒級の短間隔はレスポンス重視だが idle tick が増える。
   5 分（300 秒）ちょうどはキャッシュを外しつつ待ちも短い最悪値なので避ける。
-- ベースライン・投稿方針・除外対象は毎回 ScheduleWakeup の `prompt` に埋めて引き継ぐ。
+- ベースライン・投稿方針・除外対象・投稿方式（インライン Reviews API）は毎回 ScheduleWakeup の `prompt` に埋めて引き継ぐ。
