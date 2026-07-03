@@ -117,7 +117,12 @@ CI が pending の間は「実行中」と報告して継続監視する。
 
 ```bash
 me=$(gh api user -q .login)
-gh api --paginate repos/{owner}/{repo}/pulls/<PR>/comments
+# 自分（$me）が未返信のトップレベル指摘（id / path / line）を洗い出す
+gh api --paginate repos/{owner}/{repo}/pulls/<PR>/comments --jq '.[]' \
+  | jq -s --arg me "$me" '
+      (map(select(.in_reply_to_id and .user.login == $me) | .in_reply_to_id)) as $replied
+      | map(select(.in_reply_to_id == null and ((.id) as $i | $replied | index($i) | not)))
+      | .[] | {id, path, line}'
 ```
 
 `owner`/`repo` は `gh repo view --json owner,name -q '.owner.login+"/"+.name'` で得る。
