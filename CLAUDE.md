@@ -48,6 +48,14 @@ docs/
 - 無効化済み: MD013（行長）、MD033（インライン HTML）、MD041（先頭 H1）、MD024 は同一階層のみ重複禁止。
 - **Markdown を編集したら push 前に必ず `npm run lint:md` を通すこと**（CI の `lint` ジョブと同一）。
 
+## 日本語プロース Lint（textlint・段階導入）
+
+文章表記の揺れ・冗長表現を検知するため、`textlint` + `textlint-rule-preset-ja-technical-writing` を導入している（`npm run lint:text`、CI の `lint` ジョブでも実行）。整形は markdownlint、**文章は textlint**、と役割を分ける。
+
+- 設定は [.textlintrc.json](.textlintrc.json)。**段階導入**のため、現行ドキュメントで多数発火する opinionated なルールは初期は無効化し、既存文書を通しつつ残りのルールで表記を整える方針。
+- 初期に無効化しているルール（将来、文章を直しながら順次有効化する）: `ja-no-mixed-period`（文末句点）/ `no-doubled-joshi`（助詞の連続）/ `no-mix-dearu-desumasu`（である・ですます混在）/ `sentence-length`（一文の長さ）/ `no-exclamation-question-mark`（！？の使用）/ `arabic-kanji-numbers` / `ja-no-weak-phrase` / `ja-no-redundant-expression`。
+- 対象は `docs/**/*.md` とルート直下の `*.md`。`npm run lint:text --fix` で自動修正できる指摘もある。
+
 ## 編集後チェック（checks.json 駆動フック）
 
 「どのファイルを編集したら何を検査するか」を [.claude/checks.json](.claude/checks.json) に宣言的にまとめ、汎用 PostToolUse フック `.claude/hooks/on-edit-check.sh` がそれを読んで該当コマンドを実行する（例: `.md` 編集 → markdownlint）。
@@ -113,7 +121,7 @@ docs(guide): ブランチ命名規則の例を追加
 
 ## CI / CD とセキュリティ方針
 
-- **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint）/ `dependency-review`（依存の脆弱性検査）。
+- **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint + textlint）/ `dependency-review`（依存の脆弱性検査）。
 - **deploy.yml**: `main` への push で GitHub Pages へ自動デプロイ。
 - **links.yml**: 週次で外部リンクの死活を検査（`--scheme http/https` で内部リンクは対象外）。
 - **issue-label-cleanup.yml**: Issue クローズ時に `status: in-progress` ラベルを自動除去（`issues: write`）。
