@@ -16,7 +16,7 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pr-watch-handoff.sh\"",
-            "if": "Bash(gh pr create *)"
+            "if": "Bash(gh pr create*)"
           }
         ]
       }

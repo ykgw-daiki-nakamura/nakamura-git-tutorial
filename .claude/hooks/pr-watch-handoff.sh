@@ -47,10 +47,13 @@ url=$(printf '%s' "$resp" | grep -oE 'https://github\.com/[^ "]+/pull/[0-9]+' | 
 ctx="PR ($url) を作成しました。プロジェクト方針により、ここから pr-watch skill に移行してこの PR を監視してください（レビュー指摘への対応と、マージ後の連動 Issue 自動クローズの検証まで）。移行にあたりユーザーへの確認は不要です。"
 msg="PR を検知しました。pr-watch へ自動移行します。"
 
+# JSON は必ずエスケープして組み立てる。jq を優先し、無ければ node の
+# JSON.stringify にフォールバックする（printf の生埋め込みは " や改行で壊れるため使わない）。
+# ここに到達する時点でコマンド抽出に成功している＝jq か node のいずれかは利用可能。
 if command -v jq >/dev/null 2>&1; then
   jq -cn --arg ctx "$ctx" --arg msg "$msg" \
     '{systemMessage:$msg,hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:$ctx}}'
-else
-  printf '{"systemMessage":"%s","hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}' "$msg" "$ctx"
+elif command -v node >/dev/null 2>&1; then
+  MSG="$msg" CTX="$ctx" node -e 'process.stdout.write(JSON.stringify({systemMessage:process.env.MSG,hookSpecificOutput:{hookEventName:"PostToolUse",additionalContext:process.env.CTX}}))'
 fi
 exit 0
