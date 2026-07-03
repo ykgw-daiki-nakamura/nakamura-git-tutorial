@@ -49,7 +49,7 @@ export default withMermaid({
     logo: '/logo.svg',
     nav: [
       { text: 'ホーム', link: '/' },
-      { text: 'ガイド', link: '/guide/', activeMatch: '^/guide/' },
+      { text: 'ガイド', link: '/guide/introduction', activeMatch: '^/guide/' },
       { text: '実習', link: '/hands-on/', activeMatch: '^/(hands-on|practice)/' }
     ],
     // パス別サイドバー: ガイドと実習でメニューを切り替える
@@ -58,7 +58,6 @@ export default withMermaid({
         {
           text: 'はじめに・基礎',
           items: [
-            { text: 'ガイドの歩き方（全体像）', link: '/guide/' },
             { text: 'Git / GitHub とは', link: '/guide/introduction' },
             { text: 'セットアップ', link: '/guide/setup' },
             { text: 'Git の基本', link: '/guide/basics' },
