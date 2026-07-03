@@ -1,0 +1,7 @@
+# Issue 作成時のテンプレート選択画面の設定
+# 空の Issue も許可する（軽微な質問・メモ用）。計画 Issue は plan.md を推奨。
+blank_issues_enabled: true
+contact_links:
+  - name: 使い方の質問・相談
+    url: https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/discussions
+    about: バグ報告や計画に当てはまらない質問は Discussions へ（未開設なら Issue でも可）
