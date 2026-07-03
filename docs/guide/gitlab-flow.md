@@ -34,9 +34,9 @@ gitGraph
     checkout "2-3-stable"
     commit tag: "v2.3.0"
     checkout main
-    commit id: "バグ修正"
+    commit id: "バグ修正(main-first)" type: HIGHLIGHT
     checkout "2-3-stable"
-    cherry-pick id: "バグ修正" tag: "v2.3.1"
+    commit id: "cherry-pick→2.3" tag: "v2.3.1"
 ```
 
 - リリース時点の状態を `2-3-stable` のような**安定ブランチ**として切り出す。
