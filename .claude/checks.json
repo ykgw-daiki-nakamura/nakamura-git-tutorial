@@ -1,0 +1,10 @@
+{
+  "//": "編集後に走らせる検査の宣言的な定義。on-edit-check.sh がこれを読み、編集されたファイルが glob に一致したら run を実行する。run 内の {file} は編集ファイルのパスに、コマンドはリポジトリ直下を作業ディレクトリとして実行される。依存が無い（コマンドが見つからない）場合は fail-open で作業を止めない。",
+  "onEdit": [
+    {
+      "label": "markdownlint",
+      "glob": "**/*.md",
+      "run": "node_modules/.bin/markdownlint-cli2 {file}"
+    }
+  ]
+}
