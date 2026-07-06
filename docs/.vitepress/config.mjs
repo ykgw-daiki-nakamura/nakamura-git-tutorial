@@ -65,6 +65,12 @@ export default withMermaid({
           ]
         },
         {
+          text: '私たちの開発規約',
+          items: [
+            { text: '私たちの開発規約', link: '/guide/team-conventions' }
+          ]
+        },
+        {
           text: 'チーム開発の基本フロー',
           items: [
             { text: 'ブランチとマージ', link: '/guide/branching' },
@@ -78,6 +84,7 @@ export default withMermaid({
             { text: 'GitHub Flow', link: '/guide/github-flow' },
             { text: 'Git Flow', link: '/guide/git-flow' },
             { text: 'GitLab Flow', link: '/guide/gitlab-flow' },
+            { text: 'Microsoft Release Flow', link: '/guide/release-flow' },
             { text: 'ブランチ戦略の使い分け', link: '/guide/branching-strategies' },
             { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' }
           ]
