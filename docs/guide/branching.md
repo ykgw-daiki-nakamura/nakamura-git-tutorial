@@ -87,7 +87,7 @@ git merge --no-ff feature/login
 `--no-ff` を付けると fast-forward 可能な場合でも必ずマージコミットを作ります。「どの機能ブランチがいつ統合されたか」を履歴に残せるため、チームによってはこれを標準にしています。
 :::
 
-ここで見た**ローカルの merge の形（Fast-forward / 3-way）**を踏まえると、GitHub 上で PR をマージするときの **Merge / Squash / Rebase and merge** の選び方が理解しやすくなります。その使い分けは [プルリクエストとレビュー](./pull-request) を参照してください。
+ここで見た**ローカルの merge の形（Fast-forward / 3-way）**を踏まえると、GitHub 上で PR をマージするときの **Merge commit / Squash and merge / Rebase and merge** の選び方が理解しやすくなります。その使い分けは [プルリクエストとレビュー（マージ方式の比較）](./pull-request#マージ方式の比較) を参照してください。
 
 ## マージとリベースの違い（予告）
 
