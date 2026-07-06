@@ -12,8 +12,9 @@ name: PR Title
 #   (3) permissions を contents:read に絞る、ことで排除している。
 on:
   pull_request_target:
-    # edited はタイトル編集を拾うために必須
-    types: [opened, edited, synchronize, reopened]
+    # edited はタイトル編集を拾うために必須。synchronize（コード push）は
+    # タイトルを変えないため title-only 検証では不要（実行回数を抑える）。
+    types: [opened, edited, reopened]
 
 # GITHUB_TOKEN は読み取りのみに制限（pull_request_target 既定の昇格を打ち消す）
 permissions:

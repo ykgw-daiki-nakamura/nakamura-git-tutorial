@@ -72,10 +72,13 @@ docs: ブランチ命名規則の例を追加
 
 ## プルリクエストのタイトル
 
-このリポジトリは **Squash Merge** を採用しているため、**PR タイトルがそのまま `main` のコミットメッセージ**になります。PR タイトルもコミットメッセージと同じ **Conventional Commits 形式**（`type(scope): summary`）にしてください。CI（`pr-title.yml`）が自動で検証します。
+このリポジトリは **Squash Merge** を採用しているため、**PR タイトルがそのまま `main` のコミットメッセージ**になります。PR タイトルもコミットメッセージと同じ **Conventional Commits 形式**にしてください。CI（`pr-title.yml`）が自動で検証します。
+
+形式は `type: summary`、または scope を付けて `type(scope): summary`（**`(scope)` は任意**、破壊的変更は `type!:` も可）。
 
 ```text
 feat(auth): ログイン失敗時のリトライを追加
+docs: セットアップ手順を追記
 ```
 
 ## 行動規範
