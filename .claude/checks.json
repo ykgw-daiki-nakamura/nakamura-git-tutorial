@@ -7,6 +7,16 @@
       "run": "node_modules/.bin/markdownlint-cli2 {file}"
     },
     {
+      "label": "textlint",
+      "glob": "docs/**/*.md",
+      "run": "node_modules/.bin/textlint {file}"
+    },
+    {
+      "label": "textlint",
+      "glob": "*.md",
+      "run": "node_modules/.bin/textlint {file}"
+    },
+    {
       "label": "nav-consistency",
       "glob": "docs/.vitepress/config.mjs",
       "run": "npm run docs:check-nav"
