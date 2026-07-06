@@ -89,7 +89,7 @@ if (orphans.length) {
 }
 
 if (ok) {
-  console.log('✓ nav 整合 OK: sidebar と docs/{guide,hands-on,practice} の *.md は一致しています。')
+  console.log(`✓ nav 整合 OK: sidebar と docs/{${SECTIONS.join(',')}} の *.md は一致しています。`)
   process.exit(0)
 }
 console.error('')
