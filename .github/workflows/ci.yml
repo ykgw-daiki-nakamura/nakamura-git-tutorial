@@ -54,6 +54,10 @@ jobs:
       - name: Lint Markdown
         run: npm run lint:md
 
+      # 日本語プロースの表記ゆれ・冗長表現を検証（textlint・段階導入）
+      - name: Lint Japanese prose
+        run: npm run lint:text
+
   # PR で新たに追加/更新される依存に既知の脆弱性が無いか検査する
   # （リポジトリの Dependency graph が有効である必要がある）
   dependency-review:
