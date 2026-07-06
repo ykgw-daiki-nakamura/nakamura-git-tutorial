@@ -4,7 +4,7 @@
 
 ## 土台は GitHub Flow
 
-- `main` は常にデプロイ可能な状態に保つ（`main` に入ったものは [GitHub Pages](./ci) へ自動デプロイ）。
+- `main` は常にデプロイ可能な状態に保つ（`main` に入ったものは [GitHub Pages へ継続デプロイ](./release)される）。
 - 作業は**短命な作業ブランチ**で行い、**Pull Request 経由でのみ** `main` にマージする。
 - 直接 `main` にコミット／プッシュしない。
 
