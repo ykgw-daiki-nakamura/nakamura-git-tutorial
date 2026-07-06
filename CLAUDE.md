@@ -64,7 +64,7 @@ docs/
 - `checks.json` の `onEdit` に `{ glob, run, label }` を追加すれば検査を増やせる。`run` 内の `{file}` は編集ファイルのパスに置換され、コマンドはリポジトリ直下で実行される。
 - 違反があれば `exit 2` で Claude にフィードバックされる。対応 glob が無いファイルや、検査コマンド未導入（依存なし）の場合は**作業を止めない**（fail-open）。
 - 設定を変えるだけで検査を足せるよう、ロジック（フック）とプロジェクト固有の対応表（`checks.json`）を分離している。
-- **textlint** も markdownlint と同格で `onEdit` に登録し、docs 編集時に CI（`lint:text`）と同じ検査をローカル即時実行する（対象は `docs/**/*.md` とルート直下 `*.md`。textlint 未導入環境ではコマンド不在で fail-open）。
+- **textlint** も markdownlint と同格で `onEdit` に登録し、docs 編集時に CI（`lint:text`）と同じ検査をローカル即時実行する（on-edit の対象は `docs/**/*.md`。ルート直下の `*.md` は CI の `lint:text` が担保する。textlint 未導入環境ではコマンド不在で fail-open）。
 - 構造ファイル（例: `config.mjs`）を編集したら関連ドキュメントの更新を促す `docs-sync-reminder.sh` も同様に checks.json の `docsSync`（`{ glob, remind }`）を読む。こちらは `exit 2`（ブロック）ではなく注意喚起（additionalContext）に留める。
 
 ## コミット/PR 衛生・安全ガード（guard フック）
