@@ -30,7 +30,8 @@ docs/
 ├─ hands-on/              # 実習（ハンズオン）コンテンツ
 ├─ practice/              # 実習で編集する練習用ページ（サンドボックス）
 └─ index.md               # トップページ
-.github/workflows/        # CI（ci.yml）/ Pages デプロイ（deploy.yml）/ 外部リンク検査（links.yml）
+.github/workflows/        # CI（ci.yml）/ PR タイトル検証（pr-title.yml）/ Pages デプロイ（deploy.yml）/ 外部リンク検査（links.yml）
+.github/scripts/          # ワークフローから呼ぶスクリプト（check-pr-title.sh 等）
 ```
 
 ## コンテンツ執筆の規約
@@ -97,7 +98,7 @@ PreToolUse フックで、コミットの衛生と危険操作の抑止を機械
 1. **着手前に計画を GitHub Issue にまとめる。** 数行の docs 修正など些細な変更でも例外にしない。目的・スコープ・作業計画（チェックリスト）・完了条件を書く。既存の計画 Issue があればそれを使う。**着手したら Issue に `status: in-progress` ラベルを付与し自分をアサインする**（`gh issue edit <Issue> --add-label "status: in-progress" --add-assignee @me`）。一覧で着手中を判別でき、複数人／エージェントでの二重着手を防げる。
 2. 最新の `main` からブランチを切る。接頭辞は `feat/` `fix/` `docs/` `chore/` `ci/`。
 3. 変更してコミットする（下記のコミット規約）。
-4. `git push -u origin <branch>` して Pull Request を作成する（テンプレートが自動挿入される）。**PR 本文に `Closes #<Issue>` を記載して連動 Issue にリンクする**（マージ時に GitHub が自動クローズ）。
+4. `git push -u origin <branch>` して Pull Request を作成する（テンプレートが自動挿入される）。**PR 本文に `Closes #<Issue>` を記載して連動 Issue にリンクする**（マージ時に GitHub が自動クローズ）。**PR タイトルも Conventional Commits 形式にする**（Squash Merge のためタイトルがそのまま `main` のコミットメッセージになる。`pr-title.yml` が検証）。
 5. CI が通り、レビューで承認されたらマージする。
 
 Issue / PR には GitHub テンプレートが用意されている。Issue は [.github/ISSUE_TEMPLATE/](.github/ISSUE_TEMPLATE/)（計画 Issue: `plan.md` ／ バグ報告: `bug.md`）から選ぶと、上記の「目的・スコープ・作業計画・完了条件」が雛形として入る。PR は [.github/PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) が自動挿入され、`Closes #<Issue>` 欄と提出前チェックリスト（`docs:build` / `lint:md`）が最初から並ぶ。
@@ -123,6 +124,7 @@ docs(guide): ブランチ命名規則の例を追加
 ## CI / CD とセキュリティ方針
 
 - **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint + textlint）/ `dependency-review`（依存の脆弱性検査）。
+- **pr-title.yml**（PR 時）: **PR タイトルが Conventional Commits 準拠か検証**する。Squash Merge では PR タイトルがマージコミットメッセージになるため。許可 type は `checks.json` の `commit.conventional.types`（`guard-commit.sh` と同一ソース）を `.github/scripts/check-pr-title.sh` が読む。
 - **deploy.yml**: `main` への push で GitHub Pages へ自動デプロイ。
 - **links.yml**: 週次で外部リンクの死活を検査（`--scheme http/https` で内部リンクは対象外）。
 - **issue-label-cleanup.yml**: Issue クローズ時に `status: in-progress` ラベルを自動除去（`issues: write`）。
