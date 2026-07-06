@@ -14,7 +14,7 @@
 - **エンタープライズ製品** — 顧客が特定バージョンで検証・運用しており、勝手に上げられない
 - **長期サポート (LTS)** — 「この版は 3 年間サポートします」と約束している
 
-こうした状況では、**複数のバージョン系列を同時に保守する**必要があります。そのために、リリースした系列ごとに**ずっと生き続けるブランチ**（`release-1.28`, `release-1.29` など）を用意し、それぞれにパッチを積んでいきます。これが**パターンA＝長命なリリースブランチ運用**です。
+こうした状況では、**複数のバージョン系列を同時に保守する**必要があります。そのために、リリースした系列ごとに**ずっと生き続けるブランチ**（`release/1.28`, `release/1.29` など）を用意し、それぞれにパッチを積んでいきます。これが**パターンA＝長命なリリースブランチ運用**です。
 
 ## 単一 hotfix 線との違い
 
@@ -23,7 +23,7 @@
 | | 単一 hotfix 線（release.md） | 複数保守ブランチ（本ページ） |
 | --- | --- | --- |
 | 目的 | 出荷直後の緊急修正を安全に出す | 複数バージョンを長期に並行保守 |
-| ブランチ | 必要なときに 1 本 | 系列ごとに常設（`release-1.28` / `release-1.29` …） |
+| ブランチ | 必要なときに 1 本 | 系列ごとに常設（`release/1.28` / `release/1.29` …） |
 | 寿命 | 短命（役目を終えたら畳む） | 長命（サポート期間中ずっと維持） |
 | 代表例 | 小〜中規模のプロダクト | Kubernetes / Node.js / PostgreSQL など |
 
@@ -40,37 +40,37 @@
 #    → 修正コミット abc1234 が main に入ったとする
 
 # 2. サポート中の系列へ cherry-pick する
-git switch release-1.29
+git switch release/1.29
 git cherry-pick abc1234
-git push origin release-1.29
+git push origin release/1.29
 
-git switch release-1.28
+git switch release/1.28
 git cherry-pick abc1234
-git push origin release-1.28
+git push origin release/1.28
 
 # 3. 各系列でパッチ版を切る（注釈付きタグ → Release）
-git switch release-1.29
+git switch release/1.29
 git tag -a v1.29.3 -m "リリース v1.29.3"
 git push origin v1.29.3
-gh release create v1.29.3 --generate-notes --target release-1.29
+gh release create v1.29.3 --generate-notes --target release/1.29
 ```
 
 ```mermaid
 gitGraph
     commit id: "..."
-    branch release-1.28
-    checkout release-1.28
+    branch release/1.28
+    checkout release/1.28
     commit tag: "v1.28.0"
     checkout main
     commit id: "1.29開発"
-    branch release-1.29
-    checkout release-1.29
+    branch release/1.29
+    checkout release/1.29
     commit tag: "v1.29.0"
     checkout main
     commit id: "バグ修正(main-first)" type: HIGHLIGHT
-    checkout release-1.29
+    checkout release/1.29
     commit id: "cherry-pick→1.29" tag: "v1.29.1"
-    checkout release-1.28
+    checkout release/1.28
     commit id: "cherry-pick→1.28" tag: "v1.28.1"
 ```
 
@@ -81,6 +81,10 @@ gitGraph
 ## 実際の OSS ではどうしているか
 
 長命なリリースブランチは、大規模 OSS でごく一般的な運用です。ブランチ名の付け方に各プロジェクトの個性が出ます。
+
+::: tip 本チュートリアルでの命名
+実プロジェクトのブランチ名は `release-1.29`・`v20.x`・`REL_16_STABLE` などさまざまですが、**本チュートリアルでは他ページと揃えて `release/x.y`（スラッシュ形）に統一**しています。上の自前例（`release/1.28` など）と、下の表に出てくる各 OSS の実名との違いは、この方針によるものです。
+:::
 
 | プロジェクト | ブランチ名の例 | 運用の特徴 |
 | --- | --- | --- |

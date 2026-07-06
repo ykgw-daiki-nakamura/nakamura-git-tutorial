@@ -93,6 +93,8 @@ PreToolUse フックで、コミットの衛生と危険操作の抑止を機械
 依存（`jq`/`node`/`git`）が無い環境では fail-open で作業を止めない。**ガードは正当な理由なく
 迂回しない**こと。ステージ差分からのコミット生成は `.claude/skills/commit` を使う。
 
+> **人間向けの規約ページ**: 上記の決め事は、読者向けに [docs/guide/team-conventions.md](docs/guide/team-conventions.md)（「私たちの開発規約」）にも公開している。運用ルールを変えるときは両者を同期させること。
+
 ## 開発フロー（GitHub Flow）
 
 1. **着手前に計画を GitHub Issue にまとめる。** 数行の docs 修正など些細な変更でも例外にしない。目的・スコープ・作業計画（チェックリスト）・完了条件を書く。既存の計画 Issue があればそれを使う。計画立案から Issue 化までは `.claude/skills/plan`（**実装はせず Issue 作成で止める**）を使うと手順を踏み外さない。**着手したら Issue に `status: in-progress` ラベルを付与し自分をアサインする**（`gh issue edit <Issue> --add-label "status: in-progress" --add-assignee @me`）。一覧で着手中を判別でき、複数人／エージェントでの二重着手を防げる。
