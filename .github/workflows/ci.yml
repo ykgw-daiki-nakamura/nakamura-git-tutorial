@@ -30,6 +30,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # sidebar と実ファイルの双方向整合を検証（オーファン＝sidebar 未登録／死にリンク）
+      - name: Check nav consistency
+        run: npm run docs:check-nav
+
       # ビルドが通るかを検証（内部リンク切れ・Mermaid 構文エラーなどを検知）
       - name: Build with VitePress
         run: npm run docs:build
