@@ -8,6 +8,7 @@
 | skill | 立ち位置 | いつ使う | 主な出力・副作用 |
 | --- | --- | --- | --- |
 | [worktree-task](worktree-task/SKILL.md) | **作業する** | 隔離環境で変更を実装し PR まで出したい | 計画 Issue・worktree・ブランチ・PR を作成 |
+| [issue-label](issue-label/SKILL.md) | **Issue を分類する** | Issue の内容に合ったラベルを付けたい | 実在ラベルのみ付与（`status: in-progress` は付けない） |
 | [pr-watch](pr-watch/SKILL.md) | **自分の PR を追う** | 出した 1 つの PR を監視し、レビュー対応とマージ後処理をしたい | レビュー指摘への修正 push・連動 Issue の自動クローズ検証 |
 | [pr-review-watch](pr-review-watch/SKILL.md) | **PR をレビューする** | 新規に立った PR を検知してレビューを投稿したい | PR への**レビューコメント投稿**（Bot の PR は既定で対象外） |
 | [pr-desc](pr-desc/SKILL.md) | **PR 説明を書く** | 差分と連動 Issue から `Closes #N` 付き PR 本文を生成したい | PR 説明文の生成・提示（任意で PR 作成／更新） |
