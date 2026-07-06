@@ -7,6 +7,7 @@
 
 | skill | 立ち位置 | いつ使う | 主な出力・副作用 |
 | --- | --- | --- | --- |
+| [plan](plan/SKILL.md) | **計画する** | 調査して計画を立て Issue にしておきたい（実装はまだしない） | plan.md 準拠の Issue を作成（**Issue 作成で止める**・実装しない） |
 | [worktree-task](worktree-task/SKILL.md) | **作業する** | 隔離環境で変更を実装し PR まで出したい | 計画 Issue・worktree・ブランチ・PR を作成 |
 | [pr-watch](pr-watch/SKILL.md) | **自分の PR を追う** | 出した 1 つの PR を監視し、レビュー対応とマージ後処理をしたい | レビュー指摘への修正 push・連動 Issue の自動クローズ検証 |
 | [pr-review-watch](pr-review-watch/SKILL.md) | **PR をレビューする** | 新規に立った PR を検知してレビューを投稿したい | PR への**レビューコメント投稿**（Bot の PR は既定で対象外） |
@@ -27,13 +28,18 @@
 ## 典型的な組み合わせ
 
 ```text
-worktree-task で実装 → PR 作成
+plan で調査・計画 → plan.md 準拠の Issue を作成（ここで止める）
         │
-        └─（その PR を自分で追う）→ pr-watch で監視・レビュー対応・マージ後処理
+        └→ worktree-task <Issue> で実装 → PR 作成
+                │
+                └─（その PR を自分で追う）→ pr-watch で監視・レビュー対応・マージ後処理
 
 pr-review-watch は独立して常駐し、新規 PR を検知してレビューを投稿する
 ```
 
+`plan` と `worktree-task` はどちらも計画を Issue 化するが、**`plan` は Issue 作成で止める**
+（実装しない）のに対し、`worktree-task` はそのまま**ブランチ → 実装 → PR** まで進む。
+「計画だけ固めたい」なら `plan`、「実装まで一気に」なら `worktree-task` を入り口にする。
 `worktree-task` は「Issue 化 → ブランチ → PR リンク」を手順として踏み外さないための既定経路。
 コミットを伴う作業は原則これを入り口にすると、`pr-watch` へそのまま監視を引き継げる
 （PR 作成を検知して自動移行するフックも導入済み）。

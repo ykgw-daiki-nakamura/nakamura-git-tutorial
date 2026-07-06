@@ -97,7 +97,7 @@ PreToolUse フックで、コミットの衛生と危険操作の抑止を機械
 
 ## 開発フロー（GitHub Flow）
 
-1. **着手前に計画を GitHub Issue にまとめる。** 数行の docs 修正など些細な変更でも例外にしない。目的・スコープ・作業計画（チェックリスト）・完了条件を書く。既存の計画 Issue があればそれを使う。**着手したら Issue に `status: in-progress` ラベルを付与し自分をアサインする**（`gh issue edit <Issue> --add-label "status: in-progress" --add-assignee @me`）。一覧で着手中を判別でき、複数人／エージェントでの二重着手を防げる。
+1. **着手前に計画を GitHub Issue にまとめる。** 数行の docs 修正など些細な変更でも例外にしない。目的・スコープ・作業計画（チェックリスト）・完了条件を書く。既存の計画 Issue があればそれを使う。計画立案から Issue 化までは `.claude/skills/plan`（**実装はせず Issue 作成で止める**）を使うと手順を踏み外さない。**着手したら Issue に `status: in-progress` ラベルを付与し自分をアサインする**（`gh issue edit <Issue> --add-label "status: in-progress" --add-assignee @me`）。一覧で着手中を判別でき、複数人／エージェントでの二重着手を防げる。
 2. 最新の `main` からブランチを切る。接頭辞は `feat/` `fix/` `docs/` `chore/` `ci/`。
 3. 変更してコミットする（下記のコミット規約）。
 4. `git push -u origin <branch>` して Pull Request を作成する（テンプレートが自動挿入される）。**PR 本文に `Closes #<Issue>` を記載して連動 Issue にリンクする**（マージ時に GitHub が自動クローズ）。**PR タイトルも Conventional Commits 形式にする**（Squash Merge のためタイトルがそのまま `main` のコミットメッセージになる。`pr-title.yml` が検証）。
@@ -137,4 +137,4 @@ docs(guide): ブランチ命名規則の例を追加
 
 - ファイルを編集したら、対応するチェック（`lint:md` / `docs:build`）をローカルで実行してから push する。
 - 破壊的・外向きの操作（push、PR 作成、マージ、Issue 操作）は方針に沿って慎重に行う。
-- `.claude/skills/` に補助 skill がある。役割と棲み分け（worktree-task / pr-watch / pr-review-watch）は [.claude/skills/README.md](.claude/skills/README.md) を参照。
+- `.claude/skills/` に補助 skill がある。役割と棲み分け（plan / worktree-task / pr-watch / pr-review-watch）は [.claude/skills/README.md](.claude/skills/README.md) を参照。
