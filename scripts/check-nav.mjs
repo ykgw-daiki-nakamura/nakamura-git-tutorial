@@ -21,6 +21,7 @@ const NON_CONTENT = new Set(['public'])
 const SECTIONS = readdirSync(docsDir, { withFileTypes: true })
   .filter((d) => d.isDirectory() && !d.name.startsWith('.') && !NON_CONTENT.has(d.name))
   .map((d) => d.name)
+  .sort() // readdirSync の順序差でログ・反復順が揺れないよう安定化
 
 // 1) config.mjs を解決して sidebar のリンクを集める
 // 動的 import には file:// URL を渡す（絶対パス文字列は Windows で無効な specifier になるため）
@@ -89,7 +90,7 @@ if (orphans.length) {
 }
 
 if (ok) {
-  console.log('✓ nav 整合 OK: sidebar と docs/{guide,hands-on,practice} の *.md は一致しています。')
+  console.log(`✓ nav 整合 OK: sidebar と docs/{${SECTIONS.join(',')}} の *.md は一致しています。`)
   process.exit(0)
 }
 console.error('')
