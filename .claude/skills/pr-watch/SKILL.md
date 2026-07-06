@@ -109,8 +109,22 @@ CI が pending の間は「実行中」と報告して継続監視する。
 返信本文には必ず **(1) 対応内容の要約 (2) 修正コミットの SHA (3) 末尾の署名** を含める。
 
 **未返信の検出（既読管理）**: インラインコメントのうち `in_reply_to_id == null`（＝トップレベルの指摘）
-を対象に、自分の返信（`in_reply_to_id` がその `id` を指すコメント）が無いものを「未返信」として洗い出す。
-`gh api repos/{owner}/{repo}/pulls/<PR>/comments` を取得して突き合わせると、対応漏れ・返信漏れを防げる。
+を対象に、**自分（認証ユーザー）の返信**が無いものを「未返信」として洗い出す。判定は
+「`in_reply_to_id` が当該 `id` を指す」だけでなく、**その返信の `user.login` が自分**であることも
+条件に含める（他者・レビュアーの返信を「対応済み」と誤判定しないため）。認証ユーザーは
+`gh api user -q .login` で得る。一覧取得は**既定で 1 ページ（30 件）**しか返らないため、
+コメントが多い PR での取りこぼしを防ぐよう **`--paginate` で全件走査**する:
+
+```bash
+me=$(gh api user -q .login)
+# 自分（$me）が未返信のトップレベル指摘（id / path / line）を洗い出す
+gh api --paginate repos/{owner}/{repo}/pulls/<PR>/comments --jq '.[]' \
+  | jq -s --arg me "$me" '
+      (map(select(.in_reply_to_id and .user.login == $me) | .in_reply_to_id)) as $replied
+      | map(select(.in_reply_to_id == null and ((.id) as $i | $replied | index($i) | not)))
+      | .[] | {id, path, line}'
+```
+
 `owner`/`repo` は `gh repo view --json owner,name -q '.owner.login+"/"+.name'` で得る。
 
 **署名**: PR に投稿するコメント／返信（インライン・イシューレベルとも）の本文末尾には、認証アカウントとは
