@@ -1,17 +1,17 @@
 # ブランチ戦略の使い分け
 
-[GitHub Flow](./github-flow) / [Git Flow](./git-flow) / [GitLab Flow](./gitlab-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
+[GitHub Flow](./github-flow) / [Git Flow](./git-flow) / [GitLab Flow](./gitlab-flow) / [Release Flow](./release-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
 
 ## 一覧で比較
 
-| 観点 | GitHub Flow | GitLab Flow | Git Flow |
-| --- | --- | --- | --- |
-| 常設ブランチ | `main` のみ | `main` ＋環境/リリース | `main` ＋ `develop` |
-| ブランチの種類 | 少 | 中 | 多 |
-| 学習コスト | 低 | 中 | 高 |
-| デプロイ形態 | 継続的デプロイ | 継続的〜環境昇格 | 計画的リリース |
-| 複数バージョン保守 | 苦手（release で補完） | 得意 | 得意 |
-| 向くプロダクト | Web サービス／SaaS | 環境が複数ある Web | パッケージ／モバイル／組込 |
+| 観点 | GitHub Flow | GitLab Flow | Git Flow | Release Flow |
+| --- | --- | --- | --- | --- |
+| 常設ブランチ | `main` のみ | `main` ＋環境/リリース | `main` ＋ `develop` | `main` ＋長命 `release` |
+| ブランチの種類 | 少 | 中 | 多 | 中 |
+| 学習コスト | 低 | 中 | 高 | 中 |
+| デプロイ形態 | 継続的デプロイ | 継続的〜環境昇格 | 計画的リリース | スプリント単位のリリース |
+| 複数バージョン保守 | 苦手（release で補完） | 得意 | 得意 | 得意（main-first + cherry-pick） |
+| 向くプロダクト | Web サービス／SaaS | 環境が複数ある Web | パッケージ／モバイル／組込 | 大規模チーム／定期リリース |
 
 ## 判断フローチャート
 
@@ -23,6 +23,7 @@ flowchart TD
     C -->|いいえ<br/>main→即デプロイ| E["GitHub Flow"]
     C -->|はい<br/>staging/production| F["GitLab Flow<br/>(環境ブランチ)"]
     D -->|はい<br/>バージョン番号を明示| G["Git Flow"]
+    D -->|スプリント単位で定期リリース<br/>大規模チーム| I["Release Flow"]
     D -->|ゆるやか<br/>安定ブランチで十分| H["GitLab Flow<br/>(リリースブランチ)"]
 ```
 
@@ -40,6 +41,10 @@ flowchart TD
 
 **推奨: [Git Flow](./git-flow) または [GitLab Flow](./gitlab-flow)（リリースブランチ）**。複数バージョンを並行して保守でき、`release` / 安定ブランチと `hotfix` で計画的なリリースと緊急修正を両立できます。実際の運用例は [複数バージョンの保守（リリースブランチ）](./release-branches) を参照。
 
+### 大規模チームで定期リリースしつつ複数版を保守する
+
+**推奨: [Release Flow](./release-flow)**。GitHub Flow を土台に、リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。命名規則やブランチフォルダ強制で大人数の運用を機械的に揃えたいチームに向きます。
+
 ## 迷ったら小さく始める
 
 最初から複雑な戦略を選ぶ必要はありません。**まず GitHub Flow で始め**、次のような「痛み」が出てきてから段階的に足すのが安全です。
@@ -55,5 +60,6 @@ flowchart TD
 - [GitHub Flow](./github-flow)
 - [Git Flow](./git-flow)
 - [GitLab Flow](./gitlab-flow)
+- [Microsoft Release Flow](./release-flow)
 - [複数バージョンの保守（リリースブランチ）](./release-branches)
 - [リリースとバージョン管理](./release)
