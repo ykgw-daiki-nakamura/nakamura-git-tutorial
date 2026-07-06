@@ -62,7 +62,7 @@ gitGraph
 # 1. まず main で修正して PR マージ（mainline を先に直す）
 # 2. その修正コミットを release ブランチへ移植
 git switch release/20
-git cherry-pick <main で入れた修正のコミット>
+git cherry-pick COMMIT_SHA   # main に入れた修正コミットの SHA に置き換える
 git push origin release/20
 ```
 
