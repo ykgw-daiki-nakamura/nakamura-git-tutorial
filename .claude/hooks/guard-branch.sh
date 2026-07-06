@@ -23,24 +23,33 @@ extract_command() {
 }
 cmd=$(extract_command)
 
-# git commit / git push 以外は対象外
+# git commit / git push 以外は対象外。
+# `git -C <dir> commit` のように git とサブコマンドの間に -C オプションが入る形も検出する
+# （従来の単純な "git commit" 部分一致では -C 付きを取りこぼし、保護が素通りしていた）。
 op=""
-case "$cmd" in
-  *"git commit"*) op="commit" ;;
-  *"git push"*)   op="push" ;;
-  *) exit 0 ;;
-esac
+gitpfx='git([[:space:]]+-C[[:space:]]+("[^"]*"|'\''[^'\'']*'\''|[^[:space:]]+))?'
+if   [[ "$cmd" =~ ${gitpfx}[[:space:]]+commit([[:space:]]|$) ]]; then op="commit"
+elif [[ "$cmd" =~ ${gitpfx}[[:space:]]+push([[:space:]]|$) ]];   then op="push"
+else exit 0
+fi
 
 # コミット/プッシュの対象ディレクトリを推定する。
 # worktree 運用では実際の作業ブランチは対象 worktree 側にあり、$proj（メイン作業
 # ツリー）は常に main のことが多い。コマンド中の `git -C <dir>` または先頭付近の
 # `cd <dir>` を優先して解決し、見つからなければ $proj にフォールバックする。
+# 引用符（" / '）で囲まれた空白入りパスも取りこぼさないよう、引用の有無ごとに判定する。
 target="$proj"
-if [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+\"?([^\"[:space:]]+) ]]; then
-  target="${BASH_REMATCH[1]}"
-elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+\"?([^\"[:space:]\;\&\|]+) ]]; then
-  target="${BASH_REMATCH[2]}"
+if   [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+\"([^\"]+)\" ]]; then target="${BASH_REMATCH[1]}"
+elif [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+\'([^\']+)\' ]]; then target="${BASH_REMATCH[1]}"
+elif [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+([^[:space:]]+) ]]; then target="${BASH_REMATCH[1]}"
+elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+\"([^\"]+)\" ]]; then target="${BASH_REMATCH[2]}"
+elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+\'([^\']+)\' ]]; then target="${BASH_REMATCH[2]}"
+elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+([^[:space:]\;\&\|]+) ]]; then target="${BASH_REMATCH[2]}"
 fi
+
+# 解決した対象が git 作業ツリーでなければ $proj にフォールバックする。
+# （抽出ミスや存在しないパスで保護判定がスキップされるのを防ぐ。真の非 git は後段で fail-open）
+git -C "$target" rev-parse --is-inside-work-tree >/dev/null 2>&1 || target="$proj"
 
 # 現在ブランチ（detached HEAD や非 git は fail-open）
 branch=$(git -C "$target" rev-parse --abbrev-ref HEAD 2>/dev/null) || exit 0

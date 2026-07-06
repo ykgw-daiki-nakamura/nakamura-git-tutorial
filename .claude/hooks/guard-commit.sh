@@ -25,11 +25,11 @@ extract_command() {
 }
 cmd=$(extract_command)
 
-# `git commit` 以外は対象外
-case "$cmd" in
-  *"git commit"*) ;;
-  *) exit 0 ;;
-esac
+# `git commit` 以外は対象外。
+# `git -C <dir> commit` のように git とサブコマンドの間に -C オプションが入る形も対象にする
+# （従来の "git commit" 部分一致では -C 付きを取りこぼし、メッセージ検証がスキップされていた）。
+gitpfx='git([[:space:]]+-C[[:space:]]+("[^"]*"|'\''[^'\'']*'\''|[^[:space:]]+))?'
+[[ "$cmd" =~ ${gitpfx}[[:space:]]+commit([[:space:]]|$) ]] || exit 0
 
 # 最初の -m / --message の値を取り出す。-am のような短縮オプション束（末尾が m）も対象にする。
 # 無ければ（エディタ起動や -F 等）検証不能 → fail-open。--amend 等は m の直後に区切りが
