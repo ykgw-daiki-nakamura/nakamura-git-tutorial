@@ -1,10 +1,10 @@
 # ブランチ戦略の使い分け
 
-[GitHub Flow](./github-flow) / [Git Flow](./git-flow) / [GitLab Flow](./gitlab-flow) / [Release Flow](./release-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
+[GitHub Flow](./github-flow) / [Git Flow](./git-flow) / [GitLab Flow](./gitlab-flow) / [Microsoft Release Flow](./release-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
 
 ## 一覧で比較
 
-| 観点 | GitHub Flow | GitLab Flow | Git Flow | Release Flow |
+| 観点 | GitHub Flow | GitLab Flow | Git Flow | Microsoft Release Flow |
 | --- | --- | --- | --- | --- |
 | 常設ブランチ | `main` のみ | `main` ＋環境/リリース | `main` ＋ `develop` | `main` ＋長命 `release` |
 | ブランチの種類 | 少 | 中 | 多 | 中 |
@@ -23,7 +23,7 @@ flowchart TD
     C -->|いいえ<br/>main→即デプロイ| E["GitHub Flow"]
     C -->|はい<br/>staging/production| F["GitLab Flow<br/>(環境ブランチ)"]
     D -->|はい<br/>バージョン番号を明示| G["Git Flow"]
-    D -->|スプリント単位で定期リリース<br/>大規模チーム| I["Release Flow"]
+    D -->|スプリント単位で定期リリース<br/>大規模チーム| I["Microsoft<br/>Release Flow"]
     D -->|ゆるやか<br/>安定ブランチで十分| H["GitLab Flow<br/>(リリースブランチ)"]
 ```
 
@@ -43,7 +43,7 @@ flowchart TD
 
 ### 大規模チームで定期リリースしつつ複数版を保守する
 
-**推奨: [Release Flow](./release-flow)**。GitHub Flow を土台に、リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。命名規則やブランチフォルダ強制で大人数の運用を機械的に揃えたいチームに向きます。
+**推奨: [Microsoft Release Flow](./release-flow)**。GitHub Flow を土台に、リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。命名規則やブランチフォルダ強制で大人数の運用を機械的に揃えたいチームに向きます。
 
 ## 迷ったら小さく始める
 
