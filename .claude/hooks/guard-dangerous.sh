@@ -26,6 +26,12 @@ extract_command() {
 cmd=$(extract_command)
 [ -n "$cmd" ] || exit 0
 
+# 種別判定用スケルトン（ヒアドキュメント本文・引用符内・コメントを除去した文字列）。
+# docs / skills / Issue 本文に書かれた危険コマンド文字列の誤ヒットを防ぐ。危険判定は skel に、
+# ブランチ抽出・allowlist 照合は原文に対して行う。得られない場合は原文にフォールバック（安全側）。
+skel=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" 2>/dev/null)
+[ -n "$skel" ] || skel="$cmd"
+
 # ERE メタ文字をエスケープ（checks.json 由来のブランチ名を正規表現に埋める前に使う）
 ere_escape() { printf '%s' "$1" | sed 's/[][(){}.^$*+?|\\]/\\&/g'; }
 
@@ -57,16 +63,16 @@ block() { # $1 理由, $2 代替
 
 # 1) ルート/ホーム近傍の再帰削除
 # フラグは大小無視（-R は -r と等価、-F も同様）。末尾スラッシュ（/, ~/, $HOME/）も対象にする。
-if printf '%s' "$cmd" | grep -Eqi '\brm\b[^|;&]*(-[a-z]*r[a-z]*f|-[a-z]*f[a-z]*r|-r[a-z]*[[:space:]]+-f|-f[a-z]*[[:space:]]+-r)'; then
-  if printf '%s' "$cmd" | grep -Eq '(^|[[:space:]])(/|~|\$HOME|\$\{HOME\})/?(\*)?([[:space:]]|$)' \
-     || printf '%s' "$cmd" | grep -Eq -- '--no-preserve-root'; then
+if printf '%s' "$skel" | grep -Eqi '\brm\b[^|;&]*(-[a-z]*r[a-z]*f|-[a-z]*f[a-z]*r|-r[a-z]*[[:space:]]+-f|-f[a-z]*[[:space:]]+-r)'; then
+  if printf '%s' "$skel" | grep -Eq '(^|[[:space:]])(/|~|\$HOME|\$\{HOME\})/?(\*)?([[:space:]]|$)' \
+     || printf '%s' "$skel" | grep -Eq -- '--no-preserve-root'; then
     block "ルート/ホーム近傍の再帰削除" "対象を具体的なサブディレクトリに限定する（例: rm -rf ./build）"
   fi
 fi
 
 # 2) 保護ブランチへの force push
-if printf '%s' "$cmd" | grep -Eq '\bgit[[:space:]]+push\b' \
-   && printf '%s' "$cmd" | grep -Eq -- '(--force([[:space:]]|=|$)|--force-with-lease|[[:space:]]-f([[:space:]]|$))'; then
+if printf '%s' "$skel" | grep -Eq '\bgit[[:space:]]+push\b' \
+   && printf '%s' "$skel" | grep -Eq -- '(--force([[:space:]]|=|$)|--force-with-lease|[[:space:]]-f([[:space:]]|$))'; then
   # 保護ブランチ一覧（checks.json、無ければ main）
   protected=""
   if [ -f "$checks" ]; then
@@ -106,12 +112,12 @@ EOF
 fi
 
 # 3) 未検証スクリプトのパイプ実行（curl|wget ... | bash|sh）
-if printf '%s' "$cmd" | grep -Eq '\b(curl|wget)\b[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(bash|sh|zsh|dash)\b'; then
+if printf '%s' "$skel" | grep -Eq '\b(curl|wget)\b[^|]*\|[[:space:]]*(sudo[[:space:]]+)?(bash|sh|zsh|dash)\b'; then
   block "ダウンロードしたスクリプトの直接実行（curl/wget | shell）" "一度ファイルに保存し内容を確認してから実行してください"
 fi
 
 # 4) git reset --hard（未コミット変更があり失われる場合のみ）
-if printf '%s' "$cmd" | grep -Eq '\bgit[[:space:]]+reset\b[^|;&]*--hard\b'; then
+if printf '%s' "$skel" | grep -Eq '\bgit[[:space:]]+reset\b[^|;&]*--hard\b'; then
   if [ -n "$(git -C "$proj" status --porcelain 2>/dev/null)" ]; then
     block "未コミット変更がある状態での git reset --hard（変更が失われます）" "必要な変更を git stash / commit で退避してから実行してください"
   fi
