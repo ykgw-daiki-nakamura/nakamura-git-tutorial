@@ -1,0 +1,41 @@
+name: PR Label
+
+# PR タイトルの Conventional Commits type（feat/fix/docs…）から対応ラベルを自動付与する。
+# 対応表は .claude/checks.json の issueLabels.types（issue-label skill と単一ソース）。
+#
+# pull_request_target を使う理由（pr-title.yml と同じ方針）:
+#   ラベル付与には pull-requests: write が必要。フォーク PR が head 側のスクリプトや checks.json を
+#   書き換えて write トークンを悪用できないよう、検証ロジックは base（信頼できる）側から評価する。
+#   - PR head のコードは一切チェックアウト・実行しない（base の sha のみ checkout）
+#   - タイトル・番号は event payload の「データ」を env 経由で読むだけ
+#   - permissions は必要最小（contents: read ＋ pull-requests: write）
+on:
+  pull_request_target:
+    # edited でタイトル変更にも追従（type を後から直したケースを拾う）
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-label-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  label-by-type:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # base（PR のマージ先）の信頼できるツリーを checkout（PR head は実行しない）
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+
+      - name: Label PR by Conventional Commits type
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/label-pr-by-type.sh

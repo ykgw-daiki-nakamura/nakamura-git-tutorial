@@ -127,6 +127,7 @@ docs(guide): ブランチ命名規則の例を追加
 
 - **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint + textlint）/ `dependency-review`（依存の脆弱性検査）。
 - **pr-title.yml**（PR 時）: **PR タイトルが Conventional Commits 準拠か検証**する。Squash Merge では PR タイトルがマージコミットメッセージになるため。許可 type は `checks.json` の `commit.conventional.types`（`guard-commit.sh` と同一ソース）を `.github/scripts/check-pr-title.sh` が読む。
+- **pr-label.yml**（PR 時）: **PR タイトルの type に応じてラベルを自動付与**する（`feat`→enhancement 等）。対応表は `checks.json` の `issueLabels.types`（`issue-label` skill と同一ソース）を `.github/scripts/label-pr-by-type.sh` が読む。未対応 type はスキップ。`pull-requests: write` が要るため pr-title と同じく base 側で評価する（`pull_request_target`）。
 - **deploy.yml**: `main` への push で GitHub Pages へ自動デプロイ。
 - **links.yml**: 週次で外部リンクの死活を検査（`--scheme http/https` で内部リンクは対象外）。
 - **issue-label-cleanup.yml**: Issue クローズ時に `status: in-progress` ラベルを自動除去（`issues: write`）。
