@@ -8,18 +8,23 @@
 // 機械的な検査に置き換える。config.mjs は動的 import して解決済みの sidebar を走査する
 // （正規表現パースではなく実データを見るため堅牢）。
 import { readdirSync, existsSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(here, '..')
 const docsDir = resolve(repoRoot, 'docs')
 
-// sidebar 登録の対象とするコンテンツ領域（フラット構成）
-const SECTIONS = ['guide', 'hands-on', 'practice']
+// sidebar 登録の対象とするコンテンツ領域は docs/ 直下のサブディレクトリから動的に導出する
+// （`.vitepress` や `public` などの非コンテンツは除外）。新領域を足しても検査対象に入る。
+const NON_CONTENT = new Set(['public'])
+const SECTIONS = readdirSync(docsDir, { withFileTypes: true })
+  .filter((d) => d.isDirectory() && !d.name.startsWith('.') && !NON_CONTENT.has(d.name))
+  .map((d) => d.name)
 
 // 1) config.mjs を解決して sidebar のリンクを集める
-const mod = await import(resolve(docsDir, '.vitepress/config.mjs'))
+// 動的 import には file:// URL を渡す（絶対パス文字列は Windows で無効な specifier になるため）
+const mod = await import(pathToFileURL(resolve(docsDir, '.vitepress/config.mjs')).href)
 const config = await mod.default // withMermaid の戻り（オブジェクト/Promise 両対応）
 const sidebar = config?.themeConfig?.sidebar ?? {}
 
@@ -66,7 +71,10 @@ for (const section of SECTIONS) {
   }
 }
 
-// 4) レポート
+// 4) レポート（出力順を安定させるためソートしてから表示する）
+deadLinks.sort((a, b) => a.file.localeCompare(b.file))
+orphans.sort((a, b) => a.localeCompare(b))
+
 let ok = true
 if (deadLinks.length) {
   ok = false
