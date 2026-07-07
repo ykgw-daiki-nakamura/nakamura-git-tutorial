@@ -66,12 +66,6 @@ export default withMermaid({
           ]
         },
         {
-          text: '私たちの開発規約',
-          items: [
-            { text: '私たちの開発規約', link: '/guide/team-conventions' }
-          ]
-        },
-        {
           text: 'チーム開発の基本フロー',
           items: [
             { text: 'ブランチとマージ', link: '/guide/branching' },
