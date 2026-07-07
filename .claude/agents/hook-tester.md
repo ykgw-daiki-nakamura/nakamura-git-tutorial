@@ -21,7 +21,7 @@ model: sonnet
 ## 進め方
 
 1. まず既存の回帰テストを実行する: `bash .claude/hooks/lib/guard-noise.test.sh`（PASS/FAIL を確認）。
-2. 追加観点は、`tool_input.command` を持つ JSON を作ってガードに標準入力で与え、exit コードを検証する（0=許可 / 2=阻止）。**テスト文字列に含む `git push` / `rm -rf` 等のリテラルは、実行中のガード自身に誤ブロックされ得るので、変数分解やファイル経由で組み立てる**（`G="git"; "$G" push …` のように）。cmd-skeleton の挙動は `printf '%s' "$cmd" | node .claude/hooks/lib/cmd-skeleton.js [--danger]` で単体確認できる。
+2. 追加観点は、`tool_input.command` を持つ JSON を作ってガードに標準入力で与え、exit コードを検証する（0=許可 / 2=阻止）。**テスト文字列に含む `git push` / `rm -rf` 等のリテラルは、実行中のガード自身に誤ブロックされ得るので、変数分解やファイル経由で組み立てる**（`G="git"; "$G" push …` のように）。cmd-skeleton の挙動は `printf '%s' "$cmd" | node .claude/hooks/lib/cmd-skeleton.js` で単体確認できる（guard-dangerous 相当の挙動を見るときは末尾に `--danger` を付ける）。
 3. 保護ブランチ上の実操作を試す場合は、一時 git リポジトリ（`git init -b main`）を作り `git -C <tmp>` を対象にする（メイン作業ツリーを汚さない）。
 4. 出力は「実行した回帰テストの結果」「新規に見つけた過剰ブロック/すり抜け（再現手順つき）」「リスク評価と推奨修正」を重要度順に。
 
