@@ -27,8 +27,14 @@ extract_command() {
 cmd=$(extract_command)
 [ -n "$cmd" ] || exit 0
 
+# 種別判定は skeleton（ヒアドキュメント本文・引用符内・コメントを除去）に対して行い、docs / skills /
+# Issue 本文に書かれた "git push" 等の文字列で誤警告しないようにする（既存 guard と同じ作法）。
+# node が無ければ原文にフォールバック。
+skel=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" 2>/dev/null)
+[ -n "$skel" ] || skel="$cmd"
+
 # 対象は push 系 / PR 作成のみ
-printf '%s' "$cmd" | grep -Eq '\bgit[[:space:]]+push\b|\bgh[[:space:]]+pr[[:space:]]+create\b' || exit 0
+printf '%s' "$skel" | grep -Eq '\bgit[[:space:]]+push\b|\bgh[[:space:]]+pr[[:space:]]+create\b' || exit 0
 
 cd "$proj" 2>/dev/null || exit 0
 
@@ -36,11 +42,18 @@ cd "$proj" 2>/dev/null || exit 0
 maxLines=400
 skip_res=""
 allow_res=""
-if [ -f "$checks" ] && command -v jq >/dev/null 2>&1; then
-  v=$(jq -r '.guard.diffSize.maxLines // empty' "$checks" 2>/dev/null || true)
-  [ -n "$v" ] && maxLines="$v"
-  skip_res=$(jq -r '(.guard.diffSize.skipPaths // []) | .[]' "$checks" 2>/dev/null || true)
-  allow_res=$(jq -r '(.guard.diffSize.allow // []) | .[]' "$checks" 2>/dev/null || true)
+if [ -f "$checks" ]; then
+  if command -v jq >/dev/null 2>&1; then
+    v=$(jq -r '.guard.diffSize.maxLines // empty' "$checks" 2>/dev/null || true)
+    [ -n "$v" ] && maxLines="$v"
+    skip_res=$(jq -r '(.guard.diffSize.skipPaths // []) | .[]' "$checks" 2>/dev/null || true)
+    allow_res=$(jq -r '(.guard.diffSize.allow // []) | .[]' "$checks" 2>/dev/null || true)
+  elif command -v node >/dev/null 2>&1; then
+    v=$(CHECKS="$checks" node -e 'try{const m=JSON.parse(require("fs").readFileSync(process.env.CHECKS,"utf8")).guard?.diffSize?.maxLines;if(m!=null)process.stdout.write(String(m))}catch(e){}')
+    [ -n "$v" ] && maxLines="$v"
+    skip_res=$(CHECKS="$checks" node -e 'try{((JSON.parse(require("fs").readFileSync(process.env.CHECKS,"utf8")).guard?.diffSize?.skipPaths)||[]).forEach(x=>console.log(x))}catch(e){}')
+    allow_res=$(CHECKS="$checks" node -e 'try{((JSON.parse(require("fs").readFileSync(process.env.CHECKS,"utf8")).guard?.diffSize?.allow)||[]).forEach(x=>console.log(x))}catch(e){}')
+  fi
 fi
 
 # allow に一致するコマンドは対象外
@@ -58,10 +71,11 @@ mb=$(git merge-base "$base" HEAD 2>/dev/null) || exit 0
 [ -n "$mb" ] || exit 0
 
 skips=$(printf '%s' "$skip_res" | tr '\n' '\036')  # awk へ RS 区切りで渡す
-total=$(git diff --numstat "$mb"...HEAD 2>/dev/null | awk -v skips="$skips" '
+total=$(git diff --numstat "$mb"...HEAD 2>/dev/null | awk -F '\t' -v skips="$skips" '
   BEGIN { n = split(skips, S, "\036") }
   {
-    a = $1; d = $2; p = $3
+    a = $1; d = $2; p = $3         # numstat はタブ区切り。FS=タブでパスにスペースがあっても壊れない
+
     if (a == "-") next                       # バイナリは行数集計しない
     for (i = 1; i <= n; i++) { if (S[i] != "" && index(p, S[i]) == 1) next }  # skipPaths(接頭辞)除外
     sum += a + d
