@@ -59,7 +59,7 @@ docs/
 
 ## 編集後チェック（checks.json 駆動フック）
 
-「どのファイルを編集したら何を検査するか」を [.claude/checks.json](.claude/checks.json) に宣言的にまとめ、汎用 PostToolUse フック `.claude/hooks/on-edit-check.sh` がそれを読んで該当コマンドを実行する（例: `.md` 編集 → markdownlint / textlint）。
+「どのファイルを編集したら何を検査するか」を [.claude/checks.json](.claude/checks.json) に宣言的にまとめ、汎用 PostToolUse フック `.claude/hooks/on-edit-check.sh` がそれを読んで該当コマンドを実行する（例: `.md` 編集 → markdownlint、`docs/**/*.md` 編集 → textlint も）。
 
 - `checks.json` の `onEdit` に `{ glob, run, label }` を追加すれば検査を増やせる。`run` 内の `{file}` は編集ファイルのパスに置換され、コマンドはリポジトリ直下で実行される。
 - 違反があれば `exit 2` で Claude にフィードバックされる。対応 glob が無いファイルや、検査コマンド未導入（依存なし）の場合は**作業を止めない**（fail-open）。
@@ -99,7 +99,13 @@ PreToolUse フックで、コミットの衛生と危険操作の抑止を機械
 **ヒアドキュメント本文・引用符内・コメントを除去**した「スケルトン」を作り、それに対して判定する。
 これにより、docs / skills / Issue 本文に書いた `git push` / `git commit` / `rm -rf /` などの**文字列**
 （＝実行されないコマンド）を実コマンドと誤判定して過剰ブロックするのを防ぐ（値・パス・ブランチの抽出は
-原文から行う）。回帰テストは [.claude/hooks/lib/guard-noise.test.sh](.claude/hooks/lib/guard-noise.test.sh)。
+原文から行う）。
+
+また `guard-branch` / `guard-secrets` は、**実際に操作が走る作業ツリー**を [.claude/hooks/lib/target-dir.sh](.claude/hooks/lib/target-dir.sh)
+（コマンド中の `git -C <dir>` / `cd <dir>` を解決）で判定する。これにより `worktree-task` の worktree 上の
+作業ブランチでの commit / push を「main 上の直接操作」と誤ブロックせず、guard-secrets も対象 worktree の
+index を走査してシークレットを取りこぼさない（`$proj` 固定＝メイン作業ツリー基準による誤判定を防ぐ）。
+回帰テストは [.claude/hooks/lib/guard-noise.test.sh](.claude/hooks/lib/guard-noise.test.sh)（worktree ケース含む）。
 
 配線は [.claude/settings.json](.claude/settings.json) の `hooks.PreToolUse`。type 一覧・保護ブランチ名・
 除外パターンは `checks.json` を編集するだけで変えられる（ロジックと設定の分離）。いずれのガードも

@@ -35,11 +35,16 @@ if command -v node >/dev/null 2>&1; then
   [ -n "$_s" ] && skel="$_s"
 fi
 
-# git add / git commit 以外は対象外（種別判定はスケルトンに対して行う）
-case "$skel" in
-  *"git add"*|*"git commit"*) ;;
-  *) exit 0 ;;
-esac
+# git add / git commit 以外は対象外（種別判定はスケルトンに対して行う）。
+# `git -C <dir> add|commit` のように git とサブコマンドの間に -C が入る形も検出する
+# （単純な "git commit" 部分一致では worktree 運用の -C 付きを取りこぼしていた）。
+gitpfx='git([[:space:]]+-C[[:space:]]+("[^"]*"|'\''[^'\'']*'\''|[^[:space:]]+))?'
+[[ "$skel" =~ ${gitpfx}[[:space:]]+(add|commit)([[:space:]]|$) ]] || exit 0
+
+# 実際に操作が走る作業ツリー（worktree 対応）を解決する。$proj 固定だと worktree の
+# index を見ずシークレットを取りこぼすため、コマンド中の git -C / cd の対象を優先する。
+. "$(dirname "${BASH_SOURCE[0]}")/lib/target-dir.sh"
+target=$(resolve_target_dir "$cmd" "$proj")
 
 # 除外（allowlist）正規表現と走査除外パス（skipPaths）を checks.json から取得
 allow_res=""; skip_res=""
@@ -138,29 +143,30 @@ $hit
 EOF
 }
 
-if printf '%s' "$cmd" | grep -Eq '\bgit[[:space:]]+commit\b'; then
-  # ステージ済みファイルを1件ずつ走査（skipPaths（既定 docs/）配下は教材として対象外）
+if [[ "$skel" =~ ${gitpfx}[[:space:]]+commit([[:space:]]|$) ]]; then
+  # ステージ済みファイルを1件ずつ走査（skipPaths（既定 docs/）配下は教材として対象外）。
+  # 対象は $target（worktree 対応）の index。$proj 固定だと worktree コミットを取りこぼす。
   while IFS= read -r f; do
     [ -n "$f" ] || continue
     is_skip_path "$f" && continue
     if sensitive_name "$f" && ! is_allowed "$f"; then
       block "秘匿ファイルのコミット" "$f"
     fi
-    added=$(git -C "$proj" diff --cached -U0 -- "$f" 2>/dev/null | grep -E '^\+' | grep -Ev '^\+\+\+')
+    added=$(git -C "$target" diff --cached -U0 -- "$f" 2>/dev/null | grep -E '^\+' | grep -Ev '^\+\+\+')
     report_content "ステージ: $f" "$added"
-  done < <(git -C "$proj" diff --cached --name-only 2>/dev/null)
+  done < <(git -C "$target" diff --cached --name-only 2>/dev/null)
 fi
 
-if printf '%s' "$cmd" | grep -Eq '\bgit[[:space:]]+add\b'; then
-  # `git add` の後ろのパス引数（フラグ・オプションは除外）を走査
-  args=$(printf '%s' "$cmd" | sed -E 's/.*\bgit[[:space:]]+add\b//')
+if [[ "$skel" =~ ${gitpfx}[[:space:]]+add([[:space:]]|$) ]]; then
+  # `git add`（`git -C <dir> add` 含む）の後ろのパス引数（フラグ・オプションは除外）を走査
+  args=$(printf '%s' "$cmd" | sed -E 's/.*\bgit([[:space:]]+-C[[:space:]]+("[^"]*"|'\''[^'\'']*'\''|[^[:space:]]+))?[[:space:]]+add\b//')
   for tok in $args; do
     case "$tok" in
       -*) continue ;;        # フラグ
       .|--all|-A) continue ;; # 列挙不能（commit 時に走査）
     esac
     is_skip_path "$tok" && continue   # docs 等の教材は対象外
-    path="$proj/$tok"
+    path="$target/$tok"
     [ -f "$path" ] || path="$tok"
     [ -f "$path" ] || continue
     if sensitive_name "$tok" && ! is_allowed "$tok"; then
