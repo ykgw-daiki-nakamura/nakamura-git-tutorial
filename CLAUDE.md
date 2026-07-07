@@ -148,7 +148,7 @@ docs(guide): ブランチ命名規則の例を追加
 - **pr-label.yml**（PR 時）: **PR タイトルの type に応じてラベルを自動付与**する（`feat`→`type: feat` 等）。対応表は `checks.json` の `issueLabels.types`（`issue-label` skill と同一ソース）を `.github/scripts/label-pr-by-type.sh` が読む。対応表に無い type はスキップ。`type: *` ラベルの実体は [scripts/sync-labels.sh](scripts/sync-labels.sh) で用意する（`checks.json` の `commit.conventional.types` を情報源に冪等作成）。`pull-requests: write` が要るため pr-title と同じく base 側で評価する（`pull_request_target`）。
 - **deploy.yml**: `main` への push で GitHub Pages へ自動デプロイ。
 - **links.yml**: 週次で外部リンクの死活を検査（`--scheme http/https` で内部リンクは対象外）。
-- **pr-links.yml**（`.md` 変更 PR 時）: lychee で **PR 時に外部リンク切れを即検査**（`docs/**/*.md`＋ルート `*.md`、外部スキームのみ）。週次 `links.yml` と同じ lychee-action・`.lycheeignore` を共有し、マージ前フィードバックを担う。内部/相対リンクは `docs:build` が担保。
+- **pr-links.yml**（`.md` 変更 PR 時）: lychee で **PR 時に外部リンク切れを可視化**（`docs/**/*.md`＋ルート `*.md`、外部スキームのみ）。週次 `links.yml` と同じ lychee-action・`.lycheeignore` を共有。外部リンク検査は flaky なため **`fail: false` の非ブロッキング**（PR ゲートにはしない方針を links.yml と共通化）。結果はジョブサマリに出て早期フィードバックになる。内部/相対リンクは `docs:build` が担保。
 - **issue-label-cleanup.yml**: Issue クローズ時に `status: in-progress` ラベルを自動除去（`issues: write`）。
 - **GitHub Actions は必ず commit SHA でピン留めし、`# vX.Y.Z` のバージョンコメントを添える**（Dependabot が更新）。
 - ワークフローは**最小権限**（`permissions: contents: read` を既定）とし、`persist-credentials: false`、job には `timeout-minutes` を設定する。

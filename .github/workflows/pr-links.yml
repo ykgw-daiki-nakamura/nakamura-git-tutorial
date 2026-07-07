@@ -25,14 +25,20 @@ jobs:
 
       # 検査対象は固定 glob（変更ファイル名を式へ展開せず、インジェクション経路を作らない）。
       # 外部スキームのみ検査し、内部/相対リンクは対象外（docs:build が担保）。
+      # links.yml と同じく **非ブロッキング**（fail: false）+ リトライ。外部リンク検査は
+      # ネットワーク/レート制限で不安定なため PR を落とさず、結果はジョブサマリに可視化して
+      # 切れリンクの早期フィードバックを得る（PR ゲートにはしない方針を踏襲）。
       - name: Check external links (lychee)
         uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
         with:
           args: >-
             --no-progress
+            --max-retries 3
+            --retry-wait-time 2
+            --timeout 20
             --scheme https --scheme http
             './docs/**/*.md' './*.md'
-          fail: true
+          fail: false
         env:
           # GitHub リンクのレート制限回避（読み取りのみ）
           GITHUB_TOKEN: ${{ github.token }}
