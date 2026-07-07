@@ -7,6 +7,11 @@
       "run": "node_modules/.bin/markdownlint-cli2 {file}"
     },
     {
+      "label": "textlint",
+      "glob": "docs/**/*.md",
+      "run": "node_modules/.bin/textlint {file}"
+    },
+    {
       "label": "nav-consistency",
       "glob": "docs/.vitepress/config.mjs",
       "run": "npm run docs:check-nav"
@@ -43,7 +48,7 @@
     ],
     "triage": ["question", "good first issue", "help wanted"]
   },
-  "//guard": "guard-dangerous.sh / guard-secrets.sh の除外設定。allow は正規表現の配列で、一致したコマンド（dangerous）または該当行/ファイル名（secrets）は阻止せず通す（誤検知の逃がし弁）。secrets.skipPaths は走査対象外にするパス接頭辞（既定 docs/：本リポは .env/API キーを題材にする教材のため）。",
+  "//guard": "guard-dangerous.sh / guard-secrets.sh / guard-diffsize.sh の設定。allow は正規表現の配列で、一致したコマンド（dangerous/diffSize）または該当行/ファイル名（secrets）は対象外にする。secrets.skipPaths は走査対象外にするパス接頭辞（既定 docs/：本リポは .env/API キーを題材にする教材のため）。diffSize は push/PR 作成前の差分行数の注意喚起（maxLines 既定 400・非ブロッキング）で、skipPaths（パス接頭辞）は行数集計から除外する。",
   "guard": {
     "dangerous": {
       "allow": []
@@ -51,6 +56,11 @@
     "secrets": {
       "allow": [],
       "skipPaths": ["docs/"]
+    },
+    "diffSize": {
+      "maxLines": 400,
+      "skipPaths": ["package-lock.json", "dist/", "build/"],
+      "allow": []
     }
   },
   "//docsSync": "docs-sync-reminder.sh が読む対応表。構造ファイル（glob）を編集したら remind の文言で関連ドキュメントの更新を促す（非ブロッキングの注意喚起）。",

@@ -8,6 +8,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "docs:check-nav": "node scripts/check-nav.mjs",
+    "check:config": "node scripts/check-config-consistency.mjs",
     "lint:md": "markdownlint-cli2",
     "lint:text": "textlint \"docs/**/*.md\" \"*.md\""
   },
