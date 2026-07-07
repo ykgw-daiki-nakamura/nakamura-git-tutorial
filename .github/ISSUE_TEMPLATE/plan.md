@@ -2,7 +2,6 @@
 name: 計画 Issue（機能・ドキュメント・改善）
 about: 着手前に計画をまとめる Issue。目的・スコープ・作業計画・完了条件を書く
 title: "<type>: <タスク要約>"
-labels: enhancement
 ---
 
 <!--
