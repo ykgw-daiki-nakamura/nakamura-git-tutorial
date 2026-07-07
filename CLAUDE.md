@@ -147,8 +147,10 @@ docs(guide): ブランチ命名規則の例を追加
   - **config-check**: `scripts/check-config-consistency.mjs`（`npm run check:config`）が (a) `checks.json` のスキーマ（必須キー）・(b) `.claude/hooks/*.sh` の `settings.json` 配線（未配線/宙づり参照）・(c) `checks.json` の `issueLabels`/`prLabels` が参照するラベルの実在（`gh label list`）を検査。ネット/トークンが無い環境では (c) をスキップ（fail-open）。
 - **pr-title.yml**（PR 時）: **PR タイトルが Conventional Commits 準拠か検証**する。Squash Merge では PR タイトルがマージコミットメッセージになるため。許可 type は `checks.json` の `commit.conventional.types`（`guard-commit.sh` と同一ソース）を `.github/scripts/check-pr-title.sh` が読む。
 - **pr-label.yml**（PR 時）: **PR タイトルの type に応じてラベルを自動付与**する（`feat`→`type: feat` 等）。対応表は `checks.json` の `issueLabels.types`（`issue-label` skill と同一ソース）を `.github/scripts/label-pr-by-type.sh` が読む。対応表に無い type はスキップ。`type: *` ラベルの実体は [scripts/sync-labels.sh](scripts/sync-labels.sh) で用意する（`checks.json` の `commit.conventional.types` を情報源に冪等作成）。`pull-requests: write` が要るため pr-title と同じく base 側で評価する（`pull_request_target`）。
+- **workflow-lint.yml**（`.github/workflows/**`・`.github/actions/**` 変更 PR 時）: ワークフロー自体を検査。**actionlint**（YAML/式/埋め込みシェルの静的解析）は blocking、**zizmor**（Actions セキュリティ監査＝`pull_request_target` 誤用・インジェクション・過剰権限）は**段階導入で非ブロッキング**（`continue-on-error`）。意図的に安全な `pull_request_target`（base 評価）の findings を整理後、`continue-on-error` を外して blocking 化する。Action は SHA ピン（Dependabot 更新）。
 - **deploy.yml**: `main` への push で GitHub Pages へ自動デプロイ。
 - **links.yml**: 週次で外部リンクの死活を検査（`--scheme http/https` で内部リンクは対象外）。
+- **pr-links.yml**（`.md` 変更 PR 時）: lychee で **PR 時に外部リンク切れを可視化**（`docs/**/*.md`＋ルート `*.md`、外部スキームのみ）。週次 `links.yml` と同じ lychee-action・`.lycheeignore` を共有。外部リンク検査は flaky なため **`fail: false` の非ブロッキング**（PR ゲートにはしない方針を links.yml と共通化）。結果はジョブサマリに出て早期フィードバックになる。内部/相対リンクは `docs:build` が担保。
 - **issue-label-cleanup.yml**: Issue クローズ時に `status: in-progress` ラベルを自動除去（`issues: write`）。
 - **GitHub Actions は必ず commit SHA でピン留めし、`# vX.Y.Z` のバージョンコメントを添える**（Dependabot が更新）。
 - ワークフローは**最小権限**（`permissions: contents: read` を既定）とし、`persist-credentials: false`、job には `timeout-minutes` を設定する。
