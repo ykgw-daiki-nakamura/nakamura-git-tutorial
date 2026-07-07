@@ -21,6 +21,16 @@
 #
 set -euo pipefail
 
+# --- bash バージョン検査 ---------------------------------------------------
+# 連想配列（declare -A）と mapfile を使うため bash 4 以上が必要。
+# macOS 標準の bash 3.2 などでは即失敗するので、分かりやすく案内して終了する。
+if [ "${BASH_VERSINFO[0]:-0}" -lt 4 ]; then
+  echo "エラー: このスクリプトは bash 4 以上が必要です（連想配列・mapfile を使用）。" >&2
+  echo "  現在のバージョン: ${BASH_VERSION:-unknown}" >&2
+  echo "  macOS 標準の bash 3.2 では動きません。'brew install bash' 等で bash 4+ を導入して実行してください。" >&2
+  exit 1
+fi
+
 checks=".claude/checks.json"
 
 # --- 依存チェック ---------------------------------------------------------
