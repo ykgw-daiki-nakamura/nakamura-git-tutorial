@@ -42,23 +42,10 @@ elif [[ "$skel" =~ ${gitpfx}[[:space:]]+push([[:space:]]|$) ]];   then op="push"
 else exit 0
 fi
 
-# コミット/プッシュの対象ディレクトリを推定する。
-# worktree 運用では実際の作業ブランチは対象 worktree 側にあり、$proj（メイン作業
-# ツリー）は常に main のことが多い。コマンド中の `git -C <dir>` または先頭付近の
-# `cd <dir>` を優先して解決し、見つからなければ $proj にフォールバックする。
-# 引用符（" / '）で囲まれた空白入りパスも取りこぼさないよう、引用の有無ごとに判定する。
-target="$proj"
-if   [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+\"([^\"]+)\" ]]; then target="${BASH_REMATCH[1]}"
-elif [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+\'([^\']+)\' ]]; then target="${BASH_REMATCH[1]}"
-elif [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+([^[:space:]]+) ]]; then target="${BASH_REMATCH[1]}"
-elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+\"([^\"]+)\" ]]; then target="${BASH_REMATCH[2]}"
-elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+\'([^\']+)\' ]]; then target="${BASH_REMATCH[2]}"
-elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+([^[:space:]\;\&\|]+) ]]; then target="${BASH_REMATCH[2]}"
-fi
-
-# 解決した対象が git 作業ツリーでなければ $proj にフォールバックする。
-# （抽出ミスや存在しないパスで保護判定がスキップされるのを防ぐ。真の非 git は後段で fail-open）
-git -C "$target" rev-parse --is-inside-work-tree >/dev/null 2>&1 || target="$proj"
+# コミット/プッシュの対象ディレクトリ（worktree 対応）を共通ヘルパで推定する。
+# `git -C <dir>` / `cd <dir>` を解決し、git 作業ツリーでなければ $proj にフォールバック。
+. "$(dirname "${BASH_SOURCE[0]}")/lib/target-dir.sh"
+target=$(resolve_target_dir "$cmd" "$proj")
 
 # 現在ブランチ（detached HEAD や非 git は fail-open）
 branch=$(git -C "$target" rev-parse --abbrev-ref HEAD 2>/dev/null) || exit 0

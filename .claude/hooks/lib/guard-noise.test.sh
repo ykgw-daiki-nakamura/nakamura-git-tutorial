@@ -25,6 +25,9 @@ trap '"$RM" "$RF" "$TD"' EXIT
 "$G" -C "$TD" "$CF" user.email t@example.com
 "$G" -C "$TD" "$CF" user.name tester
 "$G" -C "$TD" "$C" -q --allow-empty -m init
+# #142: メイン(main)配下に作業ブランチ(feat/wt)の worktree を作る
+"$G" -C "$TD" worktree add -q -b feat/wt "$TD/wt"
+TW="$TD/wt"
 set +e
 
 pass=0; fail=0
@@ -70,6 +73,19 @@ run "区切り '&&#' コメント内の危険削除は素通り" guard-dangerous
 
 echo "== guard-secrets =="
 run "heredoc 本文の add は素通り"            guard-secrets.sh 0 "$HD"
+
+echo "== worktree (#142): 作業ブランチ上の操作は許可・保護と検査は維持 =="
+# 現在ブランチ判定は $proj(=main)固定でなく、git -C / cd の対象 worktree で行う
+run "worktree(feat/wt)への commit は許可"     guard-branch.sh 0 "$G -C $TW $C -m x"
+run "worktree(feat/wt)への push は許可"       guard-branch.sh 0 "$G -C $TW $P origin feat/wt"
+run "cd worktree && commit は許可"           guard-branch.sh 0 "cd $TW && $G $C -m x"
+# guard-secrets は $proj でなく対象 worktree の index を走査する（取りこぼし解消）
+AK="AKIA"; SECRET="${AK}1234567890ABCDEF"   # ソースに実キー文字列を残さないよう分割
+printf 'k = %s\n' "$SECRET" > "$TW/leak.txt"; "$G" -C "$TW" "$A" leak.txt
+run "worktree コミットのシークレットを検出"    guard-secrets.sh 2 "$G -C $TW $C -m x"
+"$G" -C "$TW" "$RM" -q --cached leak.txt
+printf 'hello\n' > "$TW/ok.txt"; "$G" -C "$TW" "$A" ok.txt
+run "worktree の無害コミットは素通り"          guard-secrets.sh 0 "$G -C $TW $C -m x"
 
 echo ""
 echo "結果: PASS=$pass FAIL=$fail"
