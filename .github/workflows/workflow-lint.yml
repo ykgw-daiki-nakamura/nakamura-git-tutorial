@@ -1,0 +1,48 @@
+name: Workflow Lint
+
+# GitHub Actions ワークフロー自体の静的解析（actionlint）とセキュリティ監査（zizmor）。
+# pull_request_target の誤用・スクリプトインジェクション・過剰権限・YAML/式の誤りを機械検知する。
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - '.github/actions/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workflow-lint-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # YAML / 式 / 埋め込みシェルの静的解析。誤りがあれば落とす（blocking）。
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: actionlint
+        uses: raven-actions/actionlint@3d39aea434753780c3b3d4a1a31c854b4dbf49d7 # v2.2.0
+
+  # Actions のセキュリティ監査。段階導入のため初期は非ブロッキング（可視化のみ）。
+  # 本リポは pr-title.yml / pr-label.yml で意図的に安全な pull_request_target
+  # （base の sha のみ checkout・PR head 非実行・最小権限）を使うため、findings を確認しながら
+  # ベースラインを整えた後に continue-on-error を外して blocking 化する。
+  zizmor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write # zizmor の SARIF を Security タブへアップロードするため
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: zizmor (段階導入・可視化のみ)
+        continue-on-error: true
+        uses: zizmorcore/zizmor-action@192e21d79ab29983730a13d1382995c2307fbcaa # v0.5.7
