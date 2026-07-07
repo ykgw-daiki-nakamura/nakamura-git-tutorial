@@ -10,9 +10,9 @@ model: sonnet
 ## 監査項目（単一情報源 → 参照側の一致）
 
 1. **許可 type**（`commit.conventional.types`）
-   - `guard-commit.sh` / `.github/scripts/check-pr-title.sh`（pr-title.yml）/ `sync-labels.sh` が同じ type 集合を使うか。CLAUDE.md の記述と食い違わないか。
+   - `guard-commit.sh` / `.github/scripts/check-pr-title.sh`（pr-title.yml）/ `scripts/sync-labels.sh` が同じ type 集合を使うか。CLAUDE.md の記述と食い違わないか。
 2. **ラベル語彙**（`issueLabels.types`。`prLabels` は**存在する環境のみ** optional）
-   - `issueLabels.types` は Issue（`issue-label` skill）と PR（`.github/scripts/label-pr-by-type.sh`／pr-label.yml）の**双方**で使われる。参照するラベル名が一致し、`sync-labels.sh` が実体を作るラベルと揃うか。`prLabels` は現状 `checks.json` に無く（`check-config-consistency.mjs` でも optional 扱い）、キーがある場合だけ照合する。参照ラベルが実在するか（`gh label list --limit 200`。ネット/トークンが無ければスキップし、その旨を明記）。
+   - `issueLabels.types` は Issue（`issue-label` skill）と PR（`.github/scripts/label-pr-by-type.sh`／pr-label.yml）の**双方**で使われる。参照するラベル名が一致し、`scripts/sync-labels.sh` が実体を作るラベルと揃うか。`prLabels` は現状 `checks.json` に無く（`scripts/check-config-consistency.mjs` でも optional 扱い）、キーがある場合だけ照合する。参照ラベルが実在するか（`gh label list --limit 200`。ネット/トークンが無ければスキップし、その旨を明記）。
 3. **保護ブランチ**（`protectedBranches`）
    - `guard-branch.sh` / `guard-dangerous.sh` が同じ集合を見るか。
 4. **hooks の配線**
@@ -24,7 +24,7 @@ model: sonnet
 
 ## 進め方
 
-1. `.claude/checks.json` を読み、各キー（types / labels / protectedBranches / guard.* / onEdit / docsSync）を情報源として控える。
+1. `.claude/checks.json` を読み、各キー（`commit.conventional.types` / `issueLabels` / `protectedBranches` / `guard.*` / `onEdit` / `docsSync`）を情報源として控える。
 2. 参照側を `Grep`/`Read` で突き合わせる（例: `grep -rn "protectedBranches\|type: " .claude .github`）。
 3. `npm run check:config`（config-check）を実行して機械判定を裏取りする。落ちた項目は原因を特定する。
 4. 出力は重要度順に、**不整合の箇所（ファイル:行）・情報源との差・是正案**。問題が無い項目も「OK」と簡潔に添える。
