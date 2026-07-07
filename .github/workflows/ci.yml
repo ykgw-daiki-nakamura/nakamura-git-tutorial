@@ -66,6 +66,11 @@ jobs:
   config-check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # (c) の `gh label list` は Issues API（ラベル）を読むため issues: read が必要。
+    # これが無いと 403 で (c) が常時スキップされ、ラベル整合が検査されない。
+    permissions:
+      contents: read
+      issues: read
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:

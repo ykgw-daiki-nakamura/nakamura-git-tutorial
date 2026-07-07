@@ -48,7 +48,12 @@ if (settings) {
   const settingsText = JSON.stringify(settings)
   // トップレベルの *.sh（lib/ 配下や README は除く）
   const hookDir = p('.claude/hooks')
-  const hookFiles = readdirSync(hookDir).filter((f) => f.endsWith('.sh'))
+  let hookFiles = []
+  try {
+    hookFiles = readdirSync(hookDir).filter((f) => f.endsWith('.sh'))
+  } catch (e) {
+    errors.push(`(b) .claude/hooks を読み取れません（存在しない/読めない）: ${e.message}`)
+  }
   for (const f of hookFiles) {
     if (!settingsText.includes(`hooks/${f}`)) {
       errors.push(`(b) フック .claude/hooks/${f} が存在するのに settings.json に配線されていません`)
@@ -77,13 +82,30 @@ function referencedLabels(cfg) {
   return [...set]
 }
 let ghLabels = null
+let ghInstalled = true
 try {
-  const out = execFileSync('gh', ['label', 'list', '--limit', '200', '--json', 'name', '--jq', '.[].name'], {
-    encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
-  })
-  ghLabels = new Set(out.split('\n').map((s) => s.trim()).filter(Boolean))
+  execFileSync('gh', ['--version'], { stdio: 'ignore' })
 } catch {
-  notes.push('(c) gh 未導入/未認証のためラベル実在検査をスキップしました（fail-open）')
+  ghInstalled = false
+}
+if (!ghInstalled) {
+  notes.push('(c) gh 未導入のためラベル実在検査をスキップしました（ローカルでの fail-open）')
+} else {
+  try {
+    const out = execFileSync('gh', ['label', 'list', '--limit', '200', '--json', 'name', '--jq', '.[].name'], {
+      encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+    })
+    ghLabels = new Set(out.split('\n').map((s) => s.trim()).filter(Boolean))
+  } catch (e) {
+    // gh は在るのに失敗した場合、CI（GH_TOKEN あり）では権限/API の問題を見逃さないよう **エラー扱い**にする。
+    // ローカル（未認証など）はスキップに留める。ci.yml 側で issues: read を付与し gh label list を通す。
+    const firstLine = String(e.message || e).split('\n')[0]
+    if (process.env.GH_TOKEN || process.env.CI) {
+      errors.push(`(c) gh label list に失敗しました（CI ではスキップせず失敗扱い。Issues 読み取り権限や API を確認）: ${firstLine}`)
+    } else {
+      notes.push(`(c) gh の呼び出しに失敗したためスキップしました（ローカルでの fail-open）: ${firstLine}`)
+    }
+  }
 }
 if (checks && ghLabels) {
   for (const label of referencedLabels(checks)) {
