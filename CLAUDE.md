@@ -144,4 +144,4 @@ docs(guide): ブランチ命名規則の例を追加
 
 - ファイルを編集したら、対応するチェック（`lint:md` / `docs:build`）をローカルで実行してから push する。
 - 破壊的・外向きの操作（push、PR 作成、マージ、Issue 操作）は方針に沿って慎重に行う。
-- `.claude/skills/` に補助 skill がある。役割と棲み分け（plan / worktree-task / pr-watch / pr-review-watch）は [.claude/skills/README.md](.claude/skills/README.md) を参照。
+- `.claude/skills/` に補助 skill がある。**正典の一覧・役割・棲み分けは [.claude/skills/README.md](.claude/skills/README.md) を参照**（ここで個別に列挙するとドリフトするため一本化）。
