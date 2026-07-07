@@ -2,6 +2,3 @@
 # ローカル開発サーバー（ドキュメント中の例示）
 ^https?://localhost
 ^https?://127\.0\.0\.1
-# ドキュメントのインストール例に含まれる URL（テンプレート変数 ${...} を含む・特定バージョン例で
-# 実在しないため誤検知になる）。例: docs/standards のツール導入手順の release ダウンロード URL。
-^https?://github\.com/lycheeverse/lychee/releases/download/

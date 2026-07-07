@@ -4,8 +4,11 @@ name: PR Links
 # 内部/相対リンクは docs:build が担保、週次の links.yml とは別に「PR 時の即フィードバック」を担う。
 on:
   pull_request:
+    # 起動条件を実際の検査対象（下の args と同じ docs 配下＋ルート *.md）に合わせる。
+    # 他所の Markdown 変更で無駄に起動しない／スコープ記述と一致させる。
     paths:
-      - '**/*.md'
+      - 'docs/**/*.md'
+      - '*.md'
 
 permissions:
   contents: read
