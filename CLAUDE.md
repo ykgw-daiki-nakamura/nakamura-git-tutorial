@@ -59,11 +59,12 @@ docs/
 
 ## 編集後チェック（checks.json 駆動フック）
 
-「どのファイルを編集したら何を検査するか」を [.claude/checks.json](.claude/checks.json) に宣言的にまとめ、汎用 PostToolUse フック `.claude/hooks/on-edit-check.sh` がそれを読んで該当コマンドを実行する（例: `.md` 編集 → markdownlint）。
+「どのファイルを編集したら何を検査するか」を [.claude/checks.json](.claude/checks.json) に宣言的にまとめ、汎用 PostToolUse フック `.claude/hooks/on-edit-check.sh` がそれを読んで該当コマンドを実行する（例: `.md` 編集 → markdownlint / textlint）。
 
 - `checks.json` の `onEdit` に `{ glob, run, label }` を追加すれば検査を増やせる。`run` 内の `{file}` は編集ファイルのパスに置換され、コマンドはリポジトリ直下で実行される。
 - 違反があれば `exit 2` で Claude にフィードバックされる。対応 glob が無いファイルや、検査コマンド未導入（依存なし）の場合は**作業を止めない**（fail-open）。
 - 設定を変えるだけで検査を足せるよう、ロジック（フック）とプロジェクト固有の対応表（`checks.json`）を分離している。
+- **textlint** も markdownlint と同格で `onEdit` に登録し、docs 編集時に CI（`lint:text`）と同じ検査をローカル即時実行する（on-edit の対象は `docs/**/*.md`。ルート直下の `*.md` は CI の `lint:text` が担保する。textlint 未導入環境ではコマンド不在で fail-open）。
 - 構造ファイル（例: `config.mjs`）を編集したら関連ドキュメントの更新を促す `docs-sync-reminder.sh` も同様に checks.json の `docsSync`（`{ glob, remind }`）を読む。こちらは `exit 2`（ブロック）ではなく注意喚起（additionalContext）に留める。
 
 ## コミット/PR 衛生・安全ガード（guard フック）
@@ -88,7 +89,13 @@ PreToolUse フックで、コミットの衛生と危険操作の抑止を機械
   `docs/`（`checks.json` の `guard.secrets.skipPaths`）配下と、`example` 等のプレースホルダ例は
   過剰ブロックを避けるため走査対象外。誤検知は `guard.secrets.allow`（正規表現）で通せる。
 
-4 ガードとも、コマンド種別の判定前に [.claude/hooks/lib/cmd-skeleton.js](.claude/hooks/lib/cmd-skeleton.js) で
+- **`guard-diffsize.sh`**: `git push` / `gh pr create` の直前に、`origin/main` との差分行数（追加+削除）を
+  測り、`checks.json` の `guard.diffSize.maxLines`（既定 400）を超えたら **Issue/PR 分割の検討を促す**。
+  `exit 2` の**ブロックはせず**、`docs-sync-reminder.sh` と同じ非ブロッキングの注意喚起（`additionalContext`）
+  に留める。生成物・ロックファイルは `guard.diffSize.skipPaths`（パス接頭辞）で集計から除外。誤検知は
+  `guard.diffSize.allow`（正規表現）で対象外にできる。ベース取得不能・依存欠如時は fail-open。
+
+上記 4 つのブロック系ガード（commit/branch/dangerous/secrets）は、コマンド種別の判定前に [.claude/hooks/lib/cmd-skeleton.js](.claude/hooks/lib/cmd-skeleton.js) で
 **ヒアドキュメント本文・引用符内・コメントを除去**した「スケルトン」を作り、それに対して判定する。
 これにより、docs / skills / Issue 本文に書いた `git push` / `git commit` / `rm -rf /` などの**文字列**
 （＝実行されないコマンド）を実コマンドと誤判定して過剰ブロックするのを防ぐ（値・パス・ブランチの抽出は
@@ -131,7 +138,8 @@ docs(guide): ブランチ命名規則の例を追加
 
 ## CI / CD とセキュリティ方針
 
-- **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint + textlint）/ `dependency-review`（依存の脆弱性検査）。
+- **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint + textlint）/ `config-check`（設定↔実体の整合）/ `dependency-review`（依存の脆弱性検査）。
+  - **config-check**: `scripts/check-config-consistency.mjs`（`npm run check:config`）が (a) `checks.json` のスキーマ（必須キー）・(b) `.claude/hooks/*.sh` の `settings.json` 配線（未配線/宙づり参照）・(c) `checks.json` の `issueLabels`/`prLabels` が参照するラベルの実在（`gh label list`）を検査。ネット/トークンが無い環境では (c) をスキップ（fail-open）。
 - **pr-title.yml**（PR 時）: **PR タイトルが Conventional Commits 準拠か検証**する。Squash Merge では PR タイトルがマージコミットメッセージになるため。許可 type は `checks.json` の `commit.conventional.types`（`guard-commit.sh` と同一ソース）を `.github/scripts/check-pr-title.sh` が読む。
 - **pr-label.yml**（PR 時）: **PR タイトルの type に応じてラベルを自動付与**する（`feat`→enhancement 等）。対応表は `checks.json` の `issueLabels.types`（`issue-label` skill と同一ソース）を `.github/scripts/label-pr-by-type.sh` が読む。未対応 type はスキップ。`pull-requests: write` が要るため pr-title と同じく base 側で評価する（`pull_request_target`）。
 - **deploy.yml**: `main` への push で GitHub Pages へ自動デプロイ。

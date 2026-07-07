@@ -26,8 +26,11 @@ cmd=$(extract_command)
 # 種別判定用スケルトン（ヒアドキュメント本文・引用符内・コメントを除去した文字列）。
 # docs / skills / Issue 本文に書かれた git コマンド文字列の誤ヒットを防ぐ。得られない
 # 場合（node 無し等）は原文にフォールバックする（従来どおり＝安全側）。
-skel=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" 2>/dev/null)
-[ -n "$skel" ] || skel="$cmd"
+skel="$cmd"
+if command -v node >/dev/null 2>&1; then
+  _s=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" 2>/dev/null)
+  [ -n "$_s" ] && skel="$_s"
+fi
 
 # git commit / git push 以外は対象外。種別判定はスケルトンに対して行う。
 # `git -C <dir> commit` のように git とサブコマンドの間に -C オプションが入る形も検出する

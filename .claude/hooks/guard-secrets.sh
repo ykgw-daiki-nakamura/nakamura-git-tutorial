@@ -29,8 +29,11 @@ cmd=$(extract_command)
 # 種別判定用スケルトン（ヒアドキュメント本文・引用符内・コメントを除去した文字列）。
 # 本文に書かれた `git add` / `git commit` 文字列の誤ヒットを防ぐ。add 対象パスの抽出は
 # 後段で原文から行う。得られない場合（node 無し等）は原文にフォールバック（安全側）。
-skel=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" 2>/dev/null)
-[ -n "$skel" ] || skel="$cmd"
+skel="$cmd"
+if command -v node >/dev/null 2>&1; then
+  _s=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" 2>/dev/null)
+  [ -n "$_s" ] && skel="$_s"
+fi
 
 # git add / git commit 以外は対象外（種別判定はスケルトンに対して行う）
 case "$skel" in
