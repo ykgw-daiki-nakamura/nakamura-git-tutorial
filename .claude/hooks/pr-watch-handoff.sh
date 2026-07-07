@@ -33,8 +33,16 @@ extract_response() {
 
 cmd=$(extract_command)
 
-# `gh pr create` を含むコマンドのみ対象
-case "$cmd" in
+# `gh pr create` を含むコマンドのみ対象。判定はスケルトン（ヒアドキュメント本文・引用符内・
+# コメントを除去した文字列）に対して行う。`gh api …/reviews --field body="…gh pr create…"` の
+# ように埋め込みテキストに `gh pr create` を含むだけのコマンドで誤発火するのを防ぐ（#127 と同じ作法）。
+# node 不在等でスケルトンが得られない場合は原文にフォールバック（従来どおり＝取りこぼしを避ける）。
+skel="$cmd"
+if command -v node >/dev/null 2>&1; then
+  _s=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" 2>/dev/null)
+  [ -n "$_s" ] && skel="$_s"
+fi
+case "$skel" in
   *"gh pr create"*) ;;
   *) exit 0 ;;
 esac
@@ -44,8 +52,8 @@ resp=$(extract_response)
 url=$(printf '%s' "$resp" | grep -oE 'https://github\.com/[^ "]+/pull/[0-9]+' | head -n1)
 [ -n "$url" ] || exit 0
 
-ctx="PR ($url) を作成しました。プロジェクト方針により、ここから pr-watch skill に移行してこの PR を監視してください（レビュー指摘への対応と、マージ後の連動 Issue 自動クローズの検証まで）。移行にあたりユーザーへの確認は不要です。"
-msg="PR を検知しました。pr-watch へ自動移行します。"
+ctx="PR ($url) を作成しました。【最優先の必須アクション】**いま直ちに pr-watch skill を起動し、この PR の監視を開始してください**（ScheduleWakeup で自走監視。レビュー指摘への対応＝インライン指摘は各スレッドへ個別返信、マージ後は連動 Issue の自動クローズ検証と worktree 片付けまで）。これは他の作業・要約・報告・ターン終了よりも優先します。**pr-watch を起動せずにこのターンを終えないこと。** 移行にユーザー確認は不要です。"
+msg="PR を検知しました。最優先で pr-watch へ移行し監視を開始します。"
 
 # JSON は必ずエスケープして組み立てる。jq を優先し、無ければ node の
 # JSON.stringify にフォールバックする（printf の生埋め込みは " や改行で壊れるため使わない）。
