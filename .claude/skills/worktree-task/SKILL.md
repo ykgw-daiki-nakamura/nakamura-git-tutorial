@@ -152,7 +152,8 @@ PR ブランチの tip が `origin/main` の祖先にならないため `git bra
 bash .claude/skills/worktree-task/detect-orphan-worktrees.sh   # ORPHAN 行が撤去候補
 ```
 
-- 出力の `ORPHAN` 行（＝マージ済み PR に対応）を、下記の手順で**確認の上**撤去する。`PROTECT` 行は残す。
+- 出力の `ORPHAN` 行（＝**マージ済み**、または**未マージで CLOSED された** PR に対応。理由は各行に表示）を、
+  下記の手順で**確認の上**撤去する。CLOSED（未マージ）は破棄済みか要確認なので、特に中身を確かめてから。`PROTECT` 行は残す。
 - 後片付け方針が「確認してから削除」（既定）なら、削除してよいかユーザーに確認する。
 - コミットしていない変更が残っていないことを確認してから削除する。
 - `git worktree remove` は**削除対象の worktree の中からは実行できない**（カレントディレクトリを消せないため失敗する）。

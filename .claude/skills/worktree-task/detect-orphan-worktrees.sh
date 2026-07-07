@@ -41,9 +41,11 @@ emit() { # $1 path, $2 branch
 
   local reason=""
   if [ "$have_gh" = 1 ]; then
-    local state num
-    state=$(gh pr list --head "$branch" --state all --json state,number --jq '.[0].state // ""' 2>/dev/null || true)
-    num=$(gh pr list --head "$branch" --state all --json number --jq '.[0].number // ""' 2>/dev/null || true)
+    # state と number は 1 回の gh 呼び出しから取り出す（API 回数削減・両者の整合を担保）
+    local pr_json state num
+    pr_json=$(gh pr list --head "$branch" --state all --json state,number --jq '.[0] // {}' 2>/dev/null || true)
+    state=$(printf '%s' "$pr_json" | jq -r '.state // ""' 2>/dev/null || true)
+    num=$(printf '%s' "$pr_json" | jq -r '.number // ""' 2>/dev/null || true)
     case "$state" in
       MERGED) reason="PR #${num} が MERGED" ;;
       OPEN)   return 0 ;;                            # 進行中は保護
