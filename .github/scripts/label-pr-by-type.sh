@@ -34,7 +34,7 @@ if [ -z "$label" ]; then
 fi
 
 # 実在ラベルのみ付与
-if ! gh label list --json name --jq '.[].name' 2>/dev/null | grep -Fxq "$label"; then
+if ! gh label list --limit 200 --json name --jq '.[].name' 2>/dev/null | grep -Fxq "$label"; then
   echo "ラベル '$label' がこのリポジトリに存在しません。スキップします。"
   exit 0
 fi

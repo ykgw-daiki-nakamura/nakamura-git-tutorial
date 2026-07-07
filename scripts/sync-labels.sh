@@ -102,5 +102,9 @@ for t in "${types[@]}"; do
   created=$((created + 1))
 done
 
-echo "完了: ${created} 個の 'type: *' ラベルを同期しました。"
+if [ "$rc" -eq 0 ]; then
+  echo "完了: ${created} 個の 'type: *' ラベルを同期しました。"
+else
+  echo "警告: 同期できなかった type があります（上のエラーを参照）。同期できたのは ${created} 個です。" >&2
+fi
 exit "$rc"

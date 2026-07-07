@@ -33,7 +33,7 @@ GitHub Issue のタイトル・本文を読み、**実在するラベルだけ**
 
 ```bash
 gh issue view <N> --json number,title,body,labels
-gh label list --json name --jq '.[].name'   # 実在ラベル（付与はこの集合内のみ）
+gh label list --limit 200 --json name --jq '.[].name'   # 実在ラベル（付与はこの集合内のみ。--limit で全件取得）
 ```
 
 ### 2. 対応表を読む
