@@ -50,7 +50,8 @@ export default withMermaid({
     nav: [
       { text: 'ホーム', link: '/' },
       { text: 'ガイド', link: '/guide/introduction', activeMatch: '^/guide/' },
-      { text: '実習', link: '/hands-on/', activeMatch: '^/(hands-on|practice)/' }
+      { text: '実習', link: '/hands-on/', activeMatch: '^/(hands-on|practice)/' },
+      { text: '開発規約', link: '/standards/', activeMatch: '^/standards/' }
     ],
     // パス別サイドバー: ガイドと実習でメニューを切り替える
     sidebar: {
@@ -117,6 +118,14 @@ export default withMermaid({
           items: [
             { text: 'コマンド早見表', link: '/guide/commands' },
             { text: 'トラブルシューティング', link: '/guide/troubleshooting' }
+          ]
+        }
+      ],
+      '/standards/': [
+        {
+          text: '開発規約',
+          items: [
+            { text: 'ブランチ戦略とリリース・デプロイ', link: '/standards/' }
           ]
         }
       ],
