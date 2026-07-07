@@ -88,7 +88,13 @@ PreToolUse フックで、コミットの衛生と危険操作の抑止を機械
   `docs/`（`checks.json` の `guard.secrets.skipPaths`）配下と、`example` 等のプレースホルダ例は
   過剰ブロックを避けるため走査対象外。誤検知は `guard.secrets.allow`（正規表現）で通せる。
 
-4 ガードとも、コマンド種別の判定前に [.claude/hooks/lib/cmd-skeleton.js](.claude/hooks/lib/cmd-skeleton.js) で
+- **`guard-diffsize.sh`**: `git push` / `gh pr create` の直前に、`origin/main` との差分行数（追加+削除）を
+  測り、`checks.json` の `guard.diffSize.maxLines`（既定 400）を超えたら **Issue/PR 分割の検討を促す**。
+  `exit 2` の**ブロックはせず**、`docs-sync-reminder.sh` と同じ非ブロッキングの注意喚起（`additionalContext`）
+  に留める。生成物・ロックファイルは `guard.diffSize.skipPaths`（パス接頭辞）で集計から除外。誤検知は
+  `guard.diffSize.allow`（正規表現）で対象外にできる。ベース取得不能・依存欠如時は fail-open。
+
+上記 4 つのブロック系ガード（commit/branch/dangerous/secrets）は、コマンド種別の判定前に [.claude/hooks/lib/cmd-skeleton.js](.claude/hooks/lib/cmd-skeleton.js) で
 **ヒアドキュメント本文・引用符内・コメントを除去**した「スケルトン」を作り、それに対して判定する。
 これにより、docs / skills / Issue 本文に書いた `git push` / `git commit` / `rm -rf /` などの**文字列**
 （＝実行されないコマンド）を実コマンドと誤判定して過剰ブロックするのを防ぐ（値・パス・ブランチの抽出は
