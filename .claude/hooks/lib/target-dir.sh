@@ -15,9 +15,9 @@ resolve_target_dir() {
   if   [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+\"([^\"]+)\" ]]; then cand="${BASH_REMATCH[1]}"
   elif [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+\'([^\']+)\' ]]; then cand="${BASH_REMATCH[1]}"
   elif [[ "$cmd" =~ git[[:space:]]+-C[[:space:]]+([^[:space:]]+) ]]; then cand="${BASH_REMATCH[1]}"
-  elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+\"([^\"]+)\" ]]; then cand="${BASH_REMATCH[2]}"
-  elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+\'([^\']+)\' ]]; then cand="${BASH_REMATCH[2]}"
-  elif [[ "$cmd" =~ (^|[\;\&\|][[:space:]]*)cd[[:space:]]+([^[:space:]\;\&\|]+) ]]; then cand="${BASH_REMATCH[2]}"
+  elif [[ "$cmd" =~ (^|[\(\;\&\|][[:space:]]*)cd[[:space:]]+\"([^\"]+)\" ]]; then cand="${BASH_REMATCH[2]}"
+  elif [[ "$cmd" =~ (^|[\(\;\&\|][[:space:]]*)cd[[:space:]]+\'([^\']+)\' ]]; then cand="${BASH_REMATCH[2]}"
+  elif [[ "$cmd" =~ (^|[\(\;\&\|][[:space:]]*)cd[[:space:]]+([^[:space:]\(\)\;\&\|]+) ]]; then cand="${BASH_REMATCH[2]}"
   fi
   if [ -n "$cand" ]; then
     if   git -C "$cand" rev-parse --is-inside-work-tree >/dev/null 2>&1; then target="$cand"

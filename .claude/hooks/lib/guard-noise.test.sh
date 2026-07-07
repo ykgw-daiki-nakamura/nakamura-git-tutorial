@@ -79,6 +79,7 @@ echo "== worktree (#142): 作業ブランチ上の操作は許可・保護と検
 run "worktree(feat/wt)への commit は許可"     guard-branch.sh 0 "$G -C $TW $C -m x"
 run "worktree(feat/wt)への push は許可"       guard-branch.sh 0 "$G -C $TW $P origin feat/wt"
 run "cd worktree && commit は許可"           guard-branch.sh 0 "cd $TW && $G $C -m x"
+run "サブシェル (cd worktree && commit) は許可" guard-branch.sh 0 "($G status; cd $TW && $G $C -m x)"
 # guard-secrets は $proj でなく対象 worktree の index を走査する（取りこぼし解消）
 AK="AKIA"; SECRET="${AK}1234567890ABCDEF"   # ソースに実キー文字列を残さないよう分割
 printf 'k = %s\n' "$SECRET" > "$TW/leak.txt"; "$G" -C "$TW" "$A" leak.txt
