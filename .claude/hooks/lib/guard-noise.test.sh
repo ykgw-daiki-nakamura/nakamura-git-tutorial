@@ -48,6 +48,9 @@ run "引用文字列内の push は素通り"           guard-branch.sh 0 "echo 
 run "保護ブランチ上の実 commit は阻止"       guard-branch.sh 2 "$G -C $TD $C -m x"
 run "保護ブランチ上の実 push は阻止"         guard-branch.sh 2 "$G -C $TD $P origin main"
 run "区切り直後コメント内の push は素通り"    guard-branch.sh 0 "echo hi ;# $G $P origin main"
+run "区切り |# コメント内の push は素通り"     guard-branch.sh 0 "$(printf 'echo hi |# %s %s\ncat' "$G" "$P")"
+run "区切り '&&#' コメント内の push は素通り"  guard-branch.sh 0 "$(printf 'echo hi &&# %s %s\ntrue' "$G" "$P")"
+run "区切り (# コメント内の push は素通り"     guard-branch.sh 0 "$(printf '(# %s %s\necho x )' "$G" "$P")"
 
 echo "== guard-commit =="
 run "heredoc 本文の commit は素通り"         guard-commit.sh 0 "$HD"
@@ -62,6 +65,8 @@ run "実 危険削除は阻止"                      guard-dangerous.sh 2 "$RM $
 run "引用符付き引数の実 危険削除も阻止"       guard-dangerous.sh 2 "$RM $RF \"/\""
 run "引用内 <<EOF 誤認で実コマンドを見逃さない" guard-dangerous.sh 2 "$QHERE"
 run "区切り直後コメント内の危険削除は素通り"  guard-dangerous.sh 0 "echo hi ;# $RM $RF /"
+run "区切り |# コメント内の危険削除は素通り"   guard-dangerous.sh 0 "$(printf 'echo hi |# %s %s /\ncat' "$RM" "$RF")"
+run "区切り '&&#' コメント内の危険削除は素通り" guard-dangerous.sh 0 "$(printf 'echo hi &&# %s %s /\ntrue' "$RM" "$RF")"
 
 echo "== guard-secrets =="
 run "heredoc 本文の add は素通り"            guard-secrets.sh 0 "$HD"
