@@ -3,7 +3,7 @@
 # 1 件でも失敗したら exit 1。テストが無ければ no-op（exit 0）。
 #
 # 実行: npm run test:hooks / bash scripts/test-hooks.sh
-set -uo pipefail
+set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 shopt -s nullglob
