@@ -83,6 +83,16 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-secrets.sh\"",
             "if": "Bash(git commit*)"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-diffsize.sh\"",
+            "if": "Bash(git push*)"
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-diffsize.sh\"",
+            "if": "Bash(gh pr create*)"
           }
         ]
       }
