@@ -102,12 +102,6 @@ export default withMermaid({
           ]
         },
         {
-          text: '発展',
-          items: [
-            { text: '顧客カスタマイズとバージョン運用', link: '/guide/customization' }
-          ]
-        },
-        {
           text: '付録',
           items: [
             { text: 'コマンド早見表', link: '/guide/commands' },
