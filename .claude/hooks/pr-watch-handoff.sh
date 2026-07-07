@@ -33,8 +33,16 @@ extract_response() {
 
 cmd=$(extract_command)
 
-# `gh pr create` を含むコマンドのみ対象
-case "$cmd" in
+# `gh pr create` を含むコマンドのみ対象。判定はスケルトン（ヒアドキュメント本文・引用符内・
+# コメントを除去した文字列）に対して行う。`gh api …/reviews --field body="…gh pr create…"` の
+# ように埋め込みテキストに `gh pr create` を含むだけのコマンドで誤発火するのを防ぐ（#127 と同じ作法）。
+# node 不在等でスケルトンが得られない場合は原文にフォールバック（従来どおり＝取りこぼしを避ける）。
+skel="$cmd"
+if command -v node >/dev/null 2>&1; then
+  _s=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" 2>/dev/null)
+  [ -n "$_s" ] && skel="$_s"
+fi
+case "$skel" in
   *"gh pr create"*) ;;
   *) exit 0 ;;
 esac
