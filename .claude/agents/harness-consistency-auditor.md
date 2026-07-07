@@ -11,8 +11,8 @@ model: sonnet
 
 1. **許可 type**（`commit.conventional.types`）
    - `guard-commit.sh` / `.github/scripts/check-pr-title.sh`（pr-title.yml）/ `sync-labels.sh` が同じ type 集合を使うか。CLAUDE.md の記述と食い違わないか。
-2. **ラベル語彙**（`issueLabels.types` / `prLabels`）
-   - `issue-label` skill / `.github/scripts/label-pr-by-type.sh`（pr-label.yml）が参照するラベル名が一致し、`sync-labels.sh` が実体を作るラベルと揃うか。参照ラベルが実在するか（`gh label list --limit 200`。ネット/トークンが無ければスキップし、その旨を明記）。
+2. **ラベル語彙**（`issueLabels.types`。`prLabels` は**存在する環境のみ** optional）
+   - `issueLabels.types` は Issue（`issue-label` skill）と PR（`.github/scripts/label-pr-by-type.sh`／pr-label.yml）の**双方**で使われる。参照するラベル名が一致し、`sync-labels.sh` が実体を作るラベルと揃うか。`prLabels` は現状 `checks.json` に無く（`check-config-consistency.mjs` でも optional 扱い）、キーがある場合だけ照合する。参照ラベルが実在するか（`gh label list --limit 200`。ネット/トークンが無ければスキップし、その旨を明記）。
 3. **保護ブランチ**（`protectedBranches`）
    - `guard-branch.sh` / `guard-dangerous.sh` が同じ集合を見るか。
 4. **hooks の配線**
