@@ -29,8 +29,11 @@ cmd=$(extract_command)
 # 種別判定用スケルトン（ヒアドキュメント本文・引用符内・コメントを除去した文字列）。
 # docs / skills / Issue 本文に書かれた危険コマンド文字列の誤ヒットを防ぐ。危険判定は skel に、
 # ブランチ抽出・allowlist 照合は原文に対して行う。得られない場合は原文にフォールバック（安全側）。
-skel=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" --danger 2>/dev/null)
-[ -n "$skel" ] || skel="$cmd"
+skel="$cmd"
+if command -v node >/dev/null 2>&1; then
+  _s=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" --danger 2>/dev/null)
+  [ -n "$_s" ] && skel="$_s"
+fi
 
 # ERE メタ文字をエスケープ（checks.json 由来のブランチ名を正規表現に埋める前に使う）
 ere_escape() { printf '%s' "$1" | sed 's/[][(){}.^$*+?|\\]/\\&/g'; }

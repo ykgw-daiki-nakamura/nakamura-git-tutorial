@@ -72,7 +72,7 @@ function scrubLine(line) {
       i = j < n ? j + 1 : n;
       continue;
     }
-    if (c === "#" && (r === "" || /\s$/.test(r))) break;
+    if (c === "#" && (r === "" || /[\s;&|(]$/.test(r))) break;
     if (c === "<" && line[i + 1] === "<") {
       let k = i + 2;
       if (line[k] === "-") k++;
