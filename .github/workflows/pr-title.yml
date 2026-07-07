@@ -12,9 +12,11 @@ name: PR Title
 #   (3) permissions を contents:read に絞る、ことで排除している。
 on:
   pull_request_target:
-    # edited はタイトル編集を拾うために必須。synchronize（コード push）は
-    # タイトルを変えないため title-only 検証では不要（実行回数を抑える）。
-    types: [opened, edited, reopened]
+    # opened/edited/reopened に加え synchronize（新コミット反映）も必須にする。
+    # conventional-title は必須ステータスチェックで、GitHub は head コミット SHA ごとに
+    # 評価する。synchronize が無いと新コミットの SHA にステータスが報告されず、
+    # 必須チェックが "Waiting for status to be reported" のまま固まりマージがブロックされる。
+    types: [opened, edited, reopened, synchronize]
 
 # GITHUB_TOKEN は読み取りのみに制限（pull_request_target 既定の昇格を打ち消す）
 permissions:
