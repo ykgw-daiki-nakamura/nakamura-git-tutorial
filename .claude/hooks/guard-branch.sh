@@ -23,13 +23,19 @@ extract_command() {
 }
 cmd=$(extract_command)
 
-# git commit / git push 以外は対象外。
+# 種別判定用スケルトン（ヒアドキュメント本文・引用符内・コメントを除去した文字列）。
+# docs / skills / Issue 本文に書かれた git コマンド文字列の誤ヒットを防ぐ。得られない
+# 場合（node 無し等）は原文にフォールバックする（従来どおり＝安全側）。
+skel=$(printf '%s' "$cmd" | node "$(dirname "${BASH_SOURCE[0]}")/lib/cmd-skeleton.js" 2>/dev/null)
+[ -n "$skel" ] || skel="$cmd"
+
+# git commit / git push 以外は対象外。種別判定はスケルトンに対して行う。
 # `git -C <dir> commit` のように git とサブコマンドの間に -C オプションが入る形も検出する
 # （従来の単純な "git commit" 部分一致では -C 付きを取りこぼし、保護が素通りしていた）。
 op=""
 gitpfx='git([[:space:]]+-C[[:space:]]+("[^"]*"|'\''[^'\'']*'\''|[^[:space:]]+))?'
-if   [[ "$cmd" =~ ${gitpfx}[[:space:]]+commit([[:space:]]|$) ]]; then op="commit"
-elif [[ "$cmd" =~ ${gitpfx}[[:space:]]+push([[:space:]]|$) ]];   then op="push"
+if   [[ "$skel" =~ ${gitpfx}[[:space:]]+commit([[:space:]]|$) ]]; then op="commit"
+elif [[ "$skel" =~ ${gitpfx}[[:space:]]+push([[:space:]]|$) ]];   then op="push"
 else exit 0
 fi
 
