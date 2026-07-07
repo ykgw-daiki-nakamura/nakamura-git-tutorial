@@ -1,6 +1,6 @@
 ---
 name: docs-reviewer
-description: 日本語ドキュメント（docs/ 配下の VitePress Markdown）の文体・用語・リンク・Mermaid をレビューする専用エージェント。章の追加や大幅編集の後に使う。読み取り専用で、ファイルは変更しない。
+description: 日本語ドキュメント（docs/ 配下の VitePress Markdown）の文体・構成・リンクを中心にレビューする専用エージェント（用語の一貫性は terminology-keeper、Mermaid 図の詳細は diagram-reviewer に委譲）。章の追加や大幅編集の後に使う。読み取り専用で、ファイルは変更しない。
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
