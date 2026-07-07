@@ -62,6 +62,25 @@ jobs:
       - name: Lint Japanese prose
         run: npm run lint:text
 
+  # 設定駆動ハーネスの「設定↔実体」の整合を検査（checks.json スキーマ / hook 配線 / ラベル実在）
+  config-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 20
+
+      # (a) checks.json スキーマ・(b) hook 配線・(c) ラベル実在（gh label list）を検査
+      - name: Check config↔reality consistency
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run check:config
+
   # PR で新たに追加/更新される依存に既知の脆弱性が無いか検査する
   # （リポジトリの Dependency graph が有効である必要がある）
   dependency-review:
