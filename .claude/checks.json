@@ -25,14 +25,20 @@
   },
   "//protectedBranches": "guard-branch.sh / guard-dangerous.sh が読む保護ブランチ。直接 commit / push や保護ブランチへの force push を阻止する。",
   "protectedBranches": ["main"],
-  "//issueLabels": "issue-label skill が読む Issue ラベル判定表。ロジック（skill）と対応表（設定）を分離する。実在するラベルのみ付与し、勝手に作らない（gh label create はしない）。status: in-progress は付けない（worktree-task の責務）。types=Conventional の type→主ラベル、areas=title/本文/対象パスに一致させる正規表現（大小無視）→領域ラベル、triage=明確な兆候がある時だけの補助ラベル。",
+  "//issueLabels": "issue-label skill が読む Issue ラベル判定表。ロジック（skill）と対応表（設定）を分離する。実在するラベルのみ付与し、勝手に作らない（gh label create はしない。type: * ラベルの用意は scripts/sync-labels.sh の役割）。status: in-progress は付けない（worktree-task の責務）。types=Conventional の type→種別ラベル（type: *）、areas=title/本文/対象パスに一致させる正規表現（大小無視）→領域ラベル、triage=明確な兆候がある時だけの補助ラベル。",
   "issueLabels": {
     "types": {
-      "feat": "enhancement",
-      "fix": "bug",
-      "docs": "documentation",
-      "refactor": "enhancement",
-      "perf": "enhancement"
+      "feat": "type: feat",
+      "fix": "type: fix",
+      "docs": "type: docs",
+      "chore": "type: chore",
+      "ci": "type: ci",
+      "build": "type: build",
+      "refactor": "type: refactor",
+      "test": "type: test",
+      "perf": "type: perf",
+      "style": "type: style",
+      "revert": "type: revert"
     },
     "areas": [
       { "label": "harness", "match": "\\.claude/|CLAUDE\\.md|guard-[a-z]+|/hooks/|/skills/|checks\\.json|SKILL\\.md|ハーネス|\\bharness\\b" },
