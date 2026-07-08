@@ -128,9 +128,14 @@ export default withMermaid({
           ]
         },
         {
-          text: 'カスタマイズ・禁止事項・用語',
+          text: '顧客別カスタマイズ',
           items: [
-            { text: '顧客別カスタマイズ', link: '/standards/customization' },
+            { text: '顧客別カスタマイズ', link: '/standards/customization' }
+          ]
+        },
+        {
+          text: '禁止事項・用語（参照）',
+          items: [
             { text: '禁止事項', link: '/standards/anti-patterns' },
             { text: '用語と背景', link: '/standards/glossary' }
           ]
