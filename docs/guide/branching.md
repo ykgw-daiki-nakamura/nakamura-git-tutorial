@@ -99,8 +99,6 @@ git merge --no-ff feature/login
 
 ここで見た**ローカルの merge の形（Fast-forward / 3-way）**を踏まえると、GitHub 上で PR をマージするときの **Merge commit / Squash and merge / Rebase and merge** の選び方が理解しやすくなります。その使い分けは [プルリクエストとレビュー（マージ方式の比較）](./pull-request#マージ方式の比較) を参照してください。
 
-## マージとリベースの違い（予告）
+## 作業の途中でブランチを切り替えたいとき
 
-履歴を一直線に整えたい場合は `merge` ではなく `rebase` を使う選択肢もあります。これは [rebase と履歴整理](./rebase) で詳しく扱います。
-
-なお、作業の途中で別のブランチに切り替えたくなったら、変更を一時退避できる [git stash で一時退避](./stash) が便利です。
+作業の途中で別のブランチに切り替えたくなったら、変更を一時退避できる [git stash で一時退避](./stash) が便利です。
