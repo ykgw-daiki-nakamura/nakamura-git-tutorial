@@ -48,7 +48,7 @@ git branch -d feature/login
 
 分岐後に **`main` 側が進んでいない**場合、`main` のポインタを feature の先端まで進めるだけで取り込めます。**マージコミットは作られず**、履歴は一直線のままです。
 
-取り込み前——`main` は `A` のまま、`feature` だけが `B`・`C` と先に進んでいる状態:
+取り込み前——`main` は `A` のまま、`feature/login` だけが `B`・`C` と先に進んでいる状態:
 
 ```mermaid
 gitGraph
