@@ -77,6 +77,7 @@ export default withMermaid({
         },
         {
           text: '履歴とコンフリクトの扱い',
+          collapsed: true,
           items: [
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
             { text: 'git stash で一時退避', link: '/guide/stash' }
@@ -84,6 +85,7 @@ export default withMermaid({
         },
         {
           text: 'ブランチ戦略（発展）',
+          collapsed: true,
           items: [
             { text: 'ブランチ戦略の使い分け', link: '/guide/branching-strategies' },
             { text: '他のブランチ戦略', link: '/guide/other-flows' }
@@ -91,6 +93,7 @@ export default withMermaid({
         },
         {
           text: 'リリース運用（発展）',
+          collapsed: true,
           items: [
             { text: 'リリースとバージョン管理', link: '/guide/release' },
             { text: 'リリースブランチ運用', link: '/guide/release-branches' },
