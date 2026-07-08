@@ -46,7 +46,7 @@ git branch -d feature/login
 
 ### Fast-forward マージ
 
-分岐後に **`main` 側が進んでいない**場合、`main` のポインタを feature の先端まで進めるだけで取り込めます。**マージコミットは作られず**、履歴は一直線のままです。
+分岐後に **`main` 側が進んでいない**場合、`main` のポインタを `feature/login` の先端まで進めるだけで取り込めます。**マージコミットは作られず**、履歴は一直線のままです。
 
 取り込み前——`main` は `A` のまま、`feature/login` だけが `B`・`C` と先に進んでいる状態:
 
@@ -84,7 +84,7 @@ gitGraph
 ```
 
 ```bash
-# main に feature を取り込む
+# main に feature/login を取り込む
 git switch main
 git merge feature/login
 
