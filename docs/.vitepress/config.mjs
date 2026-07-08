@@ -87,7 +87,6 @@ export default withMermaid({
           items: [
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
             { text: 'rebase と履歴整理', link: '/guide/rebase' },
-            { text: 'ブランチ更新: merge か rebase か', link: '/guide/update-branch' },
             { text: 'git stash で一時退避', link: '/guide/stash' }
           ]
         },
