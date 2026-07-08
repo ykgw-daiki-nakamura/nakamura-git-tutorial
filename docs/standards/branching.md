@@ -13,7 +13,7 @@ outline: [2, 3]
 | ブランチ | 役割 | 寿命 | 作成元 | マージ先 |
 | --- | --- | --- | --- | --- |
 | `main` | 唯一の統合ブランチ。次期バージョンの開発ライン | 永続 | — | — |
-| `feature/*` | 機能開発・改善 | 短命（目安 3 営業日以内） | `main` | `main`（PR 経由） |
+| `feature/*` | 機能開発・改善 | 短命 | `main` | `main`（PR 経由） |
 | `fix/*` | バグ修正 | 短命 | `main` | `main`（PR 経由） |
 | `release/vX.Y` | バージョン X.Y の安定化・出荷・保守ライン（SaaS / セルフホスト共通） | サポート期間中 | `main` | マージしない（cherry-pick のみ受け入れる） |
 
@@ -43,7 +43,7 @@ gitGraph
 
 - `main` は常に「次期バージョン（N+1）」の開発ラインであり、直接デプロイ・出荷の起点にはしない。
 - 出荷（SaaS 本番デプロイ / セルフホスト配布）は必ず `release/vX.Y` 上のタグから行う。
-- ハイライトされた `hotfix X` のように、修正は **main → release の一方向**にのみ流れる。
+- 図の `hotfix X` → `v1.2.1` のように、修正は **main → release の一方向**にのみ流れる。
 
 ### 命名規則
 
@@ -95,4 +95,4 @@ gitGraph
 1. `feature/*` → `main` のマージ方式は **squash merge** とする（merge commit / rebase merge はリポジトリ設定で無効化する）。
 2. `main` → `release/*` への反映は **cherry-pick のみ**とする。merge / rebase による取り込みは禁止する。
 3. `release/*` → `main` のマージは禁止する（upstream first の徹底）。
-4. PR は小さく保つ（目安: 差分 400 行以内）。大きくなる場合は feature flag を活用して分割する。
+4. PR は小さく保つ。大きくなる場合は feature flag を活用して分割する。
