@@ -87,7 +87,7 @@ docs/.vitepress/cache/
 .claude/settings.local.json
 ```
 
-`node_modules/` や `dist/` は「再生成できるもの」、`.claude/worktrees/` や `.claude/settings.local.json` は「各自固有・共有すべきでないもの」——という判断基準がそのまま表れています。コメントもすべて独立行で書かれている点にも注目してください。
+除外しているのは、`node_modules/` や `dist/` のように再生成できるものと、`.claude/worktrees/` や `.claude/settings.local.json` のように各自のローカル専用のものです。コメントは対象の直前に置いておくと、なぜ無視するのかが後から追えます。
 
 ## よくある落とし穴
 
