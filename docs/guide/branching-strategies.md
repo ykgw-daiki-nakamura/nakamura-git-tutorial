@@ -1,6 +1,6 @@
 # ブランチ戦略の使い分け
 
-[GitHub Flow](./github-flow) / [Git Flow](./git-flow) / [GitLab Flow](./gitlab-flow) / [Microsoft Release Flow](./release-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
+[GitHub Flow](./github-flow) / [Git Flow](./other-flows#git-flow) / [GitLab Flow](./other-flows#gitlab-flow) / [Microsoft Release Flow](./other-flows#microsoft-release-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
 
 ## 一覧で比較
 
@@ -35,15 +35,15 @@ flowchart TD
 
 ### 検証環境・本番環境が分かれている Web アプリ
 
-**推奨: [GitLab Flow](./gitlab-flow)（環境ブランチ）**。「いま本番に何が出ているか」をブランチで表現でき、`main` → `staging` → `production` の昇格フローが作れます。
+**推奨: [GitLab Flow](./other-flows#gitlab-flow)（環境ブランチ）**。「いま本番に何が出ているか」をブランチで表現でき、`main` → `staging` → `production` の昇格フローが作れます。
 
 ### バージョン番号を明示して出荷するソフトウェア
 
-**推奨: [Git Flow](./git-flow) または [GitLab Flow](./gitlab-flow)（リリースブランチ）**。複数バージョンを並行して保守でき、`release` / 安定ブランチと `hotfix` で計画的なリリースと緊急修正を両立できます。実際の運用例は [複数バージョンの保守（リリースブランチ）](./release-branches) を参照。
+**推奨: [Git Flow](./other-flows#git-flow) または [GitLab Flow](./other-flows#gitlab-flow)（リリースブランチ）**。複数バージョンを並行して保守でき、`release` / 安定ブランチと `hotfix` で計画的なリリースと緊急修正を両立できます。実際の運用例は [複数バージョンの保守（リリースブランチ）](./release-branches) を参照。
 
 ### 大規模チームで定期リリースしつつ複数版を保守する
 
-**推奨: [Microsoft Release Flow](./release-flow)**。GitHub Flow を土台に、リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。命名規則やブランチフォルダ強制で大人数の運用を機械的に揃えたいチームに向きます。
+**推奨: [Microsoft Release Flow](./other-flows#microsoft-release-flow)**。GitHub Flow を土台に、リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。命名規則やブランチフォルダ強制で大人数の運用を機械的に揃えたいチームに向きます。
 
 ## 迷ったら小さく始める
 
@@ -58,8 +58,6 @@ flowchart TD
 ## 関連ページ
 
 - [GitHub Flow](./github-flow)
-- [Git Flow](./git-flow)
-- [GitLab Flow](./gitlab-flow)
-- [Microsoft Release Flow](./release-flow)
+- [その他の主要フロー（Git Flow / GitLab Flow / Release Flow）](./other-flows)
 - [複数バージョンの保守（リリースブランチ）](./release-branches)
 - [リリースとバージョン管理](./release)
