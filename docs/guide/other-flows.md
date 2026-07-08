@@ -197,7 +197,7 @@ gitGraph
 
 ### main-first + cherry-pick
 
-`release` ブランチのバグを直すときは、**先に `main`（mainline）を直し、その修正を `release` ブランチへ `cherry-pick` で移植**します。`release` から `main` へマージして戻すことはしません（Release Flow 固有のルール）。
+`release/*` ブランチのバグを直すときは、**先に `main`（mainline）を直し、その修正を `release/*` ブランチへ `cherry-pick` で移植**します。`release/*` から `main` へマージして戻すことはしません（Release Flow 固有のルール）。
 
 この **main-first + cherry-pick** の具体的な手順・コマンド・図は [リリースブランチ運用](./release-branches) にまとめています。「修正が `main` に無い状態を作らない（順序を逆にすると次のリリースで同じバグが復活する）」という鉄則も共通です。
 
