@@ -31,7 +31,7 @@ flowchart LR
     SHARED -->|"オーナーがレビューしてマージ"| SHARED
 ```
 
-①〜④ は clone した後は**ローカルだけ**で進みます。⑤〜⑧ で、共有リポジトリへ push したり PR を出したりします。
+①〜③ は clone した後は**ローカルだけ**で進みます。④〜⑦ で、共有リポジトリへ push したり PR を出したりします。
 
 ::: tip 一人で練習する場合
 オーナーと参加者を兼ねて、自分一人でも実習できます。その場合は下の「オーナー向け」のセットアップを自分で行い、レビュー・マージも自分で行ってください。
@@ -64,7 +64,7 @@ flowchart LR
 2. 参加者を**コラボレーターとして招待**する（参加者がブランチを push できるようにするため）
    - リポジトリの **Settings → Collaborators → Add people** で各参加者を追加
 
-3. fork した直後は **Actions が無効**なことがあるため、**Actions** タブで有効化する（⑦ の CI 実習で使います）
+3. fork した直後は **Actions が無効**なことがあるため、**Actions** タブで有効化する（⑥ の CI 実習で使います）
 
 4. （推奨）`main` に **Branch protection rule** を設定し、「Require a pull request before merging」「Require status checks to pass」を有効にする
    - これで「PR・CI を通った変更だけが `main` に入る」状態になり、マージはオーナーの承認で行われます

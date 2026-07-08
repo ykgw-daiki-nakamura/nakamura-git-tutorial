@@ -1,4 +1,4 @@
-# ⑦ CI を動かす
+# ⑥ CI を動かす
 
 この実習では、このリポジトリに**もとから用意されている CI（GitHub Actions）** を、共有リポジトリで実際に動かします。新しくワークフローを書く必要はありません——PR を出せば、[.github/workflows/ci.yml](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.github/workflows/ci.yml) が自動で走り、あの「緑のチェック」が付きます。対応する解説は [CI 連携 (GitHub Actions)](../guide/ci) です。
 
@@ -49,7 +49,7 @@ git commit -am "docs: CI実習の記録を追加 (<あなた>)"
 git push -u origin practice/<あなた>-ci
 ```
 
-[⑥](./github-flow-lab) と同じ要領で、**共有リポジトリの `main`** 宛てに PR を作成します。
+[⑤](./github-flow-lab) と同じ要領で、**共有リポジトリの `main`** 宛てに PR を作成します。
 
 ```bash
 gh pr create --repo <オーナー>/nakamura-git-tutorial --base main --head practice/<あなた>-ci --fill
@@ -103,7 +103,7 @@ git push
 
 ✅ **チェックポイント**
 
-CI が再び ✅ **All checks have passed** に戻ります。これで安心してマージできる状態です。マージ（オーナーが実施）とローカルの片付けは⑥と同じ流れです。
+CI が再び ✅ **All checks have passed** に戻ります。これで安心してマージできる状態です。マージ（オーナーが実施）とローカルの片付けは⑤と同じ流れです。
 
 ```bash
 git switch main

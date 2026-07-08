@@ -1,4 +1,4 @@
-# ⑤ GitHub にリモート連携
+# ④ GitHub にリモート連携
 
 ここから後半、**GitHub と連携する実習** です。これまでローカルで作った変更を、**共有リポジトリ（origin）** へ push し、リモートと同期する流れを体験します。対応する解説は [リモートと GitHub](../guide/remote) です。
 
@@ -12,8 +12,22 @@
 | --- | --- |
 | 共有リポジトリを clone 済み・コラボレーター招待済み・GitHub 認証済み | 約 20 分 |
 
-::: warning 先にローカルの main を戻しておく
-①〜④ をやった後は、ローカルの `main` に練習用コミットが残っています。このまま進めると PR に余計な変更が混ざります。[④ の末尾「ローカル編の後片付け」](./rebase-lab) のとおり、`git fetch origin && git reset --hard origin/main` で `main` を戻してから始めてください（clone し直してもOK）。
+::: warning 先にローカルの main を戻しておく（重要）
+①〜③ では、練習のために**ローカルの `main` に直接コミット**した場合があります。そのまま `main` からブランチを切って push すると、**練習用のコミットが PR に混ざったり**、`git pull` が複雑になります。ここから共有リポジトリへ push する前に、ローカルの `main` を共有リポジトリの最新状態に戻しておきましょう。
+
+```bash
+git switch main
+git fetch origin
+git reset --hard origin/main   # ローカル main の練習コミットを破棄し、origin/main に合わせる
+```
+
+練習用ブランチ（`practice/...`）が残っていれば削除しておきます（任意）。
+
+```bash
+git branch -D practice/notes practice/branch practice/timeout-5000   # 作ったものだけでOK
+```
+
+うまくいかないときは、**作業フォルダを消して clone し直す**のが最も確実です。
 :::
 
 ## ステップ 1：リモートを確認する
@@ -63,7 +77,7 @@ git push -u origin practice/<あなた>-remote
 branch 'practice/<あなた>-remote' set up to track 'origin/practice/<あなた>-remote'.
 ```
 
-ブラウザで共有リポジトリのページを開くと、あなたのブランチが現れ、「Compare & pull request」のバナーが出ます（PR は次の⑥で扱います）。
+ブラウザで共有リポジトリのページを開くと、あなたのブランチが現れ、「Compare & pull request」のバナーが出ます（PR は次の⑤で扱います）。
 
 ::: details 🔍 `-u` は何をしている？
 `-u`（`--set-upstream`）は、ローカルのブランチと `origin` 側のブランチを**ひも付け**ます。一度設定すれば、以降は `git push` / `git pull` を引数なしで実行できます。初回だけ付ければOKです。
