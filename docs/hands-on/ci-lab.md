@@ -122,7 +122,7 @@ git branch -d practice/<あなた>-ci
 - CI は成功＝緑、失敗＝赤。ブランチ保護と組み合わせると「CI が通った変更だけマージ」を強制できる
 - push 済みの変更を打ち消すときは `git revert` が安全
 
-CI が緑になり、マージまでの安全網を体験できました。最後は、この `main` を「出荷」として確定する [⑧ タグとリリース](./release-lab) に進みましょう。
+CI が緑になり、マージまでの安全網を体験できました。
 
 ::: tip ここまでの流れ
 共有リポジトリの clone から始めて、基本操作・ブランチ・コンフリクト・rebase・リモート・GitHub Flow・CI まで、本物のリポジトリで一通り手を動かせました。ここで身につけた GitHub Flow は、そのまま実際の OSS 貢献にも使えます。[CONTRIBUTING](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/CONTRIBUTING.md) を読んで、本家への改善 PR に挑戦してみるのも良い練習になります。

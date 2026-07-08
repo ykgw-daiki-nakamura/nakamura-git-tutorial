@@ -125,4 +125,4 @@ git log --oneline -3
 - 作業ブランチの初回 push は `git push -u origin <ブランチ>`（名前入りブランチで衝突回避）
 - チームの変更は `git fetch`（確認）→ `git pull`（取り込み）で同期する
 
-リモートが使えるようになりました。次は実際のチーム開発フロー [⑥ GitHub Flow を一周する](./github-flow-lab) を体験します。
+リモートが使えるようになりました。

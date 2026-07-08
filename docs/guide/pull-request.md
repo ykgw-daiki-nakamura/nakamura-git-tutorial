@@ -113,5 +113,3 @@ gitGraph
 ::: tip 迷ったら Squash
 多くのチームでは **Squash and merge** が扱いやすく人気です。PR 単位で履歴が 1 コミットにまとまり、`main` のログが読みやすくなります。
 :::
-
-ブランチ・リモート・PR と要素が揃いました。次は、これらをつなぐ実践フロー [GitHub Flow](./github-flow) を一周します。

@@ -84,5 +84,3 @@ git pull
 ```bash
 git push origin --delete feature/login
 ```
-
-リモートと同期できたら、次は変更をレビューに乗せる [プルリクエストとレビュー](./pull-request) です。
