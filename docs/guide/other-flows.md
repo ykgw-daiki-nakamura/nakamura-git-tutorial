@@ -141,7 +141,7 @@ gitGraph
 
 ## Microsoft Release Flow
 
-**Microsoft Release Flow**（以下このページでは Release Flow）は、Microsoft（Azure DevOps チーム）が公開しているブランチ運用のガイダンスです。[GitHub Flow](./github-flow) をベースにしつつ、**大規模チームで定期リリースと複数バージョンの保守を回す**ための工夫を加えた「型」で、GitHub Flow / [Git Flow](#git-flow) / [GitLab Flow](#gitlab-flow) と並ぶ選択肢として押さえておくと比較の幅が広がります。
+**Microsoft Release Flow**（以下このページでは Release Flow）は、Microsoft（Azure DevOps チーム）が公開しているブランチ運用のガイダンスです。[GitHub Flow](./github-flow) をベースにしつつ、**大規模チームで定期リリースと複数バージョンの保守を回す**ための工夫を加えた「型」で、GitHub Flow / [Git Flow](#git-flow) / [GitLab Flow](#gitlab-flow) と並ぶ選択肢の一つです。
 
 出典: [Microsoft の Git 分岐ガイダンス（Release Flow）](https://learn.microsoft.com/ja-jp/azure/devops/repos/git/git-branching-guidance)
 
