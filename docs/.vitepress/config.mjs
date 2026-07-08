@@ -76,7 +76,7 @@ export default withMermaid({
           ]
         },
         {
-          text: '履歴とコンフリクトの扱い',
+          text: '割り込みとコンフリクトへの対処',
           collapsed: true,
           items: [
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
