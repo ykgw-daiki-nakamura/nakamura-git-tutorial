@@ -13,11 +13,10 @@ const handsOnSidebar = [
       { text: '① ローカルで基本操作', link: '/hands-on/basics-lab' },
       { text: '② ブランチとマージ', link: '/hands-on/branching-lab' },
       { text: '③ コンフリクトを解決する', link: '/hands-on/conflicts-lab' },
-      { text: '④ rebase で履歴を整える（発展・任意）', link: '/hands-on/rebase-lab' },
-      { text: '⑤ GitHub にリモート連携', link: '/hands-on/remote-lab' },
-      { text: '⑥ GitHub Flow を一周する', link: '/hands-on/github-flow-lab' },
-      { text: '⑦ CI を動かす', link: '/hands-on/ci-lab' },
-      { text: '⑧ タグとリリース', link: '/hands-on/release-lab' }
+      { text: '④ GitHub にリモート連携', link: '/hands-on/remote-lab' },
+      { text: '⑤ GitHub Flow を一周する', link: '/hands-on/github-flow-lab' },
+      { text: '⑥ CI を動かす', link: '/hands-on/ci-lab' },
+      { text: '⑦ タグとリリース', link: '/hands-on/release-lab' }
     ]
   }
 ]
