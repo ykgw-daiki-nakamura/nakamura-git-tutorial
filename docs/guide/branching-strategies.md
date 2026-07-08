@@ -58,6 +58,6 @@ flowchart TD
 ## 関連ページ
 
 - [GitHub Flow](./github-flow)
-- [その他の主要フロー（Git Flow / GitLab Flow / Release Flow）](./other-flows)
+- [他のブランチ戦略（Git Flow / GitLab Flow / Release Flow）](./other-flows)
 - [複数バージョンの保守（リリースブランチ運用）](./release-branches)
 - [リリースとバージョン管理](./release)

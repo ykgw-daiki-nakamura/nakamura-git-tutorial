@@ -1,4 +1,4 @@
-# その他の主要フロー（Git Flow / GitLab Flow / Release Flow）
+# 他のブランチ戦略（Git Flow / GitLab Flow / Release Flow）
 
 このチュートリアルは [GitHub Flow](./github-flow) を採用していますが、**複数バージョンの並行保守**や**環境ごとのデプロイ表現**が必要になると、別のブランチ運用モデルが選択肢に入ります。ここでは代表的な 3 つ——**Git Flow** / **GitLab Flow** / **Microsoft Release Flow**——を、比較の材料として紹介します。どれを選ぶかの判断は [ブランチ戦略の使い分け](./branching-strategies) を参照してください。
 
