@@ -94,5 +94,3 @@ git merge --no-ff feature/login
 履歴を一直線に整えたい場合は `merge` ではなく `rebase` を使う選択肢もあります。これは [rebase と履歴整理](./rebase) で詳しく扱います。
 
 なお、作業の途中で別のブランチに切り替えたくなったら、変更を一時退避できる [git stash で一時退避](./stash) が便利です。
-
-次は、ローカルのブランチを GitHub と同期する [リモートと GitHub](./remote) です。
