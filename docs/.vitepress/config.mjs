@@ -103,12 +103,6 @@ export default withMermaid({
           ]
         },
         {
-          text: '発展・任意トピック',
-          items: [
-            { text: 'rebase と履歴整理', link: '/guide/rebase' }
-          ]
-        },
-        {
           text: '付録',
           items: [
             { text: 'コマンド早見表', link: '/guide/commands' },
