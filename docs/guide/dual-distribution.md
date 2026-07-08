@@ -72,7 +72,7 @@ SaaS＝「常に最新 GA を継続パッチ」。SaaS とセルフホストが*
 
 ## 対外バージョンを自動で出す
 
-手動タグ運用は忘れ・ズレが起きるので、**[Conventional Commits](./release#conventional-commits-と対応している)（このリポジトリで推奨）から版を自動計算**するツールを噛ませます。
+手動タグ運用は忘れ・ズレが起きるので、**[Conventional Commits](./release#conventional-commits-と対応している)から版を自動計算**するツールを噛ませます。
 
 - **release-please（推奨）**: `main` のコミットから次版を判定し、「リリース PR」（version bump + CHANGELOG）を自動で開く。それをマージした瞬間に**タグ + GitHub Release を自動作成**する。
 - **semantic-release**: マージ即リリースまで自動化したい場合の選択肢。
