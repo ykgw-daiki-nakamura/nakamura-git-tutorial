@@ -91,4 +91,59 @@ git pull --rebase
 git config --global pull.rebase true
 ```
 
-次は、PR 画面に出る **「Update with merge commit」/「Update with rebase」** の選び方を [ブランチ更新: merge か rebase か](./update-branch) で見ていきます。
+## GitHub 上でブランチを更新する（merge か rebase か）
+
+ここまではローカルの `rebase` の話でした。同じ選択は **GitHub の PR 画面**にも現れます。PR を出したあと `main` が先に進むと、**「Update branch」** ボタンが出て、遅れた自分のブランチに `main` の最新を取り込めます。ボタンには 2 つの選択肢があります。
+
+- **Update with merge commit** … `main` の最新を**マージコミット**で取り込む（自分のコミット ID は変わらない）
+- **Update with rebase** … 自分のコミットを `main` の最新の**上に乗せ直す**（コミット ID が振り直される）
+
+結果の履歴の形は、上の「[merge と rebase の違い](#merge-と-rebase-の違い)」で見た 2 つの図とまったく同じです。
+
+::: warning これは「マージ方式」の選択ではありません
+PR を**マージするとき**の `Merge commit` / `Squash and merge` / `Rebase and merge` とは別物です。ここで選ぶのは「**遅れた自分のブランチに `main` の最新を取り込む方法**」です。マージ方式の選び方は [プルリクエストとレビュー](./pull-request) を参照してください。
+:::
+
+### どう選べばいいか
+
+まず結論から。**迷ったら `Update with merge commit` を選べば安全です。**
+
+| | Update with merge commit | Update with rebase |
+| --- | --- | --- |
+| 履歴 | マージコミットが増える | 一直線で読みやすい |
+| コミット ID | **変わらない** | **振り直される** |
+| 安全度 | 高い（元に戻しやすい） | 注意が必要 |
+| 向いているケース | 通常はこちら / 複数人で同じブランチを触っている | 履歴を綺麗に保ちたい / 自分しか触っていない PR |
+
+- **`Update with merge commit` を選ぶとき**: どちらでもよく安全に済ませたいとき／他の人も同じ PR ブランチを触っているとき／**Squash and merge** 方針で更新のマージコミットが最終的に潰れるとき。
+- **`Update with rebase` を選ぶとき**: 自分しか触っていないブランチで履歴を一直線に保ちたいとき／`Rebase and merge` 方針で最終履歴を綺麗にしたいとき。
+
+`Update with rebase` はコミット ID を振り直すため、**共有ブランチでは使わない**——上の [黄金律](#使い分けの指針) と同じ理由です。同じ PR ブランチを他の人も pull していると、次の pull で履歴が食い違います。
+
+### 手元（ローカル）で同じことをする
+
+GitHub のボタンを使わず、ローカルで取り込んでから push しても同じです。むしろコンフリクト対応はローカルの方が楽なことが多いです。
+
+```bash
+# 自分のブランチにいる状態で
+
+# 「Update with merge commit」に相当
+git fetch origin
+git merge origin/main
+git push                      # 取り込んだ結果をリモートの PR ブランチへ反映
+
+# 「Update with rebase」に相当
+git fetch origin
+git rebase origin/main
+git push --force-with-lease   # rebase 後は履歴が変わるので force push が必要
+```
+
+::: tip rebase 後の push は `--force-with-lease`
+rebase するとコミット ID が変わるため、通常の `git push` は弾かれます。`--force-with-lease` を使うと「自分が知らないうちにリモートが更新されていたら中断する」安全な force push になります。単なる `--force` は他人の push を上書きしかねないので避けましょう。
+:::
+
+複雑なコンフリクトが出たら、GitHub のボタンではなくローカルで解決します。手順は [コンフリクト解決](./conflicts) を参照してください。
+
+---
+
+次は、作業を一時退避する [git stash で一時退避](./stash) を見ていきます。
