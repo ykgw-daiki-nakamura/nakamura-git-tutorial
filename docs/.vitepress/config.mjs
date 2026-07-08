@@ -108,13 +108,28 @@ export default withMermaid({
       ],
       '/standards/': [
         {
-          text: '開発規約',
+          text: '基本方針',
           items: [
-            { text: '概要・基本方針', link: '/standards/' },
+            { text: '概要・基本方針', link: '/standards/' }
+          ]
+        },
+        {
+          text: 'ブランチとバージョン',
+          items: [
             { text: 'ブランチ運用', link: '/standards/branching' },
+            { text: 'バージョン運用', link: '/standards/versioning' }
+          ]
+        },
+        {
+          text: 'リリース・デプロイと障害対応',
+          items: [
             { text: 'リリースとデプロイ', link: '/standards/release' },
-            { text: '障害対応', link: '/standards/incident' },
-            { text: 'バージョン運用', link: '/standards/versioning' },
+            { text: '障害対応', link: '/standards/incident' }
+          ]
+        },
+        {
+          text: 'カスタマイズ・禁止事項・用語',
+          items: [
             { text: '顧客別カスタマイズ', link: '/standards/customization' },
             { text: '禁止事項', link: '/standards/anti-patterns' },
             { text: '用語と背景', link: '/standards/glossary' }
