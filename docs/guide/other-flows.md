@@ -197,17 +197,9 @@ gitGraph
 
 ### main-first + cherry-pick
 
-`release` ブランチのバグを直すときは、**先に `main`（mainline）を直し、その修正を `release` ブランチへ `cherry-pick` で移植**します。`release` から `main` へマージして戻すことはしません。
+`release` ブランチのバグを直すときは、**先に `main`（mainline）を直し、その修正を `release` ブランチへ `cherry-pick` で移植**します。`release` から `main` へマージして戻すことはしません（Release Flow 固有のルール）。
 
-```bash
-# 1. まず main で修正して PR マージ（mainline を先に直す）
-# 2. その修正コミットを release ブランチへ移植
-git switch release/20
-git cherry-pick COMMIT_SHA   # main に入れた修正コミットの SHA に置き換える
-git push origin release/20
-```
-
-「**修正が `main` に無い状態を作らない**」——これは本教材が [複数バージョンの保守](./release-branches) で強調している鉄則とまったく同じです。順序を逆にすると、次のリリースで同じバグが復活します。
+この **main-first + cherry-pick** の具体的な手順・コマンド・図は [リリースブランチ運用](./release-branches) にまとめています。「修正が `main` に無い状態を作らない（順序を逆にすると次のリリースで同じバグが復活する）」という鉄則も共通です。
 
 ### タグ主軸との違い
 
