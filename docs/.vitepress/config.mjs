@@ -13,7 +13,7 @@ const handsOnSidebar = [
       { text: '① ローカルで基本操作', link: '/hands-on/basics-lab' },
       { text: '② ブランチとマージ', link: '/hands-on/branching-lab' },
       { text: '③ コンフリクトを解決する', link: '/hands-on/conflicts-lab' },
-      { text: '④ rebase で履歴を整える', link: '/hands-on/rebase-lab' },
+      { text: '④ rebase で履歴を整える（発展・任意）', link: '/hands-on/rebase-lab' },
       { text: '⑤ GitHub にリモート連携', link: '/hands-on/remote-lab' },
       { text: '⑥ GitHub Flow を一周する', link: '/hands-on/github-flow-lab' },
       { text: '⑦ CI を動かす', link: '/hands-on/ci-lab' },
@@ -79,8 +79,13 @@ export default withMermaid({
           text: '履歴とコンフリクトの扱い',
           items: [
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
-            { text: 'rebase と履歴整理', link: '/guide/rebase' },
             { text: 'git stash で一時退避', link: '/guide/stash' }
+          ]
+        },
+        {
+          text: '発展・任意トピック',
+          items: [
+            { text: 'rebase と履歴整理', link: '/guide/rebase' }
           ]
         },
         {

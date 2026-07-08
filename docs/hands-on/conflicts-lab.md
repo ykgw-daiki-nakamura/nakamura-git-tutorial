@@ -160,4 +160,4 @@ git merge --abort
 - 解決は **編集 → `add` → `commit`** の流れ
 - `git merge --abort` で安全にやり直せる
 
-履歴をより綺麗に保つ [④ rebase で履歴を整える](./rebase-lab) に進みましょう。
+次は [⑤ GitHub にリモート連携](./remote-lab) に進みましょう。履歴を一直線に整えたい人は、**発展・任意**の [④ rebase で履歴を整える](./rebase-lab) にも取り組めます（マージ基調の標準フローでは必須ではありません）。
