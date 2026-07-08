@@ -59,7 +59,7 @@ gitGraph
     commit id: "C"
 ```
 
-`git merge feature` すると、`main` のポインタが `C` まで進むだけ（fast-forward）。枝分かれは残らず、下のように一直線になります:
+`main` に切り替えて `git merge feature/login` すると、`main` のポインタが `C` まで進むだけ（fast-forward）。枝分かれは残らず、下のように一直線になります:
 
 ```mermaid
 gitGraph
