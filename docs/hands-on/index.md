@@ -28,7 +28,7 @@ flowchart LR
     SHARED -->|"各参加者が clone"| P2["参加者 B の手元"]
     P1 -->|"ブランチを push / PR"| SHARED
     P2 -->|"ブランチを push / PR"| SHARED
-    SHARED -->|"オーナーがレビューしてマージ"| DONE["main に取り込み完了"]
+    SHARED -->|"オーナーがレビューしてマージ"| SHARED
 ```
 
 ①〜③ は clone した後は**ローカルだけ**で進みます。④〜⑦ で、共有リポジトリへ push したり PR を出したりします。
