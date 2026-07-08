@@ -71,15 +71,8 @@ export default withMermaid({
             { text: 'ブランチとマージ', link: '/guide/branching' },
             { text: 'リモートと GitHub', link: '/guide/remote' },
             { text: 'プルリクエストとレビュー', link: '/guide/pull-request' },
-            { text: 'GitHub Flow', link: '/guide/github-flow' }
-          ]
-        },
-        {
-          text: 'ブランチ戦略',
-          items: [
-            { text: 'ブランチ戦略の使い分け', link: '/guide/branching-strategies' },
-            { text: 'その他の主要フロー（Git Flow / GitLab Flow / Release Flow）', link: '/guide/other-flows' },
-            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' }
+            { text: 'GitHub Flow', link: '/guide/github-flow' },
+            { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' }
           ]
         },
         {
@@ -91,10 +84,17 @@ export default withMermaid({
           ]
         },
         {
-          text: '自動化とリリース',
+          text: 'ブランチ戦略（発展）',
           items: [
-            { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' },
+            { text: 'ブランチ戦略の使い分け', link: '/guide/branching-strategies' },
+            { text: 'その他の主要フロー（Git Flow / GitLab Flow / Release Flow）', link: '/guide/other-flows' }
+          ]
+        },
+        {
+          text: 'リリース運用（発展）',
+          items: [
             { text: 'リリースとバージョン管理', link: '/guide/release' },
+            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' },
             { text: 'デュアル配布（SaaS + セルフホスト）でのリリース運用', link: '/guide/dual-distribution' }
           ]
         },
