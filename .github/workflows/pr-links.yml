@@ -1,0 +1,47 @@
+name: PR Links
+
+# .md を変更する PR で、外部リンク（http/https）の死活を lychee で検査する。
+# 内部/相対リンクは docs:build が担保、週次の links.yml とは別に「PR 時の即フィードバック」を担う。
+on:
+  pull_request:
+    # 起動条件を実際の検査対象（下の args と同じ docs 配下＋ルート *.md）に合わせる。
+    # 他所の Markdown 変更で無駄に起動しない／スコープ記述と一致させる。
+    paths:
+      - 'docs/**/*.md'
+      - '*.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-links-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      # 検査対象は固定 glob（変更ファイル名を式へ展開せず、インジェクション経路を作らない）。
+      # 外部スキームのみ検査し、内部/相対リンクは対象外（docs:build が担保）。
+      # links.yml と同じく **非ブロッキング**（fail: false）+ リトライ。外部リンク検査は
+      # ネットワーク/レート制限で不安定なため PR を落とさず、結果はジョブサマリに可視化して
+      # 切れリンクの早期フィードバックを得る（PR ゲートにはしない方針を踏襲）。
+      - name: Check external links (lychee)
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
+        with:
+          args: >-
+            --no-progress
+            --max-retries 3
+            --retry-wait-time 2
+            --timeout 20
+            --scheme https --scheme http
+            './docs/**/*.md' './*.md'
+          fail: false
+        env:
+          # GitHub リンクのレート制限回避（読み取りのみ）
+          GITHUB_TOKEN: ${{ github.token }}
