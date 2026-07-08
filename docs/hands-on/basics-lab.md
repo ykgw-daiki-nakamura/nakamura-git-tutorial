@@ -43,7 +43,7 @@ nothing to commit, working tree clean
 ```markdown
 ## 練習ログ
 
-実習①②⑤ では、このリストに行を追加していきます。
+実習①②④⑥⑦ では、このリストに行を追加していきます。
 
 - YYYY-MM-DD サンプル: 練習を始めました
 - YYYY-MM-DD はじめてのコミットに挑戦   ← この行を追加（日付は今日の日付に）
