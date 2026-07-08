@@ -41,13 +41,13 @@ flowchart LR
 
 | 項目 | 内容 |
 | --- | --- |
-| Git | インストール済み（[セットアップ](../guide/setup) 参照） |
+| Git | インストール済み（[Git 公式のダウンロード](https://git-scm.com/downloads) 参照） |
 | GitHub アカウント | **必須** |
 | 共有リポジトリへのアクセス | 参加者はオーナーから**コラボレーター招待**を受ける（push 権限が必要） |
 | gh CLI | あると便利。Web 操作でも代替可 |
 | Node.js | 20 以上（`npm run docs:dev` でプレビューする場合） |
 
-まだ認証していない場合は、`gh auth login`、または SSH 鍵の設定（[セットアップ](../guide/setup)）を先に済ませてください。
+まだ認証していない場合は、`gh auth login`、または SSH 鍵の設定（[GitHub 公式ドキュメント](https://docs.github.com/ja/authentication/connecting-to-github-with-ssh)）を先に済ませてください。
 
 ## オーナー向け：実習用リポジトリを用意する（1 回だけ）
 

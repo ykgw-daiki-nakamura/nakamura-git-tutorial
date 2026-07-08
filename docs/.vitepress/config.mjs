@@ -59,7 +59,6 @@ export default withMermaid({
           text: 'はじめに・基礎',
           items: [
             { text: 'Git / GitHub とは', link: '/guide/introduction' },
-            { text: 'セットアップ', link: '/guide/setup' },
             { text: 'Git の基本', link: '/guide/basics' },
             { text: '.gitignore で追跡除外', link: '/guide/gitignore' }
           ]
