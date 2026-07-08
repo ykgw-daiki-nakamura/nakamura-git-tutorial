@@ -32,7 +32,8 @@ gitGraph
   commit id: "ga" tag: "v1.1.0"
   checkout main
   branch fix/1250-forecast-nan-handling
-  commit id: "fix: NaN 処理"
+  commit id: "fix: NaN 検出"
+  commit id: "fix: テスト追加"
   checkout main
   commit id: "fix C (squash)"
   branch release/v1.2
