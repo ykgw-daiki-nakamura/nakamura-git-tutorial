@@ -46,36 +46,46 @@ git branch -d feature/login
 
 ### Fast-forward マージ
 
-分岐元に新しいコミットがない場合、ポインタを進めるだけで済みます。履歴は一直線になります。
+分岐後に **`main` 側が進んでいない**場合、`main` のポインタを `feature/login` の先端まで進めるだけで取り込めます。**マージコミットは作られず**、履歴は一直線のままです。
+
+取り込み前——`main` は `A` のまま、`feature/login` だけが `B`・`C` と先に進んでいる状態:
 
 ```mermaid
 gitGraph
     commit id: "A"
-    branch feature
-    checkout feature
+    branch feature/login
+    checkout feature/login
     commit id: "B"
     commit id: "C"
-    checkout main
-    merge feature
+```
+
+`main` に切り替えて `git merge feature/login` すると、`main` のポインタが `C` まで進むだけ（fast-forward）。枝分かれは残らず、下のように一直線になります:
+
+```mermaid
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
 ```
 
 ### 3-way マージ（マージコミット）
 
-分岐後に**両方のブランチが進んでいる**場合、両者を統合する「マージコミット」が作られます。
+分岐後に**両方のブランチが進んでいる**場合（`feature/login` が `B`・`C`、`main` が `D` と別々に進んだ状態）、両者を統合する「マージコミット `M`」が作られます。
 
 ```mermaid
 gitGraph
     commit id: "A"
-    branch feature
-    checkout feature
+    branch feature/login
+    checkout feature/login
     commit id: "B"
-    checkout main
     commit id: "C"
-    merge feature id: "M"
+    checkout main
+    commit id: "D"
+    merge feature/login id: "M"
 ```
 
 ```bash
-# main に feature を取り込む
+# main に feature/login を取り込む
 git switch main
 git merge feature/login
 
