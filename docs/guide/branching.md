@@ -46,7 +46,9 @@ git branch -d feature/login
 
 ### Fast-forward マージ
 
-分岐元に新しいコミットがない場合、ポインタを進めるだけで済みます。履歴は一直線になります。
+分岐後に **`main` 側が進んでいない**場合、`main` のポインタを feature の先端まで進めるだけで取り込めます。**マージコミットは作られず**、履歴は一直線のままです。
+
+取り込み前——`main` は `A` のまま、`feature` だけが `B`・`C` と先に進んでいる状態:
 
 ```mermaid
 gitGraph
@@ -55,8 +57,15 @@ gitGraph
     checkout feature
     commit id: "B"
     commit id: "C"
-    checkout main
-    merge feature
+```
+
+`git merge feature` すると、`main` のポインタが `C` まで進むだけ（fast-forward）。枝分かれは残らず、下のように一直線になります:
+
+```mermaid
+gitGraph
+    commit id: "A"
+    commit id: "B"
+    commit id: "C"
 ```
 
 ### 3-way マージ（マージコミット）

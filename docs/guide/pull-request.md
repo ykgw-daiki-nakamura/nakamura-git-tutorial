@@ -61,22 +61,47 @@ GitHub では「コメント」「承認 (Approve)」「変更要求 (Request ch
 
 ## マージ方式の比較
 
-GitHub には 3 つのマージ方式があります。チームでどれを使うか決めておきましょう。
+GitHub には 3 つのマージ方式があります。同じ PR（`feature` の `B`・`C` の 2 コミット）を `main` に取り込んだとき、**取り込み後の `main` の履歴の形**がどう変わるかで選びます。各図の `A` は取り込み前の `main`、`B`・`C` は feature 側のコミットです。
+
+### Merge commit
+
+`feature` の全コミット（`B`・`C`）に加え、統合を示す**マージコミット `M`** が残ります。作業履歴がそのまま残る形です。
 
 ```mermaid
-flowchart TB
-    subgraph merge["Merge commit"]
-        direction LR
-        m1[main] --- mm["マージコミット<br/>（履歴をそのまま保持）"]
-    end
-    subgraph squash["Squash and merge"]
-        direction LR
-        s1[main] --- ss["1 つにまとめた<br/>単一コミット"]
-    end
-    subgraph rebase["Rebase and merge"]
-        direction LR
-        r1[main] --- rr["各コミットを<br/>一直線に追加"]
-    end
+gitGraph
+    commit id: "A"
+    branch feature
+    checkout feature
+    commit id: "B"
+    commit id: "C"
+    checkout main
+    merge feature id: "M"
+```
+
+### Squash and merge
+
+`feature` の `B`・`C` を **1 つにまとめた単一コミット**として `main` に載せます。個々のコミットは `main` には残りません。
+
+```mermaid
+gitGraph
+    commit id: "A"
+    branch feature
+    checkout feature
+    commit id: "B"
+    commit id: "C"
+    checkout main
+    commit id: "PR (B+C)" type: HIGHLIGHT
+```
+
+### Rebase and merge
+
+`feature` の各コミットを、`main` の先端へ**一直線に載せ直し**ます（`B'`・`C'`）。マージコミットは作られず、コミットは 1 つずつ残ります。
+
+```mermaid
+gitGraph
+    commit id: "A"
+    commit id: "B'"
+    commit id: "C'"
 ```
 
 | 方式 | 結果 | 向いているケース |

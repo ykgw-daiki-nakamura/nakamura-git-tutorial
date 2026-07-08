@@ -13,9 +13,9 @@ gitGraph
     commit id: "A"
     branch feature
     checkout feature
-    commit id: "X"
-    checkout main
     commit id: "B"
+    checkout main
+    commit id: "C"
     checkout feature
     merge main id: "M"
 ```
@@ -25,13 +25,11 @@ gitGraph
 ```mermaid
 gitGraph
     commit id: "A"
-    commit id: "B"
-    branch feature
-    checkout feature
-    commit id: "X'"
+    commit id: "C"
+    commit id: "B'"
 ```
 
-rebase は feature のコミット `X` を、最新の `B` の上に「乗せ直し」ます。結果として履歴が枝分かれせず一直線になります。
+rebase は feature のコミット `B` を、最新の `C` の上に「乗せ直し」ます。結果として履歴が枝分かれせず一直線になります。
 
 ```bash
 # feature ブランチで、main の最新の上に乗せ直す
