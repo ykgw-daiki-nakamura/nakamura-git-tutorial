@@ -1,6 +1,6 @@
 # ブランチ戦略の使い分け
 
-[GitHub Flow](./github-flow) / [Git Flow](./other-flows#git-flow) / [GitLab Flow](./other-flows#gitlab-flow) / [Microsoft Release Flow](./other-flows#microsoft-release-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。**普遍の「正解」は無い**ものの、本教材の推奨（既定）は最もシンプルな **GitHub Flow** で、迷ったらここから始めるのを勧めます。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
+[GitHub Flow](./github-flow) / [Git Flow](./other-flows#git-flow) / [GitLab Flow](./other-flows#gitlab-flow) / [Microsoft Release Flow](./other-flows#microsoft-release-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。**普遍の「正解」は無い**ものの、推奨（既定）は最もシンプルな **GitHub Flow** で、迷ったらここから始めるのを勧めます。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
 
 ## 一覧で比較
 
@@ -31,7 +31,7 @@ flowchart TD
 
 ### 継続的にデプロイする Web サービス／SaaS
 
-**推奨: [GitHub Flow](./github-flow)**。`main` にマージしたら即デプロイ。短命ブランチ＋PR レビューだけで回り、最もシンプル。本チュートリアルのリポジトリもこれで運用しています。
+**推奨: [GitHub Flow](./github-flow)**。`main` にマージしたら即デプロイ。短命ブランチ＋PR レビューだけで回り、最もシンプルです。
 
 ### 検証環境・本番環境が分かれている Web アプリ
 

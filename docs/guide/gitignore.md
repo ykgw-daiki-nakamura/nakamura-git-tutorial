@@ -70,9 +70,9 @@ git config --global core.excludesfile ~/.gitignore_global
 # ~/.gitignore_global に .DS_Store などを書いておく
 ```
 
-## 実例：このリポジトリの .gitignore
+## .gitignore の実例
 
-このチュートリアルサイト自身の [.gitignore](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.gitignore) は、生成物・ランタイム成果物・個人設定を的確に除外しています。実ファイルの内容は次のとおりです。
+実際の [.gitignore](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.gitignore) の例です。生成物・ランタイム成果物・個人設定を的確に除外しています。内容は次のとおりです。
 
 ```gitignore
 node_modules/
