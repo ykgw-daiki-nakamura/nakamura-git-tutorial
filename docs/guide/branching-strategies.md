@@ -39,7 +39,7 @@ flowchart TD
 
 ### バージョン番号を明示して出荷するソフトウェア
 
-**推奨: [Git Flow](./other-flows#git-flow) または [GitLab Flow](./other-flows#gitlab-flow)（リリースブランチ）**。複数バージョンを並行して保守でき、`release` / 安定ブランチと `hotfix` で計画的なリリースと緊急修正を両立できます。実際の運用例は [複数バージョンの保守（リリースブランチ）](./release-branches) を参照。
+**推奨: [Git Flow](./other-flows#git-flow) または [GitLab Flow](./other-flows#gitlab-flow)（リリースブランチ）**。複数バージョンを並行して保守でき、`release` / 安定ブランチと `hotfix` で計画的なリリースと緊急修正を両立できます。実際の運用例は [複数バージョンの保守（リリースブランチ運用）](./release-branches) を参照。
 
 ### 大規模チームで定期リリースしつつ複数版を保守する
 
@@ -59,5 +59,5 @@ flowchart TD
 
 - [GitHub Flow](./github-flow)
 - [その他の主要フロー（Git Flow / GitLab Flow / Release Flow）](./other-flows)
-- [複数バージョンの保守（リリースブランチ）](./release-branches)
+- [複数バージョンの保守（リリースブランチ運用）](./release-branches)
 - [リリースとバージョン管理](./release)

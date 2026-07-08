@@ -85,4 +85,4 @@ git pull
 git push origin --delete feature/login
 ```
 
-リモートと同期できたら、いよいよチーム開発の標準フロー [GitHub Flow](./github-flow) です。
+リモートと同期できたら、次は変更をレビューに乗せる [プルリクエストとレビュー](./pull-request) です。

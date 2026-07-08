@@ -75,4 +75,4 @@ gitGraph
 `develop` / `release` ブランチを使う [Git Flow](./other-flows#git-flow) や、環境／リリースブランチを足す [GitLab Flow](./other-flows#gitlab-flow) もあります。Web サービスのように継続的にデプロイする現場では、シンプルな **GitHub Flow** が扱いやすいですが、プロダクトによって向き不向きがあります。どれを選ぶかは [ブランチ戦略の使い分け](./branching-strategies) を参照してください。タグ付け・バージョニング・hotfix は [リリースとバージョン管理](./release) で扱います。
 :::
 
-次は、フローの中心である [プルリクエストとレビュー](./pull-request) を掘り下げます。
+フロー全体を押さえたら、次はそれを自動化する [CI 連携 (GitHub Actions)](./ci) に進みます。
