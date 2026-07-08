@@ -1,6 +1,6 @@
 # 他のブランチ戦略（Git Flow / GitLab Flow / Release Flow）
 
-このチュートリアルは [GitHub Flow](./github-flow) を採用していますが、**複数バージョンの並行保守**や**環境ごとのデプロイ表現**が必要になると、別のブランチ運用モデルが選択肢に入ります。ここでは代表的な 3 つ——**Git Flow** / **GitLab Flow** / **Microsoft Release Flow**——を、比較の材料として紹介します。どれを選ぶかの判断は [ブランチ戦略の使い分け](./branching-strategies) を参照してください。
+[GitHub Flow](./github-flow) が扱いやすい場面は多いですが、**複数バージョンの並行保守**や**環境ごとのデプロイ表現**が必要になると、別のブランチ運用モデルが選択肢に入ります。ここでは代表的な 3 つ——**Git Flow** / **GitLab Flow** / **Microsoft Release Flow**——を、比較の材料として紹介します。どれを選ぶかの判断は [ブランチ戦略の使い分け](./branching-strategies) を参照してください。
 
 ## Git Flow
 
@@ -77,8 +77,8 @@ gitGraph
   - ブランチ数が多く運用が複雑。**継続的デプロイ（CD）とは相性が悪い**。
   - `develop` と `main` の二重マージなど手順が煩雑で、長命ブランチはコンフリクトを招きやすい。
 
-::: tip このリポジトリの運用
-本チュートリアルのリポジトリは、よりシンプルな [GitHub Flow](./github-flow) で運用しています。Git Flow はあくまで「選択肢の一つ」として解説しています。どの戦略を選ぶべきかは [ブランチ戦略の使い分け](./branching-strategies) を参照してください。
+::: tip Git Flow は選択肢の一つ
+多くの場面ではよりシンプルな [GitHub Flow](./github-flow) で十分で、Git Flow はあくまで「選択肢の一つ」です。どの戦略を選ぶべきかは [ブランチ戦略の使い分け](./branching-strategies) を参照してください。
 :::
 
 ## GitLab Flow
@@ -193,7 +193,7 @@ gitGraph
     commit id: "同じ修正を先に"
 ```
 
-この「バージョン系列 = 長命なブランチ」という考え方は、本教材の [複数バージョンの保守（リリースブランチ運用）](./release-branches) と同じ発想です。
+この「バージョン系列 = 長命なブランチ」という考え方は、[複数バージョンの保守（リリースブランチ運用）](./release-branches) と同じ発想です。
 
 ### main-first + cherry-pick
 
@@ -203,7 +203,7 @@ gitGraph
 
 ### タグ主軸との違い
 
-Release Flow は「**リリースはタグではなくブランチで表す**」という立場を取ります。一方、本教材は継続デプロイ（`main` → GitHub Pages）を前提に、[リリースとバージョン管理](./release) で説明したとおり**タグ（＋ GitHub Release）を主軸**にしています。
+Release Flow は「**リリースはタグではなくブランチで表す**」という立場を取ります。一方、継続デプロイ（`main` → GitHub Pages）を前提とする場合は、[リリースとバージョン管理](./release) で説明したとおり**タグ（＋ GitHub Release）を主軸**にする選び方もあります。
 
 どちらが正しいということはありません。**「サポート中の版を長期間 back-patch し続ける」**なら release ブランチが要になり、**「常に最新の 1 版を出し続ける」**ならタグで十分、という使い分けです。
 
@@ -223,7 +223,7 @@ Release Flow では、特定環境へのデプロイを表す **`deploy/<環境>
 
 ## 関連ページ
 
-- [GitHub Flow](./github-flow) — 本チュートリアルが採用する `main` 一本のシンプルな運用
+- [GitHub Flow](./github-flow) — `main` 一本のシンプルな運用
 - [ブランチ戦略の使い分け](./branching-strategies) — どれを選ぶかの判断
 - [複数バージョンの保守（リリースブランチ運用）](./release-branches) — release ブランチ運用の実際
 - [リリースとバージョン管理](./release) — タグ主軸のリリース
