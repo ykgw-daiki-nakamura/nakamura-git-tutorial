@@ -70,17 +70,15 @@ export default withMermaid({
           items: [
             { text: 'ブランチとマージ', link: '/guide/branching' },
             { text: 'リモートと GitHub', link: '/guide/remote' },
-            { text: 'プルリクエストとレビュー', link: '/guide/pull-request' }
+            { text: 'プルリクエストとレビュー', link: '/guide/pull-request' },
+            { text: 'GitHub Flow', link: '/guide/github-flow' }
           ]
         },
         {
           text: 'ブランチ戦略',
           items: [
-            { text: 'GitHub Flow', link: '/guide/github-flow' },
-            { text: 'Git Flow', link: '/guide/git-flow' },
-            { text: 'GitLab Flow', link: '/guide/gitlab-flow' },
-            { text: 'Microsoft Release Flow', link: '/guide/release-flow' },
             { text: 'ブランチ戦略の使い分け', link: '/guide/branching-strategies' },
+            { text: 'その他の主要フロー（Git Flow / GitLab Flow / Release Flow）', link: '/guide/other-flows' },
             { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' }
           ]
         },
