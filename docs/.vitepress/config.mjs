@@ -87,15 +87,15 @@ export default withMermaid({
           text: 'ブランチ戦略（発展）',
           items: [
             { text: 'ブランチ戦略の使い分け', link: '/guide/branching-strategies' },
-            { text: 'その他の主要フロー（Git Flow / GitLab Flow / Release Flow）', link: '/guide/other-flows' }
+            { text: '他のブランチ戦略', link: '/guide/other-flows' }
           ]
         },
         {
           text: 'リリース運用（発展）',
           items: [
             { text: 'リリースとバージョン管理', link: '/guide/release' },
-            { text: '複数バージョンの保守（リリースブランチ運用）', link: '/guide/release-branches' },
-            { text: 'デュアル配布（SaaS + セルフホスト）でのリリース運用', link: '/guide/dual-distribution' }
+            { text: 'リリースブランチ運用', link: '/guide/release-branches' },
+            { text: 'デュアル配布（SaaS + セルフホスト）', link: '/guide/dual-distribution' }
           ]
         },
         {
