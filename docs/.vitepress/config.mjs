@@ -78,8 +78,7 @@ export default withMermaid({
           text: '履歴とコンフリクトの扱い',
           items: [
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
-            { text: 'git stash で一時退避', link: '/guide/stash' },
-            { text: 'rebase と履歴整理（発展・任意）', link: '/guide/rebase' }
+            { text: 'git stash で一時退避', link: '/guide/stash' }
           ]
         },
         {

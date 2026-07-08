@@ -113,3 +113,50 @@ gitGraph
 ::: tip 迷ったら Squash
 多くのチームでは **Squash and merge** が扱いやすく人気です。PR 単位で履歴が 1 コミットにまとまり、`main` のログが読みやすくなります。
 :::
+
+## PR を最新の main に追従させる（Update branch）
+
+PR を出したあとに `main` が先へ進むと、GitHub の PR 画面に **「Update branch」** ボタンが出ます。遅れた自分のブランチへ `main` の最新を取り込むための操作で、2 つの選択肢があります。
+
+- **Update with merge commit** … `main` の最新を**マージコミット**で取り込む（自分のコミット ID は変わらない）
+- **Update with rebase** … 自分のコミットを `main` の最新の**上に乗せ直す**（コミット ID が振り直される）
+
+::: warning これは「マージ方式」の選択ではありません
+上の [マージ方式の比較](#マージ方式の比較)（`Merge commit` / `Squash and merge` / `Rebase and merge`）は、**PR を `main` に取り込むとき**の方式です。ここで選ぶのは「**遅れた自分のブランチに `main` の最新を取り込む方法**」で、別物です。
+:::
+
+### どう選べばいいか
+
+**迷ったら `Update with merge commit` を選べば安全です。**
+
+| | Update with merge commit | Update with rebase |
+| --- | --- | --- |
+| コミット ID | **変わらない** | **振り直される** |
+| 安全度 | 高い（元に戻しやすい） | 注意が必要 |
+| 向いているケース | 通常はこちら / 複数人で同じブランチを触っている | 自分しか触っていない PR で履歴を一直線に保ちたい |
+
+**Squash and merge** 方針なら、取り込みのマージコミットは最終的に 1 コミットへ潰れるため、`Update with merge commit` で十分です。`Update with rebase` はコミット ID を振り直すので、**同じ PR ブランチを他の人も触っている場合は使いません**（次の pull で履歴が食い違います）。
+
+### 手元（ローカル）で同じことをする
+
+GitHub のボタンを使わず、ローカルで取り込んでから push しても同じです。コンフリクト対応はローカルの方が楽なことが多いです。
+
+```bash
+# 自分のブランチにいる状態で
+
+# 「Update with merge commit」に相当
+git fetch origin
+git merge origin/main
+git push
+
+# 「Update with rebase」に相当
+git fetch origin
+git rebase origin/main
+git push --force-with-lease   # 履歴が変わるので force push が必要
+```
+
+::: tip rebase 後の push は `--force-with-lease`
+`rebase` するとコミット ID が変わるため、通常の `git push` は弾かれます。`--force-with-lease` は「自分が知らないうちにリモートが更新されていたら中断する」安全な force push です。単なる `--force` は他人の push を上書きしかねないので避けましょう。
+:::
+
+複雑なコンフリクトが出たら、ボタンではなくローカルで解決します。手順は [コンフリクト解決](./conflicts) を参照してください。
