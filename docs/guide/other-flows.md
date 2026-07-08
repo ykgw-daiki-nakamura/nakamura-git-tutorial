@@ -193,7 +193,7 @@ gitGraph
     commit id: "同じ修正を先に"
 ```
 
-この「バージョン系列 = 長命なブランチ」という考え方は、本教材の [複数バージョンの保守（リリースブランチ）](./release-branches) と同じ発想です。
+この「バージョン系列 = 長命なブランチ」という考え方は、本教材の [複数バージョンの保守（リリースブランチ運用）](./release-branches) と同じ発想です。
 
 ### main-first + cherry-pick
 
@@ -233,6 +233,6 @@ Release Flow では、特定環境へのデプロイを表す **`deploy/<環境>
 
 - [GitHub Flow](./github-flow) — 本チュートリアルが採用する `main` 一本のシンプルな運用
 - [ブランチ戦略の使い分け](./branching-strategies) — どれを選ぶかの判断
-- [複数バージョンの保守（リリースブランチ）](./release-branches) — release ブランチ運用の実際
+- [複数バージョンの保守（リリースブランチ運用）](./release-branches) — release ブランチ運用の実際
 - [リリースとバージョン管理](./release) — タグ主軸のリリース
 - [デュアル配布（SaaS + セルフホスト）でのリリース運用](./dual-distribution) — SaaS と自ホスト版を単一 main で両立
