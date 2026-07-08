@@ -36,6 +36,9 @@ gitGraph
   commit id: "fix: テスト追加"
   checkout main
   commit id: "fix C (squash)"
+  checkout release/v1.1
+  cherry-pick id: "fix C (squash)" tag: "v1.1.1"
+  checkout main
   branch release/v1.2
   commit id: "rc2" tag: "v1.2.0-rc.1"
   commit id: "ga2" tag: "v1.2.0"
@@ -52,7 +55,8 @@ gitGraph
 - 機能追加・修正は `main` から `feature/*` / `fix/*` を切って進め、**squash merge** で `main` に取り込む。
 - squash では枝側の複数コミット（`flag: 実装`・`flag: レビュー反映` など）が `main` 上の 1 コミット（`feat B (squash)`）にまとまる。枝のコミットは `main` に個別には現れず、マージコミットも作らない（図でブランチ線が `main` に戻らないのはこのため。`main` は linear history を保つ）。
 - 出荷（SaaS 本番デプロイ / セルフホスト配布）は必ず `release/vX.Y` 上のタグから行う。
-- 図の `hotfix X` → `v1.2.1` のように、修正は **main → release の一方向**にのみ流れる。
+- 図の `fix C (squash)` → `v1.1.1` や `hotfix X` → `v1.2.1` のように、修正は **main → release の一方向**にのみ流れる（upstream first）。
+- どの `release/*` へ backport するかは**選択的**で、そのバグが存在し、かつ保守期間内の release にのみ cherry-pick する。`fix C` は保守中の v1.1 へ戻して `v1.1.1` を出す一方、v1.2 は fix C を載せた後の `main` から切るため最初から含む。
 
 ### 命名規則
 
