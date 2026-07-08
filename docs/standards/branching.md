@@ -104,4 +104,4 @@ gitGraph
 1. `feature/*` → `main` のマージ方式は **squash merge** とする（merge commit / rebase merge はリポジトリ設定で無効化する）。
 2. `main` → `release/*` への反映は **cherry-pick のみ**とする。merge / rebase による取り込みは禁止する。
 3. `release/*` → `main` のマージは禁止する（upstream first の徹底）。
-4. PR は小さく保つ。大きくなる場合は feature flag を活用して分割する。
+4. PR は小さく保つ。大きくなる場合は feature flag を活用して分割する（feature flag は[現時点では利用を見送り検討中](./versioning#feature-flag-運用)）。
