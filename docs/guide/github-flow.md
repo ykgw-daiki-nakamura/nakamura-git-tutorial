@@ -74,5 +74,3 @@ gitGraph
 ::: tip 推奨は GitHub Flow、他は代替案
 本教材の推奨（既定）は GitHub Flow です。その**代替案**として、`develop` / `release` ブランチを使う [Git Flow](./other-flows#git-flow) や、環境／リリースブランチを足す [GitLab Flow](./other-flows#gitlab-flow) があります。Web サービスのように継続的にデプロイする現場では、シンプルな GitHub Flow が扱いやすいですが、プロダクトによって向き不向きがあります。どれを選ぶかは [ブランチ戦略の使い分け](./branching-strategies) を参照してください。タグ付け・バージョニング・hotfix は [リリースとバージョン管理](./release) で扱います。
 :::
-
-フロー全体を押さえたら、次はそれを自動化する [CI 連携 (GitHub Actions)](./ci) に進みます。

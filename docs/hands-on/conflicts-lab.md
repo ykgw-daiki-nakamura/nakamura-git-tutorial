@@ -159,5 +159,3 @@ git merge --abort
 - マーカーは **HEAD（現在）側** と **取り込む側** を区切る目印
 - 解決は **編集 → `add` → `commit`** の流れ
 - `git merge --abort` で安全にやり直せる
-
-履歴をより綺麗に保つ [④ rebase で履歴を整える](./rebase-lab) に進みましょう。
