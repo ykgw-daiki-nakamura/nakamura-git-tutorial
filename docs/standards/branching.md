@@ -22,26 +22,35 @@ outline: [2, 3]
 ```mermaid
 gitGraph
   commit id: "feat A"
-  commit id: "feat B"
+  branch feature/1234-tenant-flag-api
+  commit id: "flag: 実装"
+  commit id: "flag: レビュー反映"
+  checkout main
+  commit id: "feat B (squash)"
   branch release/v1.1
   commit id: "rc" tag: "v1.1.0-rc.1"
   commit id: "ga" tag: "v1.1.0"
   checkout main
-  commit id: "feat C"
-  commit id: "feat D"
+  branch fix/1250-forecast-nan-handling
+  commit id: "fix: NaN 検出"
+  commit id: "fix: テスト追加"
+  checkout main
+  commit id: "fix C (squash)"
   branch release/v1.2
   commit id: "rc2" tag: "v1.2.0-rc.1"
   commit id: "ga2" tag: "v1.2.0"
   checkout main
   commit id: "hotfix X" type: HIGHLIGHT
-  commit id: "feat E"
+  commit id: "feat D"
   checkout release/v1.2
   cherry-pick id: "hotfix X" tag: "v1.2.1"
   checkout main
-  commit id: "feat F"
+  commit id: "feat E"
 ```
 
 - `main` は常に「次期バージョン（N+1）」の開発ラインであり、直接デプロイ・出荷の起点にはしない。
+- 機能追加・修正は `main` から `feature/*` / `fix/*` を切って進め、**squash merge** で `main` に取り込む。
+- squash では枝側の複数コミット（`flag: 実装`・`flag: レビュー反映` など）が `main` 上の 1 コミット（`feat B (squash)`）にまとまる。枝のコミットは `main` に個別には現れず、マージコミットも作らない（図でブランチ線が `main` に戻らないのはこのため。`main` は linear history を保つ）。
 - 出荷（SaaS 本番デプロイ / セルフホスト配布）は必ず `release/vX.Y` 上のタグから行う。
 - 図の `hotfix X` → `v1.2.1` のように、修正は **main → release の一方向**にのみ流れる。
 
