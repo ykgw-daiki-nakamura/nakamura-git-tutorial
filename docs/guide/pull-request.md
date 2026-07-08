@@ -61,7 +61,7 @@ GitHub では「コメント」「承認 (Approve)」「変更要求 (Request ch
 
 ## マージ方式の比較
 
-GitHub には 3 つのマージ方式があります。同じ PR（`feature` の `B`・`C` の 2 コミット）を `main` に取り込んだとき、**取り込み後の `main` の履歴の形**がどう変わるかで選びます。各図の `A` は取り込み前の `main`、`B`・`C` は feature 側のコミットです。
+GitHub には 3 つのマージ方式があります。同じ PR（`feature` の `B`・`C` の 2 コミット）を `main` に取り込んだとき、**取り込み後の `main` の履歴の形**がどう変わるかで選びます。各図の `A` は取り込み前の `main`、`B`・`C` は feature 側のコミットです（Rebase and merge の図では、載せ直したあとを `B'`・`C'` と表記します）。
 
 ### Merge commit
 
