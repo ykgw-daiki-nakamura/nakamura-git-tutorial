@@ -93,7 +93,7 @@ commit 1111aaa...
 
 タグに変更内容（リリースノート）を紐付けて公開します。
 
-### A. gh CLI の場合
+### A. `gh` CLI の場合
 
 ```bash
 gh release create v0.1.0-<あなた> \

@@ -44,7 +44,7 @@ flowchart LR
 | Git | インストール済み（[Git 公式のダウンロード](https://git-scm.com/downloads) 参照） |
 | GitHub アカウント | **必須** |
 | 共有リポジトリへのアクセス | 参加者はオーナーから**コラボレーター招待**を受ける（push 権限が必要） |
-| gh CLI | あると便利。Web 操作でも代替可 |
+| `gh` CLI | あると便利。Web 操作でも代替可 |
 | Node.js | 20 以上（`npm run docs:dev` でプレビューする場合） |
 
 まだ認証していない場合は、`gh auth login`、または SSH 鍵の設定（[GitHub 公式ドキュメント](https://docs.github.com/ja/authentication/connecting-to-github-with-ssh)）を先に済ませてください。
@@ -66,7 +66,7 @@ flowchart LR
 
 3. fork した直後は **Actions が無効**なことがあるため、**Actions** タブで有効化する（⑥ の CI 実習で使います）
 
-4. （推奨）`main` に **Branch protection rule** を設定し、「Require a pull request before merging」「Require status checks to pass」を有効にする
+4. （推奨）`main` に **Branch protection rules** を設定し、「Require a pull request before merging」「Require status checks to pass」を有効にする
    - これで「PR・CI を通った変更だけが `main` に入る」状態になり、マージはオーナーの承認で行われます
 
 セットアップが終わったら、参加者に**共有リポジトリの URL**（`https://github.com/<オーナー>/nakamura-git-tutorial`）を共有してください。
