@@ -94,7 +94,7 @@ export default withMermaid({
           text: 'リリース運用（発展）',
           items: [
             { text: 'リリースとバージョン管理', link: '/guide/release' },
-            { text: '複数バージョンの保守（リリースブランチ）', link: '/guide/release-branches' },
+            { text: '複数バージョンの保守（リリースブランチ運用）', link: '/guide/release-branches' },
             { text: 'デュアル配布（SaaS + セルフホスト）でのリリース運用', link: '/guide/dual-distribution' }
           ]
         },
