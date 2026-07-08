@@ -92,7 +92,7 @@ branch 'practice/<あなた>-remote' set up to track 'origin/practice/<あなた
 
 ```mermaid
 flowchart LR
-    OR[(origin / 共有リポジトリ)] -->|"① git fetch"| RT["origin/main"]
+    OR[("origin / 共有リポジトリ")] -->|"① git fetch"| RT["origin/main"]
     RT -->|"② git merge"| LM[ローカル main]
     OR -->|"pull = ① + ②"| LM
 ```
