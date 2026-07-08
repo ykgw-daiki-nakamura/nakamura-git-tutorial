@@ -1,4 +1,4 @@
-# ⑤ GitHub にリモート連携
+# ④ GitHub にリモート連携
 
 ここから後半、**GitHub と連携する実習** です。これまでローカルで作った変更を、**共有リポジトリ（origin）** へ push し、リモートと同期する流れを体験します。対応する解説は [リモートと GitHub](../guide/remote) です。
 
@@ -13,7 +13,7 @@
 | 共有リポジトリを clone 済み・コラボレーター招待済み・GitHub 認証済み | 約 20 分 |
 
 ::: warning 先にローカルの main を戻しておく
-①〜④ をやった後は、ローカルの `main` に練習用コミットが残っています。このまま進めると PR に余計な変更が混ざります。[④ の末尾「ローカル編の後片付け」](./rebase-lab) のとおり、`git fetch origin && git reset --hard origin/main` で `main` を戻してから始めてください（clone し直してもOK）。
+①〜③（と、取り組んだ場合は発展・任意の [rebase 実習](./rebase-lab)）の後は、ローカルの `main` に練習用コミットが残っています。このまま進めると PR に余計な変更が混ざります。次のコマンドで `main` を共有リポジトリの最新に戻してから始めてください（clone し直してもOK）: `git fetch origin && git reset --hard origin/main`。
 :::
 
 ## ステップ 1：リモートを確認する
@@ -63,7 +63,7 @@ git push -u origin practice/<あなた>-remote
 branch 'practice/<あなた>-remote' set up to track 'origin/practice/<あなた>-remote'.
 ```
 
-ブラウザで共有リポジトリのページを開くと、あなたのブランチが現れ、「Compare & pull request」のバナーが出ます（PR は次の⑥で扱います）。
+ブラウザで共有リポジトリのページを開くと、あなたのブランチが現れ、「Compare & pull request」のバナーが出ます（PR は次の⑤で扱います）。
 
 ::: details 🔍 `-u` は何をしている？
 `-u`（`--set-upstream`）は、ローカルのブランチと `origin` 側のブランチを**ひも付け**ます。一度設定すれば、以降は `git push` / `git pull` を引数なしで実行できます。初回だけ付ければOKです。

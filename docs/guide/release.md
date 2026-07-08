@@ -141,6 +141,6 @@ on:
 - リリースには**注釈付きタグ**を打ち、**push を忘れない**。**GitHub Release** でノートを公開する
 - 出荷済みバージョンを直すときは **release ブランチ + hotfix**。修正は**必ず `main` へ戻す**
 
-実際にタグを打って Release を作り、hotfix まで一周する練習は [⑧ タグとリリース](../hands-on/release-lab) で行えます。
+実際にタグを打って Release を作り、hotfix まで一周する練習は [⑦ タグとリリース](../hands-on/release-lab) で行えます。
 
 出荷済みの複数バージョンを並行して長期保守する運用は [複数バージョンの保守（リリースブランチ運用）](./release-branches) で詳しく扱います。顧客ごとのカスタマイズや、特定バージョンを土台にした案件の進め方は、開発規約の [顧客別カスタマイズ](/standards/customization)・[バージョン運用](/standards/versioning) を参照してください。
