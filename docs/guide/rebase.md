@@ -29,7 +29,7 @@ gitGraph
     commit id: "B'"
 ```
 
-rebase は `feature/login` のコミット `B` を、最新の `C` の上に「乗せ直し」ます。結果として履歴が枝分かれせず一直線になります。
+rebase は `feature/login` のコミット `B` を、最新の `C` の上に「乗せ直し」ます（`B'`）。**マージコミットを作らず**、`feature/login` のコミットが `main` の先へ一直線に並ぶのが特徴です。
 
 ```bash
 # feature/login ブランチで、main の最新の上に乗せ直す

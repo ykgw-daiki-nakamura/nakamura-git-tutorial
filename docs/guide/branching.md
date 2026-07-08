@@ -70,7 +70,7 @@ gitGraph
 
 ### 3-way マージ（マージコミット）
 
-分岐後に**両方のブランチが進んでいる**場合、両者を統合する「マージコミット」が作られます。
+分岐後に**両方のブランチが進んでいる**場合（`feature/login` が `B`・`C`、`main` が `D` と別々に進んだ状態）、両者を統合する「マージコミット `M`」が作られます。
 
 ```mermaid
 gitGraph
@@ -78,8 +78,9 @@ gitGraph
     branch feature/login
     checkout feature/login
     commit id: "B"
-    checkout main
     commit id: "C"
+    checkout main
+    commit id: "D"
     merge feature/login id: "M"
 ```
 
