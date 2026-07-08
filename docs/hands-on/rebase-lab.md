@@ -195,4 +195,4 @@ git branch -D practice/notes practice/branch practice/timeout-5000   # 作った
 - rebase はコミットを作り直すため、**共有済みの履歴には使わない**
 - `git rebase -i` で squash すると、細かいコミットを意味のある単位にまとめられる
 
-ここまででローカル編は完了です。上の後片付けを済ませたら、共有リポジトリへ push する [⑤ GitHub にリモート連携](./remote-lab) に進みます。
+ここまででローカル編は完了です。上の後片付けを必ず済ませておきましょう。
