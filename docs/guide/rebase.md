@@ -11,12 +11,12 @@
 ```mermaid
 gitGraph
     commit id: "A"
-    branch feature
-    checkout feature
+    branch feature/login
+    checkout feature/login
     commit id: "B"
     checkout main
     commit id: "C"
-    checkout feature
+    checkout feature/login
     merge main id: "M"
 ```
 

@@ -53,8 +53,8 @@ git branch -d feature/login
 ```mermaid
 gitGraph
     commit id: "A"
-    branch feature
-    checkout feature
+    branch feature/login
+    checkout feature/login
     commit id: "B"
     commit id: "C"
 ```
@@ -75,12 +75,12 @@ gitGraph
 ```mermaid
 gitGraph
     commit id: "A"
-    branch feature
-    checkout feature
+    branch feature/login
+    checkout feature/login
     commit id: "B"
     checkout main
     commit id: "C"
-    merge feature id: "M"
+    merge feature/login id: "M"
 ```
 
 ```bash
