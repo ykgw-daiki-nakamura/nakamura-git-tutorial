@@ -35,7 +35,7 @@ flowchart TD
   GAREL --> SHIP["セルフホスト配布<br/>(Release Assets / レジストリ)"]
 ```
 
-1. リリース計画に基づき `main` から `release/vX.Y` を作成する（目安: 四半期ごと）。作成後は新機能の追加を禁止し、cherry-pick による修正のみ受け入れる。
+1. リリース計画に基づき `main` から `release/vX.Y` を作成する。作成後は新機能の追加を禁止し、cherry-pick による修正のみ受け入れる。
 2. `vX.Y.Z-rc.N` タグを push すると、CI が **Pre-release の GitHub Release** を自動作成し、成果物をビルド・添付する。**ビルドが行われるのはこの RC 時点のみ**である。
 3. staging での受け入れ検証に合格したら、**同一コミットに** `vX.Y.Z` タグを付与する（RC と GA でコミットをずらさない）。
 4. GA タグ push をトリガーに、GA ワークフローが **RC 成果物を GA へ昇格（promotion）** する（本ページ「GA 昇格規約（再ビルドの禁止）」を参照）。ビルドは実行しない。
