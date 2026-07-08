@@ -18,20 +18,24 @@
 
 ## このリポジトリの CI が見ているもの
 
-`ci.yml` には 2 つのジョブがあります。
+`ci.yml` には複数のジョブがあり、PR を出すと一度にまとめて走ります。このうち、あなたの編集で主に結果を見るのは次の 2 つです。
 
 | ジョブ | 内容 |
 | --- | --- |
 | **build** | `npm run docs:build`（内部リンク切れ・Mermaid 構文エラーなどを検知） |
-| **lint** | `npm run lint:md`（Markdown の文体・整形の一貫性をチェック） |
+| **lint** | `npm run lint:md` / `npm run lint:text`（Markdown 整形・日本語プロースの一貫性をチェック） |
+
+このほかに **config-check**（設定と実体の整合）・**test-hooks**（ガードフックの回帰テスト）・**dependency-review**（依存の脆弱性検査）も走ります。PR 画面にはこれらを含む複数のチェックが並び、**すべて緑になればマージ可能**です。
 
 ```mermaid
 flowchart LR
     A["PR を作成 / 更新"] --> B["GitHub Actions 起動"]
     B --> C["build: docs:build"]
-    B --> D["lint: lint:md"]
-    C --> E{"両方成功?"}
+    B --> D["lint: lint:md / lint:text"]
+    B --> H["config-check ほか"]
+    C --> E{"すべて成功?"}
     D --> E
+    H --> E
     E -->|✅| F["PR に緑チェック<br/>マージ可能"]
     E -->|❌| G["PR に赤 ×<br/>修正が必要"]
 ```
@@ -57,12 +61,14 @@ gh pr create --repo <オーナー>/nakamura-git-tutorial --base main --head prac
 
 ✅ **チェックポイント**
 
-PR ページの下部で **build / lint のチェックが走り始め**、しばらくすると ✅ **All checks have passed** になります。**Actions** タブを開くと各ステップのログも追えます。
+PR ページの下部で **build・lint をはじめ複数のチェックが走り始め**、しばらくすると ✅ **All checks have passed** になります。**Actions** タブを開くと各ステップのログも追えます。
 
 ```text
 ✓ CI / build (pull_request)  Successful
 ✓ CI / lint  (pull_request)  Successful
 ```
+
+config-check・test-hooks・dependency-review など他のチェックも同様に緑になります。
 
 ## ステップ 2：わざと壊して赤を見る
 
@@ -118,7 +124,7 @@ git branch -d practice/<あなた>-ci
 ## まとめ
 
 - リポジトリに置かれた `.github/workflows/*.yml` により、**PR ごとに CI が自動で走る**
-- このリポジトリの CI は **build（ビルド検証）** と **lint（Markdown 整形）** をチェックする
+- このリポジトリの CI は **build（ビルド検証）** と **lint（整形・文章）** を中心に、config-check・test-hooks・dependency-review など複数のジョブをチェックする
 - CI は成功＝緑、失敗＝赤。ブランチ保護と組み合わせると「CI が通った変更だけマージ」を強制できる
 - push 済みの変更を打ち消すときは `git revert` が安全
 
