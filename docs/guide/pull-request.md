@@ -114,6 +114,49 @@ gitGraph
 多くのチームでは **Squash and merge** が扱いやすく人気です。PR 単位で履歴が 1 コミットにまとまり、`main` のログが読みやすくなります。
 :::
 
+## PR タイトルは Conventional Commits に従う
+
+**Squash and merge** を選ぶと、PR タイトルの重みが変わります。枝側のコミットは 1 つに潰されるため、**PR タイトルがそのまま `main` のコミットメッセージ**になるからです。枝の中で `wip` や `レビュー反映` と書いていても、`main` に残るのは PR タイトルだけです。
+
+そこで PR タイトルは、コミットメッセージと同じ [Conventional Commits](./commits#conventional-commits) の形式で書きます。
+
+```text
+feat(auth): パスワードリセット機能を追加
+fix(api): 空配列を渡すと 500 が返る不具合を修正
+```
+
+```mermaid
+flowchart LR
+    T["PR タイトル<br/>feat(auth): …"] --> C["main のコミットメッセージ"]
+    T --> H["リリースノートの見出し行"]
+    T --> L["type からラベルを自動付与"]
+    C --> V["SemVer で次の版を判定"]
+    L --> N["リリースノートのカテゴリ分類"]
+```
+
+### リリースノートにそのまま載る
+
+GitHub の[自動リリースノート生成](https://docs.github.com/ja/repositories/releasing-projects-on-github/automatically-generated-release-notes)は、前回のリリース以降に**マージされた PR のタイトルを見出しとして一覧に並べます**。リポジトリに `.github/release.yml` を置けば、PR ラベルごとのカテゴリ分けもできます。
+
+```yaml
+# .github/release.yml
+changelog:
+  categories:
+    - title: 新機能
+      labels: ['type: feat']
+    - title: 不具合修正
+      labels: ['type: fix']
+```
+
+つまり PR タイトルは、レビュー時の見出しであると同時に、**`main` の履歴の 1 行であり、リリースノートの 1 行**でもあります。3 か所で読まれる文章なので、書式を揃える価値があります。
+
+- `type` を揃えると、リリースノートのカテゴリ分類と次に上げる版の判定（[SemVer との対応](./release#conventional-commits-と対応している)）が機械的に決まる
+- 要約を具体的に書くと、リリースノートを読んだ利用者が「何が変わったか」を理解できる
+
+::: tip このリポジトリでの運用
+`pr-title.yml` ワークフローが PR タイトルの書式を検証し、`pr-label.yml` がタイトルの `type` に応じて `type: feat` などのラベルを自動付与します。書式が崩れた PR は CI で落ちます。
+:::
+
 ## PR を最新の main に追従させる（Update branch）
 
 PR を出したあとに `main` が先へ進むと、GitHub の PR 画面に **「Update branch」** ボタンが出ます。遅れた自分のブランチへ `main` の最新を取り込むための操作で、2 つの選択肢があります。
