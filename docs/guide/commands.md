@@ -48,9 +48,8 @@ git merge --no-ff <branch>             # マージコミットを必ず作る
 git remote -v                          # リモート確認
 git remote add origin <url>            # リモート追加
 git fetch                              # 取得のみ
-git fetch origin                       # origin の更新を取得
-git merge origin/main                  # 取得した main を取り込む
-git pull                               # 取得 + 統合（fetch + merge）
+git pull                               # 取得 + 統合（上流ブランチを fetch + merge）
+git merge origin/main                  # 作業ブランチに main を取り込む
 git push                               # 送信
 git push -u origin <branch>            # 初回（上流設定）
 git push origin --delete <branch>      # リモートブランチ削除
