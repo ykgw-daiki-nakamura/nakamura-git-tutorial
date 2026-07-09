@@ -92,7 +92,7 @@ BREAKING CHANGE: getUser が返す `name` を `firstName` と
 
 書式を揃えるだけなら好みの問題ですが、Conventional Commits には**機械が読めることによる実利**があります。
 
-- **履歴が検索できる** — `git log --oneline --grep '^fix'` で修正だけを追える
+- **履歴が検索できる** — `git log --oneline -E --grep '^fix(\(.+\))?!?:'` で修正だけを追える
 - **バージョンが決まる** — `fix` は PATCH、`feat` は MINOR、`!` / `BREAKING CHANGE` は MAJOR に対応する（[リリースとバージョン管理](./release#conventional-commits-と対応している) を参照）
 - **リリースノートが自動生成できる** — type ごとに変更点を分類してノートに並べられる
 - **PR タイトルにも効く** — Squash Merge では PR タイトルがそのまま `main` のコミットメッセージになる（[プルリクエストとレビュー](./pull-request#pr-タイトルは-conventional-commits-に従う) を参照）
