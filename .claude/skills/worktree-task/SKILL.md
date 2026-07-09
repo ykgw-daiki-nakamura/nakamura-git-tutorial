@@ -87,11 +87,45 @@ git worktree list   # 作成を確認
   （未登録のリポジトリで使う場合は先に `.gitignore` へ追加しておく）。
 - 以降のファイル編集・`git` 操作は **すべてこの worktree ディレクトリ内** で行う
   （`git -C <worktree> ...` またはそのパス配下のファイルを編集）。メインの作業ツリーは触らない。
+- **`git -C` に渡すパスはシェル変数ではなくリテラルで書く。** `guard-branch` / `guard-secrets` は
+  コマンド文字列から対象作業ツリーを静的に解決するため、`git -C "$w" commit` のように変数を使うと
+  worktree を解決できず「保護ブランチ上での直接 commit」と誤判定してブロックされる。
+
+#### 3a. 依存（node_modules）を用意する
+
+`node_modules` は `.gitignore` 済みで追跡されないため、**作った worktree には依存が入っていない**。
+そのままでは `npm run lint:md` / `npm run docs:build` などが `command not found` で落ちる。
+
+既定は**メイン作業ツリーの `node_modules` へ symlink を張る**。`package-lock.json` を共有している
+限りこれで足り、インストール時間もディスク容量も使わない。この symlink は `.gitignore` の
+`node_modules`（末尾スラッシュなし）にマッチするため、追跡対象には入らない。
+
+```bash
+ln -s "$(git rev-parse --show-toplevel)/node_modules" .claude/worktrees/<name>/node_modules
+```
+
+- **依存そのものを変更する作業**（`package.json` / `package-lock.json` を触る PR）では symlink を使わず、
+  worktree 内で `npm ci` して独立させる。メイン側の依存を壊さないため。
+- 検査コマンドが `command not found` で落ちたら、まずこの手順を踏んだか確認する。
+
+**既存 worktree を `main` に追随させるとき**:
+`node_modules` を**実ディレクトリ**として持つ作業ツリーが `5a312c3` 以降の `main` を取り込むと、
+追跡されていた symlink を Git が削除しようとして失敗する。
+
+```console
+$ git merge --ff-only origin/main
+error: Your local changes to the following files would be overwritten by merge:
+    node_modules
+Aborting
+```
+
+実体を一時退避してからマージし、あとで戻せば通る（`npm install` のやり直しは不要）。
 
 ### 4. worktree 内で作業
 
 - Issue の作業計画に沿って、worktree 内のファイルに変更を実施する。
 - 必要に応じてビルド/テスト/lint をその worktree 内で実行し、成否を確認する（例 `npm run build`）。
+  依存が無いと落ちるので、先に「3a. 依存を用意する」を済ませておく。
 - 計画のステップが進んだら Issue のチェックリストを更新してよい（`gh issue edit <ISSUE>` 等）。
 
 ### 5. コミット・push
