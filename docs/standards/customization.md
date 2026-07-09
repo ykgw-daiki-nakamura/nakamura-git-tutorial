@@ -39,7 +39,7 @@ outline: [2, 3]
 
 #### 拡張ポイントの例
 
-結果後処理フック（`ResultPostProcessor`。.NET では命名規約に従い `IResultPostProcessor`）を題材に、コードとしての形を示す。示すのは次の 3 つで、実装言語が変わっても役割の対応は変わらない。
+結果後処理フック（`ResultPostProcessor`）を題材に、コードとしての形を示す。なお .NET のタブでは、命名規約に従って `IResultPostProcessor` とする。示すのは次の 3 つで、実装言語が変わっても役割の対応は変わらない。
 
 1. コアが公開する拡張ポイントの interface
 2. 下流リポジトリに置く顧客実装
