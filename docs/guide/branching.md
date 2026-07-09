@@ -38,9 +38,10 @@ git switch main
 git branch -d feature/login
 ```
 
-::: tip ブランチ命名規則
-チームでは `feature/`, `fix/`, `hotfix/`, `chore/` などの接頭辞を付けると整理しやすくなります。例: `feature/user-profile`, `fix/login-error`
-:::
+> [!TIP]
+> **ブランチ命名規則**
+>
+> チームでは `feature/`, `fix/`, `hotfix/`, `chore/` などの接頭辞を付けると整理しやすくなります。例: `feature/user-profile`, `fix/login-error`
 
 ## マージの 2 つの形
 
@@ -93,9 +94,10 @@ git merge feature/login
 git merge --no-ff feature/login
 ```
 
-::: info `--no-ff` の使いどころ
-`--no-ff` を付けると fast-forward 可能な場合でも必ずマージコミットを作ります。「どの機能ブランチがいつ統合されたか」を履歴に残せるため、チームによってはこれを標準にしています。
-:::
+> [!NOTE]
+> **`--no-ff` の使いどころ**
+>
+> `--no-ff` を付けると fast-forward 可能な場合でも必ずマージコミットを作ります。「どの機能ブランチがいつ統合されたか」を履歴に残せるため、チームによってはこれを標準にしています。
 
 ここで見た**ローカルの merge の形（Fast-forward / 3-way）** を踏まえると、GitHub 上で PR をマージするときの **Merge commit / Squash and merge / Rebase and merge** の選び方が理解しやすくなります。その使い分けは [プルリクエストとレビュー（マージ方式の比較）](./pull-request#マージ方式の比較) を参照してください。
 
