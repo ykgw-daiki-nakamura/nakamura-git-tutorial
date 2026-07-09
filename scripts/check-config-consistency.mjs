@@ -5,7 +5,10 @@
 //   (b) .claude/hooks/ のトップレベル *.sh が settings.json に漏れなく配線され、かつ settings.json が
 //       参照するフックファイルが実在する（present-but-unwired と dangling-wiring の双方を検出）。
 //   (c) checks.json の issueLabels / prLabels が参照するラベル名が実在する（`gh label list`）。
-//       gh が無い・未認証の環境では **スキップ（fail-open）**。ネット不要な (a)(b) はローカルでも動く。
+//       gh が無い・未認証の環境では **スキップ（fail-open）**。ネット不要な (a)(b)(d) はローカルでも動く。
+//   (d) 検証スクリプトが持つフォールバックの default_types が、checks.json の
+//       commit.conventional.types と順序を含めて一致する。jq / checks.json を読めない環境でだけ
+//       挙動が食い違う「静かなドリフト」を防ぐ。
 //
 // 不一致があれば原因を出力して exit 1。CI（ci.yml）とローカル（npm run check:config）から実行する。
 import { readFileSync, readdirSync, existsSync } from 'node:fs'
@@ -115,6 +118,42 @@ if (checks && ghLabels) {
   }
 }
 
+// ---- (d) フォールバック default_types のドリフト ----
+// checks.json を読めない環境（jq 不在など）向けに、同じ type 一覧をハードコードで持つスクリプト。
+// 増減したらこの表に足す。抽出できなければ「無言の pass」にせず失敗させる。
+const FALLBACK_TYPE_SOURCES = [
+  { file: '.github/scripts/check-pr-title.sh', varName: 'default_types' },
+  { file: '.claude/hooks/guard-commit.sh', varName: 'default_types' },
+]
+if (checks) {
+  const canonical = checks.commit?.conventional?.types
+  if (!Array.isArray(canonical) || canonical.length === 0) {
+    errors.push('(d) checks.json の commit.conventional.types を type の配列として読めません')
+  } else {
+    for (const { file, varName } of FALLBACK_TYPE_SOURCES) {
+      let text = null
+      try {
+        text = readFileSync(p(file), 'utf8')
+      } catch (e) {
+        errors.push(`(d) ${file} を読み取れません（対象ファイルが移動/削除された可能性）: ${e.message}`)
+        continue
+      }
+      const m = text.match(new RegExp(`^${varName}="([^"]*)"`, 'm'))
+      if (!m) {
+        errors.push(`(d) ${file} から ${varName}="..." を抽出できません（書式が変わった可能性。無言の pass にしません）`)
+        continue
+      }
+      if (m[1] !== canonical.join('|')) {
+        errors.push(
+          `(d) ${file} の ${varName} が checks.json の commit.conventional.types と一致しません（順序含む）\n` +
+            `        checks.json: ${canonical.join('|')}\n` +
+            `        ${file}: ${m[1]}`,
+        )
+      }
+    }
+  }
+}
+
 // ---- レポート ----
 for (const n of notes) console.log(`ℹ ${n}`)
 if (errors.length) {
@@ -123,5 +162,9 @@ if (errors.length) {
   console.error('\n設定（checks.json/settings.json）と実体（hooks/ラベル）のズレを解消してください。')
   process.exit(1)
 }
-console.log('✓ 設定↔実体の整合 OK（checks.json スキーマ・hook 配線' + (ghLabels ? '・ラベル実在' : '') + '）')
+console.log(
+  '✓ 設定↔実体の整合 OK（checks.json スキーマ・hook 配線' +
+    (ghLabels ? '・ラベル実在' : '') +
+    '・フォールバック type 一覧）',
+)
 process.exit(0)
