@@ -62,15 +62,33 @@ if (rank(failOn) < 0) {
 // allowlist を GHSA -> エントリ の Map にする。書式の誤りはここで落とす
 // （理由・期限の無い除外を作らせない。これが無いと allowlist が単なる無効化に堕ちる）。
 const allow = new Map()
-for (const [i, entry] of (audit.allow ?? []).entries()) {
-  const where = `audit.allow[${i}]`
-  if (!entry?.ghsa) { errors.push(`${where}: "ghsa" がありません`); continue }
-  if (!entry.reason) { errors.push(`${where} (${entry.ghsa}): "reason" がありません（なぜ除外してよいかを書く）`); continue }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.expires ?? '')) {
-    errors.push(`${where} (${entry.ghsa}): "expires" が YYYY-MM-DD 形式ではありません（再評価期限は必須）`)
-    continue
+const allowList = audit.allow ?? []
+if (!Array.isArray(allowList)) {
+  // 配列でないまま .entries() を呼ぶと TypeError で落ち、原因の分からないスタックが出る。
+  // 他の設定不正と同じ経路に載せて、直し方の分かるメッセージにする。
+  errors.push(`audit.allow は配列である必要があります（実際: ${allowList === null ? 'null' : typeof allowList}）。{ ghsa, reason, expires } の配列で書いてください`)
+} else {
+  const seenAt = new Map() // GHSA -> 最初に現れた添字
+  for (const [i, entry] of allowList.entries()) {
+    const where = `audit.allow[${i}]`
+    if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) {
+      errors.push(`${where}: オブジェクトではありません（{ ghsa, reason, expires } を書く）`)
+      continue
+    }
+    if (!entry.ghsa) { errors.push(`${where}: "ghsa" がありません`); continue }
+    if (!entry.reason) { errors.push(`${where} (${entry.ghsa}): "reason" がありません（なぜ除外してよいかを書く）`); continue }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.expires ?? '')) {
+      errors.push(`${where} (${entry.ghsa}): "expires" が YYYY-MM-DD 形式ではありません（再評価期限は必須）`)
+      continue
+    }
+    // 重複を Map の上書きで握り潰すと、後勝ちの reason / expires だけが効いて設定ミスに気づけない。
+    if (seenAt.has(entry.ghsa)) {
+      errors.push(`${where} (${entry.ghsa}): 同じ GHSA が audit.allow[${seenAt.get(entry.ghsa)}] と重複しています（1 エントリにまとめる）`)
+      continue
+    }
+    seenAt.set(entry.ghsa, i)
+    allow.set(entry.ghsa, entry)
   }
-  allow.set(entry.ghsa, entry)
 }
 if (errors.length) {
   console.error('✗ audit の allowlist 設定が不正です:')
