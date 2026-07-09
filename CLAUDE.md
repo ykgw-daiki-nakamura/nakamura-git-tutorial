@@ -50,6 +50,25 @@ docs/
 - VitePress の内部リンクは**拡張子なし**で書く（例: `[ブランチ](./branching)`）。実ファイルは `.md`。
 - 図は Mermaid のコードフェンス（` ```mermaid `）で記述する。日本語ラベルを含む複雑な図は `"..."` で囲むと崩れにくい。
 
+## 注意書きの記法（GFM アラート）
+
+注意書きは **GitHub Flavored Markdown のアラート記法**（`> [!WARNING]`）で書く。VitePress 独自の `::: warning` コンテナは**使わない**。
+
+```markdown
+> [!WARNING]
+> **push 済みのコミットは書き換えない**
+>
+> `--amend` はコミット ID を作り直します。
+```
+
+`docs/` の Markdown は公開サイトと GitHub の両方で読まれる。`::: warning` は GitHub 上で `::: warning …` という生テキストとして露出するため、双方で描画される GFM アラートに寄せる。VitePress 1.6.4 は `markdown.gfmAlerts` が既定で `true` なので**設定は要らない**。
+
+- **種別の対応**: `tip`→`TIP` ／ `warning`→`WARNING` ／ `info`→`NOTE` ／ `danger`→`CAUTION`。GFM に `INFO` と `DANGER` は無く、VitePress は解釈するが GitHub は生テキストにするので使わない（`IMPORTANT` は双方が解釈する）。
+- **見出しは本文 1 行目の太字に置く**（`> **push 済みのコミットは書き換えない**`）。`> [!WARNING] 見出し` と書くと、GitHub は**アラートとして認識せず**、ただの引用ブロックに `[!WARNING] 見出し` を含めて表示する。マーカー行にはマーカーだけを置く。
+- **アラートの見出しラベルは英語になる**（`TIP` / `WARNING` など）。vitepress は `md.use(gitHubAlertsPlugin)` をオプション無しで呼ぶため、プラグイン側の `tipLabel` 等が届かず、`markdown.container.tipLabel` を書いても効かない。日本語ラベルと GitHub 互換は両立しないため、後者を採る。
+- **アラートを空行 1 つで隣接させない**。`MD028/no-blanks-blockquote` が発火する。間に本文を置くか `<!-- -->` を挟む。本文中の `>` 単独行（段落の区切り）は問題ない。
+- `::: code-group` はアラートではなく VitePress 専用機能なので、そのまま使ってよい。
+
 ## Markdown Lint（markdownlint-cli2）
 
 設定は [.markdownlint-cli2.jsonc](.markdownlint-cli2.jsonc)。無効化済みルール以外は既定で有効。ハマりやすい点:
