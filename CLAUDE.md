@@ -55,7 +55,8 @@ docs/
 文章表記の揺れ・冗長表現を検知するため、`textlint` + `textlint-rule-preset-ja-technical-writing` を導入している（`npm run lint:text`、CI の `lint` ジョブでも実行）。整形は markdownlint、**文章は textlint**、と役割を分ける。
 
 - 設定は [.textlintrc.cjs](.textlintrc.cjs)。**段階導入**のため、現行ドキュメントで多数発火する opinionated なルールは初期は無効化し、既存文書を通しつつ残りのルールで表記を整える方針。
-- 初期に無効化しているルール（将来、文章を直しながら順次有効化する）: `ja-no-mixed-period`（文末句点）/ `no-doubled-joshi`（助詞の連続）/ `no-mix-dearu-desumasu`（である・ですます混在）/ `sentence-length`（一文の長さ）/ `no-exclamation-question-mark`（！？の使用）/ `arabic-kanji-numbers` / `ja-no-weak-phrase` / `ja-no-redundant-expression`。
+- 無効化しているルール（合計 180 件規模で発火するため、ルール単位で文章を直しながら順次有効化する。1 ルール 1 PR を目安）: `ja-no-mixed-period`（文末句点）/ `no-doubled-joshi`（助詞の連続）/ `no-mix-dearu-desumasu`（である・ですます混在）/ `sentence-length`（一文の長さ）。
+- 有効化済みの opinionated ルール: `no-exclamation-question-mark`（感嘆符・疑問符の使用）/ `arabic-kanji-numbers`（漢数字とアラビア数字の統一）/ `ja-no-weak-phrase`（弱い表現）/ `ja-no-redundant-expression`（冗長表現）。
 - 対象は `docs/**/*.md` とルート直下の `*.md`。`npm run lint:text -- --fix` で自動修正できる指摘もある（`npm run` に引数を渡すため `--` が必要）。
 
 ## 強調の描画 Lint（lint:emphasis）
