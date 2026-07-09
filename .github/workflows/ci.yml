@@ -62,6 +62,10 @@ jobs:
       - name: Lint Japanese prose
         run: npm run lint:text
 
+      # `**` が強調として描画されるかを検証（句読点に隣接すると成立しない CommonMark の規則）
+      - name: Lint emphasis rendering
+        run: npm run lint:emphasis
+
   # 設定駆動ハーネスの「設定↔実体」の整合を検査（checks.json スキーマ / hook 配線 / ラベル実在）
   config-check:
     runs-on: ubuntu-latest

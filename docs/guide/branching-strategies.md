@@ -35,15 +35,15 @@ flowchart TD
 
 ### 検証環境・本番環境が分かれている Web アプリ
 
-**[GitLab Flow](./other-flows#gitlab-flow)（環境ブランチ）**を使うと、「いま本番に何が出ているか」をブランチで表現でき、`main` → `staging` → `production` の昇格フローが作れます。代償として、環境をブランチで表すと**環境間でコードがドリフトし、昇格のマージ経路が組み合わせで増えていく**問題を抱え込みます。ブランチを増やさず、**GitHub Environments とデプロイパイプライン**に「いまどの環境に何が出ているか」を持たせる構成も取れます。この場合、本番へ流す起点はブランチへの push ではなくタグになります。
+**[GitLab Flow](./other-flows#gitlab-flow)（環境ブランチ）** を使うと、「いま本番に何が出ているか」をブランチで表現でき、`main` → `staging` → `production` の昇格フローが作れます。代償として、環境をブランチで表すと**環境間でコードがドリフトし、昇格のマージ経路が組み合わせで増えていく**問題を抱え込みます。ブランチを増やさず、**GitHub Environments とデプロイパイプライン**に「いまどの環境に何が出ているか」を持たせる構成も取れます。この場合、本番へ流す起点はブランチへの push ではなくタグになります。
 
 ### バージョン番号を明示して出荷するソフトウェア
 
-**[Git Flow](./other-flows#git-flow) または [GitLab Flow](./other-flows#gitlab-flow)（リリースブランチ）**が向きます。複数バージョンを並行して保守でき、`release/*` / 安定ブランチと `hotfix/*` で計画的なリリースと緊急修正を両立できます。実際の運用例は [複数バージョンの保守（リリースブランチ運用）](./release-branches) を参照。
+**[Git Flow](./other-flows#git-flow) または [GitLab Flow](./other-flows#gitlab-flow)（リリースブランチ）** が向きます。複数バージョンを並行して保守でき、`release/*` / 安定ブランチと `hotfix/*` で計画的なリリースと緊急修正を両立できます。実際の運用例は [複数バージョンの保守（リリースブランチ運用）](./release-branches) を参照。
 
 ### 大規模チームで定期リリースしつつ複数版を保守する
 
-**[Microsoft Release Flow](./other-flows#microsoft-release-flow)**が向きます。GitHub Flow を土台に、リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。命名規則やブランチフォルダ強制で大人数の運用を機械的に揃えたいチームに向きます。
+**[Microsoft Release Flow](./other-flows#microsoft-release-flow)** が向きます。GitHub Flow を土台に、リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。命名規則やブランチフォルダ強制で大人数の運用を機械的に揃えたいチームに向きます。
 
 ## 戦略を足すきっかけ
 
