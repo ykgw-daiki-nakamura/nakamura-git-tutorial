@@ -100,8 +100,13 @@ git worktree list   # 作成を確認
 限りこれで足り、インストール時間もディスク容量も使わない。この symlink は `.gitignore` の
 `node_modules`（末尾スラッシュなし）にマッチするため、追跡対象には入らない。
 
+リンク元・リンク先とも**絶対パス**で指定する。`git rev-parse --show-toplevel` は使わない
+（worktree 内で実行すると worktree 自身を返し、自己参照リンクになる）。
+`git worktree list --porcelain` の先頭は常にメイン作業ツリーなので、**どこから実行しても正しく解決できる**。
+
 ```bash
-ln -s "$(git rev-parse --show-toplevel)/node_modules" .claude/worktrees/<name>/node_modules
+main=$(git worktree list --porcelain | awk 'NR==1{print $2}')
+ln -s "$main/node_modules" "$main/.claude/worktrees/<name>/node_modules"
 ```
 
 - **依存そのものを変更する作業**（`package.json` / `package-lock.json` を触る PR）では symlink を使わず、
@@ -109,8 +114,8 @@ ln -s "$(git rev-parse --show-toplevel)/node_modules" .claude/worktrees/<name>/n
 - 検査コマンドが `command not found` で落ちたら、まずこの手順を踏んだか確認する。
 
 **既存 worktree を `main` に追随させるとき**:
-`node_modules` を**実ディレクトリ**として持つ作業ツリーが `5a312c3` 以降の `main` を取り込むと、
-追跡されていた symlink を Git が削除しようとして失敗する。
+`node_modules` を**実ディレクトリ**として持つ作業ツリーが、`node_modules` の追跡を外した変更
+（PR #261）を含む `main` を取り込むと、追跡されていた symlink を Git が削除しようとして失敗する。
 
 ```console
 $ git merge --ff-only origin/main
