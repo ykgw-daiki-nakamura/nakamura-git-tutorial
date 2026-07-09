@@ -3,7 +3,8 @@
 # 準拠しているか検証する。非準拠なら exit 2 で Claude にフィードバックする。
 #
 # 設計（既存フックの作法を踏襲）:
-# - 許可 type 一覧は .claude/checks.json の commit.conventional.types から読む。無ければ既定。
+# - 許可 type 一覧は .github/conventions.json の commit.conventional.types から読む。無ければ既定。
+#   規約を強制するゲートは CI なので、語彙の情報源は CI 側（.github/）に置き、ハーネスはそれを読む。
 # - リテラルの -m/--message メッセージのみ検証する。コマンド置換（`$(...)` / バッククォート）や
 #   -F/--file、エディタ起動（-m 無し）は**内容を静的に判定できない**ため fail-open（スキップ）。
 # - jq を優先し node にフォールバック。どちらも無ければ既定 type で検証する。
@@ -11,7 +12,7 @@ set -uo pipefail
 
 input=$(cat)
 proj="${CLAUDE_PROJECT_DIR:-.}"
-checks="$proj/.claude/checks.json"
+conventions="$proj/.github/conventions.json"
 
 # tool_input.command を抽出
 extract_command() {
@@ -67,14 +68,14 @@ case "$msg" in
   *'$('*|*'`'*) exit 0 ;;
 esac
 
-# 許可 type 一覧を checks.json から取得（無ければ既定）
+# 許可 type 一覧を conventions.json から取得（無ければ既定）
 default_types="feat|fix|docs|chore|ci|build|refactor|test|perf|style|revert"
 types=""
-if [ -f "$checks" ]; then
+if [ -f "$conventions" ]; then
   if command -v jq >/dev/null 2>&1; then
-    types=$(jq -r '(.commit.conventional.types // []) | join("|")' "$checks" 2>/dev/null)
+    types=$(jq -r '(.commit.conventional.types // []) | join("|")' "$conventions" 2>/dev/null)
   elif command -v node >/dev/null 2>&1; then
-    types=$(CHECKS="$checks" node -e 'try{const t=(JSON.parse(require("fs").readFileSync(process.env.CHECKS,"utf8")).commit?.conventional?.types)||[];process.stdout.write(t.join("|"))}catch(e){}')
+    types=$(CONVENTIONS="$conventions" node -e 'try{const t=(JSON.parse(require("fs").readFileSync(process.env.CONVENTIONS,"utf8")).commit?.conventional?.types)||[];process.stdout.write(t.join("|"))}catch(e){}')
   fi
 fi
 [ -n "$types" ] || types="$default_types"

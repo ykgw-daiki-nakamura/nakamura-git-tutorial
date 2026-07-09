@@ -33,7 +33,10 @@ docs/
 └─ index.md               # トップページ
 .github/workflows/        # CI（ci.yml）/ PR タイトル検証（pr-title.yml）/ Pages デプロイ（deploy.yml）/ 外部リンク検査（links.yml）
 .github/scripts/          # ワークフローから呼ぶスクリプト（check-pr-title.sh 等）
+.github/conventions.json  # コミット/PR 規約の単一情報源（許可 type・type→ラベル名）
 ```
+
+規約の語彙（許可 type・ラベル名）を `.claude/` ではなく `.github/` に置くのは、**それを強制するゲートが CI** だからです。CI は Claude を使わないコントリビューターにも効き、ハーネスを差し替えても残ります。`.claude/checks.json` に置くのは Claude だけが読む配線（`onEdit` / `guard.*` / `protectedBranches` など）に限り、`.github/` 配下のスクリプトが `.claude/` を読むことはありません。
 
 ## コンテンツ執筆の規約
 
@@ -89,10 +92,11 @@ markdownlint（整形）も textlint（文章表現）もこれを見ず、`docs
 
 ## コミット/PR 衛生・安全ガード（guard フック）
 
-PreToolUse フックで、コミットの衛生と危険操作の抑止を機械的に担保する（設定源は [.claude/checks.json](.claude/checks.json)）。
+PreToolUse フックで、コミットの衛生と危険操作の抑止を機械的に担保する（設定源は [.claude/checks.json](.claude/checks.json)。
+ただし**許可 type だけは CI と共有する規約の語彙**なので [.github/conventions.json](.github/conventions.json) が持つ）。
 
 - **`guard-commit.sh`**: `git commit -m <msg>` のメッセージを Conventional Commits 正規表現で検証。
-  非準拠なら `exit 2`。許可 type は `checks.json` の `commit.conventional.types`。
+  非準拠なら `exit 2`。許可 type は `.github/conventions.json` の `commit.conventional.types`。
   コマンド置換（`$(...)`）や `-F`・エディタ起動など**静的判定できない**ケースは fail-open。
 - **`guard-branch.sh`**: 保護ブランチ（`checks.json` の `protectedBranches`、既定 `main`）上での
   直接 `commit` / `push` を `exit 2` で阻止し、作業ブランチの作成を促す。
@@ -127,8 +131,8 @@ PreToolUse フックで、コミットの衛生と危険操作の抑止を機械
 index を走査してシークレットを取りこぼさない（`$proj` 固定＝メイン作業ツリー基準による誤判定を防ぐ）。
 回帰テストは [.claude/hooks/lib/guard-noise.test.sh](.claude/hooks/lib/guard-noise.test.sh)（worktree ケース含む）。
 
-配線は [.claude/settings.json](.claude/settings.json) の `hooks.PreToolUse`。type 一覧・保護ブランチ名・
-除外パターンは `checks.json` を編集するだけで変えられる（ロジックと設定の分離）。いずれのガードも
+配線は [.claude/settings.json](.claude/settings.json) の `hooks.PreToolUse`。保護ブランチ名・除外パターンは
+`checks.json`、許可 type は `.github/conventions.json` を編集するだけで変えられる（ロジックと設定の分離）。いずれのガードも
 依存（`jq`/`node`/`git`）が無い環境では fail-open で作業を止めない。**ガードは正当な理由なく
 迂回しない**こと。ステージ差分からのコミット生成は `.claude/skills/commit` を使う。
 
@@ -165,9 +169,9 @@ docs(guide): ブランチ命名規則の例を追加
 
 - **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint + textlint + 強調の描画）/ `config-check`（設定↔実体の整合）/ `test-hooks`（guard フック回帰テスト）/ `dependency-review`（依存の脆弱性検査）。
   - **test-hooks**: `scripts/test-hooks.sh`（`npm run test:hooks`）が `.claude/hooks/lib/*.test.sh`（例: `guard-noise.test.sh`）を一括実行し、guard 群のノイズ誤検知・worktree 対応・secrets 走査などのデグレを検知する。1 件でも失敗すれば CI が落ちる。
-  - **config-check**: `scripts/check-config-consistency.mjs`（`npm run check:config`）が (a) `checks.json` のスキーマ（必須キー）・(b) `.claude/hooks/*.sh` の `settings.json` 配線（未配線/宙づり参照）・(c) `checks.json` の `issueLabels`/`prLabels` が参照するラベルの実在（`gh label list`）・(d) 検証スクリプトのフォールバック `default_types`（`check-pr-title.sh` / `guard-commit.sh`）が `checks.json` の `commit.conventional.types` と順序含めて一致することを検査。ネット/トークンが無い環境では (c) をスキップ（fail-open）。
-- **pr-title.yml**（PR 時）: **PR タイトルが Conventional Commits 準拠か検証**する。Squash Merge では PR タイトルがマージコミットメッセージになるため。許可 type は `checks.json` の `commit.conventional.types`（`guard-commit.sh` と同一ソース）を `.github/scripts/check-pr-title.sh` が読む。
-- **pr-label.yml**（PR 時）: **PR タイトルの type に応じてラベルを自動付与**する（`feat`→`type: feat` 等）。対応表は `checks.json` の `issueLabels.types`（`issue-label` skill と同一ソース）を `.github/scripts/label-pr-by-type.sh` が読む。対応表に無い type はスキップ。`type: *` ラベルの実体は [scripts/sync-labels.sh](scripts/sync-labels.sh) で用意する（`checks.json` の `commit.conventional.types` を情報源に冪等作成）。`pull-requests: write` が要るため pr-title と同じく base 側で評価する（`pull_request_target`）。
+  - **config-check**: `scripts/check-config-consistency.mjs`（`npm run check:config`）が (a) `conventions.json` と `checks.json` のスキーマ（必須キー・type 一覧とラベル対応表の過不足）・(b) `.claude/hooks/*.sh` の `settings.json` 配線（未配線/宙づり参照）・(c) `conventions.json` の `labels.types` と `checks.json` の `issueLabels`/`prLabels` が参照するラベルの実在（`gh label list`）・(d) 検証スクリプトのフォールバック `default_types`（`check-pr-title.sh` / `guard-commit.sh`）が `conventions.json` の `commit.conventional.types` と順序含めて一致することを検査。ネット/トークンが無い環境では (c) をスキップ（fail-open）。
+- **pr-title.yml**（PR 時）: **PR タイトルが Conventional Commits 準拠か検証**する。Squash Merge では PR タイトルがマージコミットメッセージになるため。許可 type は `.github/conventions.json` の `commit.conventional.types`（`guard-commit.sh` と同一ソース）を `.github/scripts/check-pr-title.sh` が読む。
+- **pr-label.yml**（PR 時）: **PR タイトルの type に応じてラベルを自動付与**する（`feat`→`type: feat` 等）。対応表は `.github/conventions.json` の `labels.types`（`issue-label` skill と同一ソース）を `.github/scripts/label-pr-by-type.sh` が読む。対応表に無い type はスキップ。`type: *` ラベルの実体は [scripts/sync-labels.sh](scripts/sync-labels.sh) で用意する（同じ `conventions.json` を情報源に冪等作成）。`pull-requests: write` が要るため pr-title と同じく base 側で評価する（`pull_request_target`）。
 - **workflow-lint.yml**（`.github/workflows/**`・`.github/actions/**` 変更 PR 時）: ワークフロー自体を検査。**actionlint**（YAML/式/埋め込みシェルの静的解析）は blocking、**zizmor**（Actions セキュリティ監査＝`pull_request_target` 誤用・インジェクション・過剰権限）は**段階導入で非ブロッキング**（`continue-on-error`）。意図的に安全な `pull_request_target`（base 評価）の findings を整理後、`continue-on-error` を外して blocking 化する。Action は SHA ピン（Dependabot 更新）。
 - **deploy.yml**: `main` への push で GitHub Pages へ自動デプロイ。
 - **links.yml**: 週次で外部リンクの死活を検査（`--scheme http/https` で内部リンクは対象外）。
