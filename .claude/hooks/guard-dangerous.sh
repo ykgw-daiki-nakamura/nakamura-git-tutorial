@@ -66,11 +66,29 @@ block() { # $1 理由, $2 代替
 
 # 1) ルート/ホーム近傍の再帰削除
 # フラグは大小無視（-R は -r と等価、-F も同様）。末尾スラッシュ（/, ~/, $HOME/）も対象にする。
-if printf '%s' "$skel" | grep -Eqi '\brm\b[^|;&]*(-[a-z]*r[a-z]*f|-[a-z]*f[a-z]*r|-r[a-z]*[[:space:]]+-f|-f[a-z]*[[:space:]]+-r)'; then
-  if printf '%s' "$skel" | grep -Eq '(^|[[:space:]])(/|~|\$HOME|\$\{HOME\})/?(\*)?([[:space:]]|$)' \
-     || printf '%s' "$skel" | grep -Eq -- '--no-preserve-root'; then
-    block "ルート/ホーム近傍の再帰削除" "対象を具体的なサブディレクトリに限定する（例: rm -rf ./build）"
-  fi
+#
+# 判定は **rm の引数** に限定する。スケルトン全体から `/` を探すと、日本語の散文で多用する
+# 「A / B」のような区切りスラッシュに反応してしまう（本文に rm の記述が同居しただけで阻止される）。
+# そのため区切り（; | &）でセグメントに割り、rm を含むセグメントの引数だけを見る。
+rm_danger=0
+set -f   # 引数走査中に * を glob 展開させない
+while IFS= read -r seg; do
+  printf '%s' "$seg" | grep -Eqi '\brm\b[^|;&]*(-[a-z]*r[a-z]*f|-[a-z]*f[a-z]*r|-r[a-z]*[[:space:]]+-f|-f[a-z]*[[:space:]]+-r)' || continue
+  if printf '%s' "$seg" | grep -Eq -- '--no-preserve-root'; then rm_danger=1; break; fi
+  for tok in $(printf '%s' "$seg" | sed -E 's/.*\brm\b//'); do
+    case "$tok" in
+      -*) continue ;;
+      '/'|'/*'|'~'|'~/'|'~/*'|'$HOME'|'$HOME/'|'$HOME/*'|'${HOME}'|'${HOME}/'|'${HOME}/*')
+        rm_danger=1; break ;;
+    esac
+  done
+  [ "$rm_danger" -eq 1 ] && break
+done <<EOF
+$(printf '%s' "$skel" | tr ';|&\n' '\n\n\n\n')
+EOF
+set +f
+if [ "$rm_danger" -eq 1 ]; then
+  block "ルート/ホーム近傍の再帰削除" "対象を具体的なサブディレクトリに限定する（例: rm -rf ./build）"
 fi
 
 # 2) 保護ブランチへの force push
