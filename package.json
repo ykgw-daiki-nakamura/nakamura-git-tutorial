@@ -9,6 +9,7 @@
     "docs:preview": "vitepress preview docs",
     "docs:check-nav": "node scripts/check-nav.mjs",
     "check:config": "node scripts/check-config-consistency.mjs",
+    "check:audit": "node scripts/check-audit.mjs",
     "lint:md": "markdownlint-cli2",
     "lint:text": "textlint \"docs/**/*.md\" \"*.md\"",
     "lint:emphasis": "node scripts/check-emphasis.mjs",
