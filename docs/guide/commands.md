@@ -68,6 +68,23 @@ git stash pop                          # 退避した作業を戻す
 git reflog                             # HEAD の移動履歴（救出用）
 ```
 
+## リリース
+
+```bash
+git cherry-pick <commit>               # 別ブランチの修正を移植（main-first の back-patch）
+git cherry-pick --continue             # コンフリクト解決後に続行
+git cherry-pick --abort                # 中止
+
+git tag -a v1.2.0 -m "リリース v1.2.0" # 注釈付きタグを打つ
+git tag                                # タグ一覧
+git push origin v1.2.0                 # タグをリモートへ送る
+
+gh release create v1.2.0 --generate-notes             # GitHub Release を作成
+gh release create v1.2.0 --generate-notes --target release/1.2   # 枝上のタグから
+```
+
+詳しくは [リリースとバージョン管理](./release)、複数バージョンを保守する場合は [リリースブランチ運用](./release-branches) を参照してください。
+
 ## GitHub CLI (`gh`)
 
 ```bash
