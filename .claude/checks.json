@@ -22,33 +22,15 @@
       "run": "npm run docs:check-nav"
     }
   ],
-  "//commit": "guard-commit.sh が読むコミットメッセージ検証設定。types が Conventional Commits の許可 type 一覧。",
-  "commit": {
-    "conventional": {
-      "types": ["feat", "fix", "docs", "chore", "ci", "build", "refactor", "test", "perf", "style", "revert"]
-    }
-  },
+  "//conventions": "Conventional Commits の許可 type 一覧（旧 commit.conventional.types）と type→ラベル名の対応表（旧 issueLabels.types）は、このファイルではなく .github/conventions.json が単一情報源。規約を強制するゲートは CI であり、Claude を使わないコントリビューターにも効くため、語彙は CI 側に置く。ここに残すのは Claude ハーネスだけが読む配線と推定ヒューリスティック。",
   "//protectedBranches": "guard-branch.sh / guard-dangerous.sh が読む保護ブランチ。直接 commit / push や保護ブランチへの force push を阻止する。",
   "protectedBranches": ["main"],
-  "//issueLabels": "issue-label skill が読む Issue ラベル判定表。ロジック（skill）と対応表（設定）を分離する。実在するラベルのみ付与し、勝手に作らない（gh label create はしない。type: * ラベルの用意は scripts/sync-labels.sh の役割）。status: in-progress は付けない（worktree-task の責務）。types=Conventional の type→種別ラベル（type: *）、areas=title/本文/対象パスに一致させる正規表現（大小無視）→領域ラベル、triage=明確な兆候がある時だけの補助ラベル。",
+  "//issueLabels": "issue-label skill が読む Issue ラベル判定表のうち、Claude 固有の推定ヒューリスティック。type→種別ラベル（type: *）の対応表は .github/conventions.json の labels.types にあり、この skill は両方を読む。実在するラベルのみ付与し、勝手に作らない（gh label create はしない。type: * ラベルの用意は scripts/sync-labels.sh の役割）。status: in-progress は付けない（worktree-task の責務）。areas=title/本文/対象パスに一致させる正規表現（大小無視）→領域ラベル、triage=明確な兆候がある時だけの補助ラベル。",
   "issueLabels": {
-    "types": {
-      "feat": "type: feat",
-      "fix": "type: fix",
-      "docs": "type: docs",
-      "chore": "type: chore",
-      "ci": "type: ci",
-      "build": "type: build",
-      "refactor": "type: refactor",
-      "test": "type: test",
-      "perf": "type: perf",
-      "style": "type: style",
-      "revert": "type: revert"
-    },
     "areas": [
       { "label": "harness", "match": "\\.claude/|CLAUDE\\.md|guard-[a-z]+|/hooks/|/skills/|checks\\.json|SKILL\\.md|ハーネス|\\bharness\\b" },
       { "label": "documentation", "match": "(^|/)docs/|/guide/|vitepress|チュートリアル|教材ページ" },
-      { "label": "github_actions", "match": "\\.github/workflows/|ci\\.yml|deploy\\.yml|links\\.yml|pr-title\\.yml|GitHub Actions" },
+      { "label": "github_actions", "match": "\\.github/|ci\\.yml|deploy\\.yml|links\\.yml|pr-title\\.yml|conventions\\.json|GitHub Actions" },
       { "label": "dependencies", "match": "package(-lock)?\\.json|devDependencies|npm ci\\b|Dependabot|脆弱性" }
     ],
     "triage": ["question", "good first issue", "help wanted"]

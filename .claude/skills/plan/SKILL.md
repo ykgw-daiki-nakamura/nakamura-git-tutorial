@@ -64,10 +64,11 @@ GitHub Issue を作成する**ところまでを担う skill。**ブランチ・
 - `gh issue create` で plan.md 準拠の本文を作る（既存 Issue を使う場合は `gh issue edit` で更新）。
 - **ラベル**: 種別ラベルはタイトル先頭の `<type>`（Conventional Commits）に対応する `type: *`
   （例: `feat`→`type: feat`、`docs`→`type: docs`）と、内容に応じた領域ラベルを付ける。対応表は
-  `.claude/checks.json` の `issueLabels`（`type`→`type: *`・領域ラベル）を正とし、既存の
-  `issue-label` skill があれば**それに委譲／踏襲**する。`type: *` ラベルの実体は
-  [scripts/sync-labels.sh](../../../scripts/sync-labels.sh) で用意する（**実在しないラベルは付けない**）。
-  ロジックと対応表を分離する既存方針に合わせ、**語彙は設定側（checks.json）を正**とする。
+  `.github/conventions.json` の `labels.types`（`type`→`type: *`）と `.claude/checks.json` の
+  `issueLabels`（領域ラベル）を正とし、既存の `issue-label` skill があれば**それに委譲／踏襲**する。
+  `type: *` ラベルの実体は [scripts/sync-labels.sh](../../../scripts/sync-labels.sh) で用意する
+  （**実在しないラベルは付けない**）。ロジックと対応表を分離する既存方針に合わせ、
+  **語彙は設定側を正**とする。
 - **`status: in-progress` は付けない**。着手ラベルの付与は実装に入る `worktree-task` の責務。
   `plan` は「計画済み・未着手」の Issue を残す。
 

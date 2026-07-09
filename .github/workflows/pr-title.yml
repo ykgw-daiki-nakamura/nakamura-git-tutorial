@@ -4,7 +4,7 @@ name: PR Title
 # PR タイトルが Conventional Commits に準拠しているかを検証し、main の履歴を一貫させる。
 #
 # pull_request_target を使う理由（セキュリティ）:
-#   フォーク PR が head 側の検証スクリプトや checks.json を書き換えてチェックを回避できないよう、
+#   フォーク PR が head 側の検証スクリプトや conventions.json を書き換えてチェックを回避できないよう、
 #   検証ロジック（スクリプト・許可 type）は必ず **base（信頼できる）側**から評価する。
 #   pull_request_target のリスク（昇格トークンで untrusted コードを実行）は、
 #   (1) PR head のコードを一切チェックアウト・実行しない（base の sha のみ checkout）、
@@ -34,14 +34,14 @@ jobs:
     timeout-minutes: 5
     steps:
       # base（PR のマージ先）の信頼できるツリーを checkout する。
-      # PR head は checkout しない（untrusted なスクリプト/checks.json を実行しないため）。
+      # PR head は checkout しない（untrusted なスクリプト/conventions.json を実行しないため）。
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           persist-credentials: false
 
       # タイトルは env 経由で渡す（run へ直接展開しないことでスクリプトインジェクションを防ぐ）。
-      # スクリプトと checks.json は上でチェックアウトした base 側＝信頼できるもの。
+      # スクリプトと conventions.json は上でチェックアウトした base 側＝信頼できるもの。
       - name: Validate PR title (Conventional Commits)
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
