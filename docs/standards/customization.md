@@ -37,6 +37,104 @@ outline: [2, 3]
 - 顧客固有コードは**顧客ごとの独立したリポジトリ（下流リポジトリ / downstream）** に置く。コアリポジトリに顧客固有コードを含めない（顧客間のコード分離 = 契約境界）。
 - 下流リポジトリにも本規約のブランチ運用（trunk-based、PR 必須、Rulesets）を適用する。
 
+#### 拡張ポイントの例
+
+予測後処理フック（`ForecastPostProcessor`）を題材に、コードとしての形を示す。示すのは次の 3 つで、実装言語が変わっても役割の対応は変わらない。
+
+1. コアが公開する拡張ポイントの interface
+2. 下流リポジトリに置く顧客実装
+3. コアが実装を発見する登録（.NET は DI コンテナ、TypeScript は registry、Python は entry point）
+
+各コード片の冒頭コメントは、そのファイルがコアと下流のどちらのリポジトリに属するかを示す。
+
+::: code-group
+
+```csharp [.NET]
+// ── コアリポジトリ: Product.Core/Extensibility/IForecastPostProcessor.cs
+namespace Product.Core.Extensibility;
+
+// 拡張ポイントの interface は公開 API。破壊的変更は MAJOR でのみ行う。
+public interface IForecastPostProcessor
+{
+    ForecastResult Process(ForecastResult result, ForecastContext context);
+}
+
+// ── 下流リポジトリ product-ext-acme: src/AcmeForecastPostProcessor.cs
+public sealed class AcmeForecastPostProcessor : IForecastPostProcessor
+{
+    private const double CorrectionBias = 0.03;
+
+    public ForecastResult Process(ForecastResult result, ForecastContext context)
+        => result with { Value = result.Value * context.SeasonalityFactor + CorrectionBias };
+}
+
+// ── 下流リポジトリ product-ext-acme: src/AcmeExtensionModule.cs
+// コアは起動時に IExtensionModule 実装を読み込み、DI コンテナへ登録する。
+public sealed class AcmeExtensionModule : IExtensionModule
+{
+    public void Register(IServiceCollection services)
+        => services.AddSingleton<IForecastPostProcessor, AcmeForecastPostProcessor>();
+}
+```
+
+```ts [TypeScript]
+// ── コアリポジトリ: packages/core/src/extensibility/forecast-post-processor.ts
+// 拡張ポイントの interface は公開 API。破壊的変更は MAJOR でのみ行う。
+export interface ForecastPostProcessor {
+  process(result: ForecastResult, context: ForecastContext): ForecastResult;
+}
+
+// ── 下流リポジトリ product-ext-acme: src/acme-forecast-post-processor.ts
+import type { ForecastContext, ForecastPostProcessor, ForecastResult } from "@product/core";
+
+const CORRECTION_BIAS = 0.03;
+
+export class AcmeForecastPostProcessor implements ForecastPostProcessor {
+  process(result: ForecastResult, context: ForecastContext): ForecastResult {
+    return { ...result, value: result.value * context.seasonalityFactor + CORRECTION_BIAS };
+  }
+}
+
+// ── 下流リポジトリ product-ext-acme: src/register.ts
+// コアは起動時にこの register を呼び出し、registry 経由で実装を解決する。
+import type { ExtensionRegistry } from "@product/core";
+
+export default function register(registry: ExtensionRegistry): void {
+  registry.forecastPostProcessors.register(new AcmeForecastPostProcessor());
+}
+```
+
+```python [Python]
+# ── コアリポジトリ: product_core/extensibility.py
+from typing import Protocol
+
+# 拡張ポイントの interface は公開 API。破壊的変更は MAJOR でのみ行う。
+class ForecastPostProcessor(Protocol):
+    def process(self, result: ForecastResult, context: ForecastContext) -> ForecastResult: ...
+
+# ── 下流リポジトリ product-ext-acme: src/forecast_postprocess_ext.py
+from dataclasses import replace
+
+CORRECTION_BIAS = 0.03
+
+class AcmeForecastPostProcessor:
+    def process(self, result: ForecastResult, context: ForecastContext) -> ForecastResult:
+        return replace(result, value=result.value * context.seasonality_factor + CORRECTION_BIAS)
+
+# ── 下流リポジトリ product-ext-acme: pyproject.toml
+# コアは起動時にこの entry point group を走査し、実装を解決する。
+#
+#   [project.entry-points."product.forecast_post_processor"]
+#   acme = "forecast_postprocess_ext:AcmeForecastPostProcessor"
+```
+
+:::
+
+- コアは interface だけを公開し、実装の存在を知らない。顧客名がコアのコードに現れないため、前述「Tier 1: 設定・フラグによるカスタマイズ」で禁じた顧客識別子によるコード分岐も生じない。
+- 実装の解決は、コアが提供する発見機構（DI コンテナ / registry / entry point）に委ねる。下流リポジトリは既存の口へ実装を差し込むだけで、コアの再ビルドは要らない（後述「ビルドとバージョニング」）。
+- 顧客固有の値（上記の `CorrectionBias`）は実装の内側に閉じる。パラメータとして外から与えられる差異であれば、それは Tier 1 の設定で扱う。
+- 契約テストは、この interface のシグネチャと入出力の約束が保たれることを検証する（後述「バージョン追従の運用」）。
+
 #### ビルドとバージョニング
 
 ```mermaid
@@ -88,15 +186,42 @@ flowchart LR
 1. 必要な拡張ポイントがコアに存在するか確認する。データ取り込み用フック（要求 C）は既存とする。予測後処理用フック（要求 B）が未提供であれば、まず**コアへ汎用の拡張ポイントを追加する PR** を `main` に出す（全顧客が使える口であり、通常の開発フロー。承認は「カスタマイズ階層（Tier）」に従う）。
 2. 拡張ポイントが揃ったら、Acme 専用の下流リポジトリ（`product-ext-acme`、コアの downstream）を作成し、各フックの Acme 実装と契約テストを配置する。このリポジトリにも本規約のブランチ運用（trunk + PR + Rulesets）を適用する。
 
-```text
-product-ext-acme/                  # Acme 下流リポジトリ（downstream）
+::: code-group
+
+```text [.NET]
+product-ext-acme/                       # Acme 下流リポジトリ（downstream）
   src/
-    forecast_postprocess_ext.py    # 予測後処理フックの実装（要求B）
-    external_ingest_connector.py   # データ取り込みフックの実装（要求C）
+    AcmeForecastPostProcessor.cs        # 予測後処理フックの実装（要求B）
+    AcmeExternalIngestConnector.cs      # データ取り込みフックの実装（要求C）
+    AcmeExtensionModule.cs              # 拡張ポイントへの登録（DI コンテナ）
   tests/
-    contract/                      # 拡張ポイントの契約テスト
+    Contract/                           # 拡張ポイントの契約テスト
   .github/workflows/build.yml
 ```
+
+```text [TypeScript]
+product-ext-acme/                       # Acme 下流リポジトリ（downstream）
+  src/
+    acme-forecast-post-processor.ts     # 予測後処理フックの実装（要求B）
+    acme-external-ingest-connector.ts   # データ取り込みフックの実装（要求C）
+    register.ts                         # 拡張ポイントへの登録（registry）
+  tests/
+    contract/                           # 拡張ポイントの契約テスト
+  .github/workflows/build.yml
+```
+
+```text [Python]
+product-ext-acme/                       # Acme 下流リポジトリ（downstream）
+  src/
+    forecast_postprocess_ext.py         # 予測後処理フックの実装（要求B）
+    external_ingest_connector.py        # データ取り込みフックの実装（要求C）
+  pyproject.toml                        # 拡張ポイントへの登録（entry point）
+  tests/
+    contract/                           # 拡張ポイントの契約テスト
+  .github/workflows/build.yml
+```
+
+:::
 
 #### ビルド（合成）
 
