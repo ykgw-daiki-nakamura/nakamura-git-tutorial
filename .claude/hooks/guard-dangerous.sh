@@ -75,7 +75,14 @@ set -f   # 引数走査中に * を glob 展開させない
 while IFS= read -r seg; do
   printf '%s' "$seg" | grep -Eqi '\brm\b[^|;&]*(-[a-z]*r[a-z]*f|-[a-z]*f[a-z]*r|-r[a-z]*[[:space:]]+-f|-f[a-z]*[[:space:]]+-r)' || continue
   if printf '%s' "$seg" | grep -Eq -- '--no-preserve-root'; then rm_danger=1; break; fi
-  for tok in $(printf '%s' "$seg" | sed -E 's/.*\brm\b//'); do
+  # `rm` 以降だけを引数として切り出す。sed の ERE では `\b` が単語境界にならない環境が
+  # あるため（BSD sed では backspace 扱い）、シェルの正規表現で明示的に切り出す。
+  # 先行するパス（/usr/bin/rm など）も許容する。切り出せなければセグメント全体を見る（安全側）。
+  rm_args="$seg"
+  if [[ "$seg" =~ (^|[[:space:]])([^[:space:]]*/)?rm[[:space:]] ]]; then
+    rm_args="${seg#*"${BASH_REMATCH[0]}"}"
+  fi
+  for tok in $rm_args; do
     case "$tok" in
       -*) continue ;;
       '/'|'/*'|'~'|'~/'|'~/*'|'$HOME'|'$HOME/'|'$HOME/*'|'${HOME}'|'${HOME}/'|'${HOME}/*')

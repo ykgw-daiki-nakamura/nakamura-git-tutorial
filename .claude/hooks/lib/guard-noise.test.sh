@@ -84,9 +84,14 @@ run "実 rm -rf と引用内の区切り / の同居は素通り"        guard-d
 # コマンド置換の中に閉じ括弧を含む文字列があっても対応括弧を誤認しない
 PAREN="$(printf 'gh pr comment --body "$(echo %s)%s)"' '"' '"')"
 run "コマンド置換内の \")\" を含む文字列でも壊れない"    guard-dangerous.sh 0 "$PAREN"
+# 引用符付きの安全なサブパスは許可する（--danger の保持を単独トークン一致に限定した回帰）
+run "引用符付きの安全な絶対パスの削除は許可"            guard-dangerous.sh 0 "$RM $RF \"/tmp/build\""
+run "引用符付きの worktree 配下の削除は許可"            guard-dangerous.sh 0 "$RM $RF \"$TD/wt/node_modules\""
+run "引用符付きの \$HOME 配下の削除は許可"               guard-dangerous.sh 0 "$RM $RF \"\$HOME/.cache/x\""
 # 検知は維持する（すり抜けさせない）
 run "実 ルート削除は引き続き阻止"                       guard-dangerous.sh 2 "$RM $RF /"
 run "実 ホーム削除は引き続き阻止"                       guard-dangerous.sh 2 "$RM $RF ~"
+run "引用符付きの \$HOME 自体の削除は阻止"              guard-dangerous.sh 2 "$RM $RF \"\$HOME\""
 run "実 サブディレクトリ削除は引き続き許可"             guard-dangerous.sh 0 "$RM $RF ./build"
 run "実 worktree 配下の削除は許可"                      guard-dangerous.sh 0 "$RM $RF $TD/wt/node_modules"
 

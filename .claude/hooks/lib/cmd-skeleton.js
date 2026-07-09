@@ -22,7 +22,10 @@
 //
 // 値（メッセージ・パス・ブランチ名）の抽出は各 guard 側で原文から行う。
 const DANGER = process.argv.includes("--danger");
-const PRESERVE = ["--force-with-lease", "--no-preserve-root", "--force", "${HOME}", "$HOME", "/", "~"];
+// 危険判定に必要なフラグ。引用符内でも保持する。
+const PRESERVE_FLAGS = ["--force-with-lease", "--no-preserve-root", "--force"];
+// 危険な削除対象。ルート・ホームそのもの（末尾の / や * は許容）だけを保持する。
+const DANGER_TARGET = /^(\/|~|\$HOME|\$\{HOME\})\/?\*?$/;
 
 let s = "";
 process.stdin.on("data", (d) => (s += d)).on("end", () => {
@@ -30,11 +33,15 @@ process.stdin.on("data", (d) => (s += d)).on("end", () => {
 });
 
 // 引用符内の内容を潰す。--danger 時は危険トークンだけ残す。
+// 判定は **単独トークンとしての一致** で行う。部分一致にすると `rm -rf "/tmp"` や
+// `rm -rf "$HOME/x"` のような安全なサブパスからも `/` や `$HOME` が単独トークンとして漏れ、
+// guard-dangerous が誤検知する。
 function placeholder(content) {
   let out = " __STR__ ";
   if (DANGER) {
-    for (const tok of PRESERVE) {
-      if (content.includes(tok)) out += tok + " ";
+    for (const tok of content.split(/\s+/)) {
+      if (!tok) continue;
+      if (PRESERVE_FLAGS.includes(tok) || DANGER_TARGET.test(tok)) out += tok + " ";
     }
   }
   return out;
