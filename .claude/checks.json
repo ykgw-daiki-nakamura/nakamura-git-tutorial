@@ -47,7 +47,7 @@
     },
     "areas": [
       { "label": "harness", "match": "\\.claude/|CLAUDE\\.md|guard-[a-z]+|/hooks/|/skills/|checks\\.json|SKILL\\.md|ハーネス|\\bharness\\b" },
-      { "label": "documentation", "match": "(^|/)docs/|/guide/|/hands-on/|vitepress|チュートリアル|教材ページ" },
+      { "label": "documentation", "match": "(^|/)docs/|/guide/|vitepress|チュートリアル|教材ページ" },
       { "label": "github_actions", "match": "\\.github/workflows/|ci\\.yml|deploy\\.yml|links\\.yml|pr-title\\.yml|GitHub Actions" },
       { "label": "dependencies", "match": "package(-lock)?\\.json|devDependencies|npm ci\\b|Dependabot|脆弱性" }
     ],
