@@ -87,6 +87,25 @@ git worktree list   # 作成を確認
   （未登録のリポジトリで使う場合は先に `.gitignore` へ追加しておく）。
 - 以降のファイル編集・`git` 操作は **すべてこの worktree ディレクトリ内** で行う
   （`git -C <worktree> ...` またはそのパス配下のファイルを編集）。メインの作業ツリーは触らない。
+- **`git -C` に渡すパスはシェル変数ではなくリテラルで書く。** `guard-branch` / `guard-secrets` は
+  コマンド文字列から対象作業ツリーを**静的に**解決する。`git -C "$w" commit` のように変数を使うと
+  worktree を解決できず、「保護ブランチ上での直接 commit」と誤判定してブロックされる。
+
+**依存（`node_modules`）は通常セットアップ不要。** worktree は `.claude/worktrees/<name>`、つまり
+メイン作業ツリーの**内側**にあるため、Node のモジュール解決も `npm run` の PATH 構築も親ディレクトリを
+遡り、リポジトリ直下の `node_modules` に到達する。`npm install` せずに `lint:md` / `lint:text` /
+`lint:emphasis` / `docs:build` / `check:config` / `test:hooks` / `docs:check-nav` が動く。
+
+- **例外: `package.json` を変更する PR では、worktree 内で `npm install` する。** しないと worktree は
+  メイン側の `node_modules` を黙って使い、`package.json` の記述と実際に読み込まれる依存がずれる。
+  追加した依存がメイン側に**推移的依存として偶然存在する**と、ローカルでは通るのに意味が変わる
+  （CI は `npm ci` で lockfile から入れ直すため気付けるが、ローカルでは気付けない）。
+- worktree 内で `npm install` すると `node_modules` の実体ができる。`.gitignore` 済みでコミット対象には
+  ならないが、**`git worktree remove` の前に削除が必要**になることがある（下記「7. 後片付け」）。
+- 親を遡るのは Node のモジュール解決と `npm run` の PATH 構築であって、パスそのものではない。
+  worktree の cwd で `node_modules/.bin/<tool>` と**相対パスで直叩きすると解決できない**。
+  `npm run <script>` か `npx <tool>` を使う（`checks.json` の `onEdit` は `.bin` を相対パスで書くが、
+  フック本体がリポジトリ直下へ `cd` してから実行するので影響しない）。
 
 ### 4. worktree 内で作業
 
@@ -168,6 +187,27 @@ git -C <main-worktree> worktree list          # 撤去を確認
 
 - 未コミット変更が残っている場合は削除しない。ユーザーに残すか破棄するか確認する。
 - worktree を残す指示なら削除せず、パスをユーザーに伝えて終了する。
+
+**`npm install` した worktree の撤去。** `node_modules` の実体があると `git worktree remove` が
+「未コミット変更あり」と判断して失敗することがある。生成物なので、消してから撤去してよい。
+
+```bash
+rm -rf .claude/worktrees/<name>/node_modules
+git -C <main-worktree> worktree remove .claude/worktrees/<name>
+```
+
+**移行トラップ（`node_modules` 追跡解除の前後）。** かつて `node_modules` は絶対パスを指す symlink として
+git に追跡されていた（現在は追跡解除済み）。当時に作られ、`npm install` で実体ディレクトリに置き換わった
+worktree が、追跡解除後の `main` を取り込もうとすると失敗する。
+
+```console
+$ git merge --ff-only origin/main
+error: Your local changes to the following files would be overwritten by merge:
+    node_modules
+Aborting
+```
+
+実体を一時退避してからマージし、マージ後に戻す（`npm install` のやり直しは不要）。
 
 ## 注意
 
