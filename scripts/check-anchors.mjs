@@ -88,8 +88,18 @@ for (const file of mdFiles) {
       const hash = href.indexOf('#')
       if (hash === -1) continue
       const pathPart = href.slice(0, hash)
-      const frag = decodeURIComponent(href.slice(hash + 1))
-      if (!frag) continue
+      const rawFrag = href.slice(hash + 1)
+      if (!rawFrag) continue
+      // 不正な % エンコード（`#%ZZ` 等）で decodeURIComponent は URIError を投げる。
+      // スクリプトごと落とすと他のリンクを検査しないまま終わるので、その 1 件だけを
+      // 「検査不能」として記録し、走査を続ける（黙って飛ばさない）。
+      let frag
+      try {
+        frag = decodeURIComponent(rawFrag)
+      } catch {
+        errors.push({ file, line: idx + 1, href, why: 'fragment の % エンコードが不正で復号できません' })
+        continue
+      }
 
       // 対象ページの md パスを解決する。
       // `/standards/versioning` のようなサイトルート相対は docs/ が起点。
