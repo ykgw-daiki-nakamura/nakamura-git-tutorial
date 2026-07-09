@@ -27,8 +27,6 @@ npm run lint:md      # markdownlint-cli2 による Markdown 整形チェック
 docs/
 ├─ .vitepress/config.mjs  # サイト設定（nav / sidebar / Mermaid）
 ├─ guide/                 # チュートリアル本文
-├─ hands-on/              # 実習（ハンズオン）コンテンツ
-├─ practice/              # 実習で編集する練習用ページ（サンドボックス）
 └─ index.md               # トップページ
 .github/workflows/        # CI（ci.yml）/ PR タイトル検証（pr-title.yml）/ Pages デプロイ（deploy.yml）/ 外部リンク検査（links.yml）
 .github/scripts/          # ワークフローから呼ぶスクリプト（check-pr-title.sh 等）
@@ -36,7 +34,7 @@ docs/
 
 ## コンテンツ執筆の規約
 
-- 本文は日本語で、`docs/guide/` または `docs/hands-on/` に Markdown で追加する。
+- 本文は日本語で、`docs/guide/` に Markdown で追加する。
 - **新規ページを追加したら `docs/.vitepress/config.mjs` の `sidebar` にも登録する**（登録漏れに注意）。
 - VitePress の内部リンクは**拡張子なし**で書く（例: `[ブランチ](./branching)`）。実ファイルは `.md`。
 - 図は Mermaid のコードフェンス（` ```mermaid `）で記述する。日本語ラベルを含む複雑な図は `"..."` で囲むと崩れにくい。

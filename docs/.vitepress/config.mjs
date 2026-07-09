@@ -3,24 +3,6 @@ import { withMermaid } from 'vitepress-plugin-mermaid'
 const siteUrl = 'https://ykgw-daiki-nakamura.github.io/nakamura-git-tutorial/'
 const description = 'Git / GitHub をチーム開発で実践的に使いこなすための図解付きチュートリアル'
 
-// 実習タブ用サイドバー（/hands-on/ と /practice/ で共有する）
-const handsOnSidebar = [
-  {
-    text: '実習（ハンズオン）',
-    items: [
-      { text: '実習の進め方', link: '/hands-on/' },
-      { text: '練習場（サンドボックス）', link: '/practice/' },
-      { text: '① ローカルで基本操作', link: '/hands-on/basics-lab' },
-      { text: '② ブランチとマージ', link: '/hands-on/branching-lab' },
-      { text: '③ コンフリクトを解決する', link: '/hands-on/conflicts-lab' },
-      { text: '④ GitHub にリモート連携', link: '/hands-on/remote-lab' },
-      { text: '⑤ GitHub Flow を一周する', link: '/hands-on/github-flow-lab' },
-      { text: '⑥ CI を動かす', link: '/hands-on/ci-lab' },
-      { text: '⑦ タグとリリース', link: '/hands-on/release-lab' }
-    ]
-  }
-]
-
 export default withMermaid({
   title: 'nakamura-git-tutorial',
   description,
@@ -49,10 +31,9 @@ export default withMermaid({
     nav: [
       { text: 'ホーム', link: '/' },
       { text: 'ガイド', link: '/guide/introduction', activeMatch: '^/guide/' },
-      { text: '実習', link: '/hands-on/', activeMatch: '^/(hands-on|practice)/' },
       { text: '開発規約', link: '/standards/', activeMatch: '^/standards/' }
     ],
-    // パス別サイドバー: ガイドと実習でメニューを切り替える
+    // パス別サイドバー: ガイドと開発規約でメニューを切り替える
     sidebar: {
       '/guide/': [
         {
@@ -141,9 +122,7 @@ export default withMermaid({
             { text: '用語と背景', link: '/standards/glossary' }
           ]
         }
-      ],
-      '/hands-on/': handsOnSidebar,
-      '/practice/': handsOnSidebar
+      ]
     },
     socialLinks: [
       { icon: 'github', link: 'https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial' }

@@ -9,9 +9,6 @@ hero:
       text: はじめる
       link: /guide/introduction
     - theme: alt
-      text: 手を動かす実習
-      link: /hands-on/
-    - theme: alt
       text: コマンド早見表
       link: /guide/commands
 features:
@@ -23,6 +20,4 @@ features:
     details: コンフリクト解決と rebase による履歴整理を、Mermaid 図でわかりやすく。
   - title: ⚙️ 自動化で守る
     details: GitHub Actions による CI とブランチ保護で、壊れた変更をマージさせない。
-  - title: 🛠️ 手を動かす実習
-    details: ローカル演習から GitHub Flow・CI まで、コピペで再現できるハンズオンで定着。
 ---
