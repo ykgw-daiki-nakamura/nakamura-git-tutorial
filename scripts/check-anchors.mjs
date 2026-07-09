@@ -48,7 +48,10 @@ function collectHtml(dir) {
     if (statSync(p).isDirectory()) { collectHtml(p); continue }
     if (!name.endsWith('.html')) continue
     const html = readFileSync(p, 'utf8')
-    const ids = new Set([...html.matchAll(/\bid="([^"]*)"/g)].map((m) => m[1]))
+    // 属性名がちょうど `id` のものだけを拾う。`\bid="` だと `data-id="…"` にも当たり
+    // （`-` と `i` の間に word 境界が立つ）、実在しないアンカーが偽の id と一致して
+    // **黙って検査を通ってしまう**。`\sid="` では `<a href="x"id="y">` を取りこぼすので後読みで書く。
+    const ids = new Set([...html.matchAll(/(?<![-\w:])id="([^"]*)"/g)].map((m) => m[1]))
     // キーは `/` 区切りに正規化する（Windows の `\` 区切りだと mdToHtml() の結果と噛み合わない）
     idsOf.set(relative(distDir, p).replace(/\\/g, '/'), ids)
   }
