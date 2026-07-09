@@ -12,9 +12,10 @@ flowchart LR
     CLEAN -->|git stash pop| WT
 ```
 
-::: warning 追跡されていないファイルは既定で退避されない
-新規作成してまだ `git add` していないファイルは、既定では stash されず作業ツリーに残ります。これも含めたいときは `-u`（`--include-untracked`）を付けます。
-:::
+> [!WARNING]
+> **追跡されていないファイルは既定で退避されない**
+>
+> 新規作成してまだ `git add` していないファイルは、既定では stash されず作業ツリーに残ります。これも含めたいときは `-u`（`--include-untracked`）を付けます。
 
 ## 基本操作
 

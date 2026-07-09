@@ -12,9 +12,10 @@
 | **リリース** | `main` のある 1 点に「これが v1.2.0」と**印を付けて出荷単位を確定**する | `git tag` / GitHub Release |
 | **デプロイ** | その成果物を本番環境で動かす | CI/CD・ホスティング |
 
-::: tip 継続デプロイ型の例
-たとえば `main` に push されるたびに GitHub Actions が自動で GitHub Pages へデプロイする**継続デプロイ型**の構成（[deploy.yml](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.github/workflows/deploy.yml) の例）では、タグや Release は**デプロイのトリガーではなく「出荷点の印」** として使います。プロダクトによっては、次章で触れるように**タグや Release をデプロイのトリガー**にする構成もあります。
-:::
+> [!TIP]
+> **継続デプロイ型の例**
+>
+> たとえば `main` に push されるたびに GitHub Actions が自動で GitHub Pages へデプロイする**継続デプロイ型**の構成（[deploy.yml](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.github/workflows/deploy.yml) の例）では、タグや Release は**デプロイのトリガーではなく「出荷点の印」** として使います。プロダクトによっては、次章で触れるように**タグや Release をデプロイのトリガー**にする構成もあります。
 
 ## セマンティックバージョニング (SemVer)
 
@@ -37,9 +38,10 @@
 | `feat!:` / 本文に `BREAKING CHANGE:` | **MAJOR** |
 | `docs:` `chore:` `refactor:` など | 原則バージョンに影響しない |
 
-::: tip 0.x.y のうちは
-`1.0.0` に達する前（`0.x.y`）は「まだ安定していない開発版」の合図です。この期間は破壊的変更でも MINOR（`0.2.0` → `0.3.0`）で上げる運用が一般的です。
-:::
+> [!TIP]
+> **0.x.y のうちは**
+>
+> `1.0.0` に達する前（`0.x.y`）は「まだ安定していない開発版」の合図です。この期間は破壊的変更でも MINOR（`0.2.0` → `0.3.0`）で上げる運用が一般的です。
 
 ## タグを打つ
 
@@ -57,9 +59,10 @@ git tag              # タグ一覧
 git show v1.2.0      # タグの中身とコミットを表示
 ```
 
-::: warning タグは push を忘れやすい
-`git push` は**タグを送りません**。タグを共有するには `git push origin <タグ名>`（またはまとめて `git push --tags`）が必要です。「ローカルには v1.2.0 があるのに GitHub に無い」の多くはこれが原因です。
-:::
+> [!WARNING]
+> **タグは push を忘れやすい**
+>
+> `git push` は**タグを送りません**。タグを共有するには `git push origin <タグ名>`（またはまとめて `git push --tags`）が必要です。「ローカルには v1.2.0 があるのに GitHub に無い」の多くはこれが原因です。
 
 ## GitHub Release
 
@@ -72,9 +75,10 @@ gh release create v1.2.0 --generate-notes
 
 ブラウザの場合は、リポジトリの **Releases → Draft a new release** から、タグを選び **Generate release notes** を押すと、前回のリリース以降にマージされた PR からノートが自動生成されます。
 
-::: tip CHANGELOG.md で変更履歴を残す
-自動生成のリリースノートに加えて、リポジトリに `CHANGELOG.md` を置き、**人が読む変更履歴**を [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 形式でまとめておくと親切です。PR をマージするたびに `[Unreleased]` へ 1 行足し、リリース時にバージョン見出しへ繰り上げます。**[CHANGELOG.md](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/CHANGELOG.md) がその実例**です。
-:::
+> [!TIP]
+> **CHANGELOG.md で変更履歴を残す**
+>
+> 自動生成のリリースノートに加えて、リポジトリに `CHANGELOG.md` を置き、**人が読む変更履歴**を [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/) 形式でまとめておくと親切です。PR をマージするたびに `[Unreleased]` へ 1 行足し、リリース時にバージョン見出しへ繰り上げます。**[CHANGELOG.md](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/CHANGELOG.md) がその実例**です。
 
 ## release ブランチと hotfix
 
@@ -101,13 +105,17 @@ gitGraph
 4. その修正コミットを **`release/1.2` へ cherry-pick** する。修正だけを移すので、`main` の未完成な `1.3` の変更は混ざらない。
 5. `release/1.2` に **`v1.2.1` を打って Release**・デプロイする。
 
-::: warning 修正は必ず `main` から先に入れる
-逆順（先に `release/1.2` だけ直す）にすると、**`main` への取り込みを忘れて次のリリースで同じバグが復活**します。これが hotfix 運用で最も多い事故です。`main` に入れてから各系列へ配れば、修正が `main` に無い状態がそもそも生まれないので、取りこぼしが構造的に起きません。`release/1.2` を `main` へマージし戻す形は取らず、**修正は `main` → `release/*` の一方向にだけ流します**。
-:::
+> [!WARNING]
+> **修正は必ず `main` から先に入れる**
+>
+> 逆順（先に `release/1.2` だけ直す）にすると、**`main` への取り込みを忘れて次のリリースで同じバグが復活**します。これが hotfix 運用で最も多い事故です。`main` に入れてから各系列へ配れば、修正が `main` に無い状態がそもそも生まれないので、取りこぼしが構造的に起きません。`release/1.2` を `main` へマージし戻す形は取らず、**修正は `main` → `release/*` の一方向にだけ流します**。
 
-::: tip いつ release ブランチが要るか
-出荷済みのバージョンを保守しない継続デプロイ中心の Web サービスなら、release ブランチは要りません。hotfix も「`main` を直して再デプロイ」で完結します。release ブランチが要るのは、**複数バージョンを並行して保守する**とき、または**出荷後に安定化期間を設ける**とき——つまり「出荷済みを直し続ける」必要があるときです。`develop` / `release` を常設する **Git Flow**、`main` + `release/*` の **GitLab Flow** など、より形式化した運用もあります。有名 OSS が実際に採る**長命なリリースブランチ**運用は [複数バージョンの保守（リリースブランチ運用）](./release-branches) で詳しく扱います。
-:::
+<!-- 2 つのアラートを空行 1 つで隣接させると MD028 が発火するため、区切りを置く -->
+
+> [!TIP]
+> **いつ release ブランチが要るか**
+>
+> 出荷済みのバージョンを保守しない継続デプロイ中心の Web サービスなら、release ブランチは要りません。hotfix も「`main` を直して再デプロイ」で完結します。release ブランチが要るのは、**複数バージョンを並行して保守する**とき、または**出荷後に安定化期間を設ける**とき——つまり「出荷済みを直し続ける」必要があるときです。`develop` / `release` を常設する **Git Flow**、`main` + `release/*` の **GitLab Flow** など、より形式化した運用もあります。有名 OSS が実際に採る**長命なリリースブランチ**運用は [複数バージョンの保守（リリースブランチ運用）](./release-branches) で詳しく扱います。
 
 ## CI と組み合わせる（例）
 

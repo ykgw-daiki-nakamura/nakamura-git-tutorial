@@ -59,9 +59,10 @@ git config --get credential.helper
 gh auth login
 ```
 
-::: tip どちらを選ぶか
-チームの方針があればそれに従ってください。特に決まっていなければ、**手元の端末では SSH、プロキシで 22 番が塞がれている環境では HTTPS** が無難です。あとから `git remote set-url origin <新しい URL>` で切り替えられます。
-:::
+> [!TIP]
+> **どちらを選ぶか**
+>
+> チームの方針があればそれに従ってください。特に決まっていなければ、**手元の端末では SSH、プロキシで 22 番が塞がれている環境では HTTPS** が無難です。あとから `git remote set-url origin <新しい URL>` で切り替えられます。
 
 ## リモートの確認・追加
 
@@ -113,9 +114,10 @@ flowchart LR
     OR -->|"pull = ① + ②"| LB
 ```
 
-::: warning `git pull` の ② は設定で変わる
-`pull.rebase` を有効にしていると、② は `merge` ではなく履歴を書き換える取り込み方になります。本ガイドは **merge 基調**で説明するため、`git pull --no-rebase` のように明示するか、`git config --global pull.rebase false` を一度設定しておくと手順どおりに再現できます。
-:::
+> [!WARNING]
+> **`git pull` の ② は設定で変わる**
+>
+> `pull.rebase` を有効にしていると、② は `merge` ではなく履歴を書き換える取り込み方になります。本ガイドは **merge 基調**で説明するため、`git pull --no-rebase` のように明示するか、`git config --global pull.rebase false` を一度設定しておくと手順どおりに再現できます。
 
 ```bash
 # 安全に確認してから取り込みたい場合
@@ -127,9 +129,10 @@ git merge origin/main
 git pull
 ```
 
-::: tip 安全な習慣
-チーム開発では、作業前に `git pull`（または `fetch`）で最新を取り込む習慣をつけましょう。古い状態で作業を進めると、後で大きなコンフリクトの原因になります。
-:::
+> [!TIP]
+> **安全な習慣**
+>
+> チーム開発では、作業前に `git pull`（または `fetch`）で最新を取り込む習慣をつけましょう。古い状態で作業を進めると、後で大きなコンフリクトの原因になります。
 
 ## リモートブランチの削除
 
