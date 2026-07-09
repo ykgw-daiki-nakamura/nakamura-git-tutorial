@@ -1,0 +1,29 @@
+{
+  "//": "このリポジトリのコミット／PR 規約の単一情報源。規約を強制するゲートは CI なので、語彙は CI 側（.github/）が持ち、他の読み手がここを読む。JSON はコメントを持てないため、解説は \"//\" 接頭辞のキーに書く（値としては読まない）。",
+  "//readers": "読み手: (1) CI = .github/scripts/check-pr-title.sh（PR タイトル検証）・.github/scripts/label-pr-by-type.sh（PR ラベル自動付与）、(2) Claude ハーネス = .claude/hooks/guard-commit.sh（コミットメッセージ検証）・.claude/skills/{commit,issue-label,plan}、(3) scripts/sync-labels.sh（type: * ラベルの実体作成）。読み手の追加・変更時は scripts/check-config-consistency.mjs の整合検査も更新する。",
+  "//scope": "ここに置くのは「CI が読む＝全コントリビューターに効く」語彙だけ。Claude ハーネス固有の配線（onEdit / docsSync / guard.* / protectedBranches / ラベルの領域推定ヒューリスティック）は .claude/checks.json に置く。",
+
+  "//commit": "Conventional Commits の許可 type 一覧。PR タイトル（squash merge でそのまま main のコミットメッセージになる）と各コミットの subject を検証する。type の追加・削除はこの配列の変更だけで済ませる。ただし各検証スクリプトは、jq やこのファイルを読めない環境向けに同じ一覧を default_types としてハードコードで持つ。ドリフトは check-config-consistency.mjs が順序込みで検査する。",
+  "commit": {
+    "conventional": {
+      "types": ["feat", "fix", "docs", "chore", "ci", "build", "refactor", "test", "perf", "style", "revert"]
+    }
+  },
+
+  "//labels": "type → GitHub ラベル名の対応表。Issue（issue-label skill）と PR（pr-label.yml）の双方が同じ語彙を使う。ここに載る全ラベルの実体は scripts/sync-labels.sh が冪等に作成する（読み手はラベルを勝手に作らない）。commit.conventional.types と過不足なく対応していることを check-config-consistency.mjs が検査する。",
+  "labels": {
+    "types": {
+      "feat": "type: feat",
+      "fix": "type: fix",
+      "docs": "type: docs",
+      "chore": "type: chore",
+      "ci": "type: ci",
+      "build": "type: build",
+      "refactor": "type: refactor",
+      "test": "type: test",
+      "perf": "type: perf",
+      "style": "type: style",
+      "revert": "type: revert"
+    }
+  }
+}

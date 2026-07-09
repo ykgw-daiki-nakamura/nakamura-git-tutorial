@@ -4,10 +4,10 @@
 #
 # 用途:
 #   コミット規約の各 type（feat / fix / docs …）に対応する `type: *` ラベルを、
-#   このリポジトリに冪等に作成／更新する。type の一覧は .claude/checks.json の
+#   このリポジトリに冪等に作成／更新する。type の一覧は .github/conventions.json の
 #   `commit.conventional.types`（guard-commit.sh・pr-title.yml と同一ソース）を読む。
-#   ラベル名は pr-label.yml / issue-label skill が参照する `issueLabels.types` の値と
-#   一致する（例: feat → "type: feat"）。
+#   ラベル名も同ファイルの `labels.types`（pr-label.yml / issue-label skill と同一ソース）
+#   から引く。ここで名前を組み立てない（例: feat → "type: feat"）。
 #
 # 使い方:
 #   bash scripts/sync-labels.sh
@@ -31,7 +31,7 @@ if [ "${BASH_VERSINFO[0]:-0}" -lt 4 ]; then
   exit 1
 fi
 
-checks=".claude/checks.json"
+conventions=".github/conventions.json"
 
 # --- 依存チェック ---------------------------------------------------------
 for cmd in gh jq; do
@@ -40,15 +40,15 @@ for cmd in gh jq; do
     exit 1
   fi
 done
-if [ ! -f "$checks" ]; then
-  echo "エラー: $checks が見つかりません。リポジトリ直下で実行してください。" >&2
+if [ ! -f "$conventions" ]; then
+  echo "エラー: $conventions が見つかりません。リポジトリ直下で実行してください。" >&2
   exit 1
 fi
 
 # --- type → 色・説明 の対応表 --------------------------------------------
-# ラベル名は "type: <type>"。色は既存ラベル（bug/documentation/status: in-progress/
-# harness 等）と被らないよう選んでいる。type 一覧そのものは checks.json を情報源にし、
-# ここは各 type の見た目（色）と説明だけを持つ。
+# 色は既存ラベル（bug/documentation/status: in-progress/harness 等）と被らないよう選んでいる。
+# type 一覧とラベル名そのものは conventions.json を情報源にし、ここは各 type の見た目（色）と
+# 説明だけを持つ。
 declare -A COLOR=(
   [feat]=0e8a16 [fix]=e11d21 [docs]=1d76db [chore]=cccccc [ci]=0e6aad
   [build]=c2a000 [refactor]=006b75 [test]=8250df [perf]=d93f0b
@@ -68,10 +68,10 @@ declare -A DESC=(
   [revert]="以前のコミットの取り消し"
 )
 
-# --- checks.json から type 一覧を読む ------------------------------------
-mapfile -t types < <(jq -r '.commit.conventional.types[]?' "$checks")
+# --- conventions.json から type 一覧を読む --------------------------------
+mapfile -t types < <(jq -r '.commit.conventional.types[]?' "$conventions")
 if [ "${#types[@]}" -eq 0 ]; then
-  echo "エラー: checks.json の commit.conventional.types が空です。" >&2
+  echo "エラー: $conventions の commit.conventional.types が空です。" >&2
   exit 1
 fi
 
@@ -80,7 +80,7 @@ for t in "${!COLOR[@]}"; do
   found=0
   for ct in "${types[@]}"; do [ "$t" = "$ct" ] && found=1 && break; done
   if [ "$found" -eq 0 ]; then
-    echo "警告: 対応表の type '$t' は checks.json に無い（ラベルは作成しない）。" >&2
+    echo "警告: 対応表の type '$t' は $conventions に無い（ラベルは作成しない）。" >&2
   fi
 done
 
@@ -90,13 +90,19 @@ created=0
 for t in "${types[@]}"; do
   color="${COLOR[$t]:-}"
   desc="${DESC[$t]:-}"
-  # checks.json に有るのに対応表に無い type はエラー停止（ラベル取りこぼし防止）。
+  # conventions.json に有るのに対応表に無い type はエラー停止（ラベル取りこぼし防止）。
   if [ -z "$color" ] || [ -z "$desc" ]; then
     echo "エラー: type '$t' の色/説明が対応表にありません。scripts/sync-labels.sh を更新してください。" >&2
     rc=1
     continue
   fi
-  label="type: $t"
+  # ラベル名は conventions.json の labels.types が単一情報源。ここで組み立てない。
+  label=$(jq -r --arg t "$t" '(.labels.types // {})[$t] // empty' "$conventions")
+  if [ -z "$label" ]; then
+    echo "エラー: type '$t' に対応するラベル名が $conventions の labels.types にありません。" >&2
+    rc=1
+    continue
+  fi
   echo "同期: '$label' (#$color) — $desc"
   gh label create "$label" --color "$color" --description "$desc" --force
   created=$((created + 1))
