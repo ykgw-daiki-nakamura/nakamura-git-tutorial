@@ -78,8 +78,12 @@ run "heredoc 本文(コマンド置換内)の削除+区切り / は素通り" gu
 # (b) 二重引用符内のコードフェンス（バッククォート）に削除コマンド + 区切りスラッシュ
 BODY_FENCE="$(printf 'gh api R -f body="対応しました。\n%s%s%sbash\n%s %s <worktree>/node_modules\n%s%s%s"' '`' '`' '`' "$RM" "$RF" '`' '`' '`')"
 run "引用内コードフェンスの削除+区切り / は素通り"       guard-dangerous.sh 0 "$BODY_FENCE"
-# (c) 散文の区切りスラッシュは rm の引数ではない
-run "rm の記述と散文の区切り / が同居しても素通り"       guard-dangerous.sh 0 "echo 'a / b' ; true"
+# (c) 実 rm -rf と散文の区切りスラッシュが同居しても、/ が rm の引数でなければ素通り
+run "実 rm -rf と別セグメントの区切り / の同居は素通り"  guard-dangerous.sh 0 "echo a / b && $RM $RF ./build"
+run "実 rm -rf と引用内の区切り / の同居は素通り"        guard-dangerous.sh 0 "$RM $RF ./build ; echo 'a / b'"
+# コマンド置換の中に閉じ括弧を含む文字列があっても対応括弧を誤認しない
+PAREN="$(printf 'gh pr comment --body "$(echo %s)%s)"' '"' '"')"
+run "コマンド置換内の \")\" を含む文字列でも壊れない"    guard-dangerous.sh 0 "$PAREN"
 # 検知は維持する（すり抜けさせない）
 run "実 ルート削除は引き続き阻止"                       guard-dangerous.sh 2 "$RM $RF /"
 run "実 ホーム削除は引き続き阻止"                       guard-dangerous.sh 2 "$RM $RF ~"

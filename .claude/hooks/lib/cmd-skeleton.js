@@ -48,16 +48,40 @@ function findChar(src, from, ch) {
 }
 
 // src[open] === "(" として、対応する ")" の位置を返す（見つからなければ src.length）。
+// 引用符・エスケープの中の括弧は数えない。`$(echo ")")` のように閉じ括弧を含む文字列があると
+// 対応括弧を誤認し、コマンド置換のスケルトン化が壊れて検知漏れ・誤検知につながる。
 function matchParen(src, open) {
   let depth = 0;
-  for (let i = open; i < src.length; i++) {
-    if (src[i] === "(") depth++;
-    else if (src[i] === ")") {
+  let i = open;
+  const n = src.length;
+  while (i < n) {
+    const c = src[i];
+    if (c === "\\") { i += 2; continue; }
+    if (c === "'") { i = findChar(src, i + 1, "'") + 1; continue; }
+    if (c === '"') { i = skipDouble(src, i); continue; }
+    if (c === "(") depth++;
+    else if (c === ")") {
       depth--;
       if (depth === 0) return i;
     }
+    i++;
   }
-  return src.length;
+  return n;
+}
+
+// src[i] === '"' として、対応する閉じ引用符の **次** の位置を返す。
+// 二重引用符の中の $( ... ) はネストしうるので、その中の引用符も追って読み飛ばす。
+function skipDouble(src, i) {
+  let j = i + 1;
+  const n = src.length;
+  while (j < n) {
+    const c = src[j];
+    if (c === "\\") { j += 2; continue; }
+    if (c === '"') return j + 1;
+    if (c === "$" && src[j + 1] === "(") { j = matchParen(src, j + 1) + 1; continue; }
+    j++;
+  }
+  return n;
 }
 
 // コメント開始とみなせる位置か（行頭・空白直後・コマンド区切り直後）。
