@@ -99,6 +99,8 @@ export class AcmeResultPostProcessor implements ResultPostProcessor {
 // コアは起動時にこの register を呼び出し、registry 経由で実装を解決する。
 import type { ExtensionRegistry } from "@product/core";
 
+import { AcmeResultPostProcessor } from "./acme-result-post-processor";
+
 export default function register(registry: ExtensionRegistry): void {
   registry.resultPostProcessors.register(new AcmeResultPostProcessor());
 }
@@ -191,8 +193,8 @@ flowchart LR
 ```text [.NET]
 product-ext-acme/                       # Acme 下流リポジトリ（downstream）
   src/
-    AcmeResultPostProcessor.cs          # 結果後処理フックの実装（要求B）
-    AcmeExternalIngestConnector.cs      # データ取り込みフックの実装（要求C）
+    AcmeResultPostProcessor.cs          # 結果後処理フックの実装（要求 B）
+    AcmeExternalIngestConnector.cs      # データ取り込みフックの実装（要求 C）
     AcmeExtensionModule.cs              # 拡張ポイントへの登録（DI コンテナ）
   tests/
     contract/                           # 拡張ポイントの契約テスト
@@ -202,8 +204,8 @@ product-ext-acme/                       # Acme 下流リポジトリ（downstrea
 ```text [TypeScript]
 product-ext-acme/                       # Acme 下流リポジトリ（downstream）
   src/
-    acme-result-post-processor.ts       # 結果後処理フックの実装（要求B）
-    acme-external-ingest-connector.ts   # データ取り込みフックの実装（要求C）
+    acme-result-post-processor.ts       # 結果後処理フックの実装（要求 B）
+    acme-external-ingest-connector.ts   # データ取り込みフックの実装（要求 C）
     register.ts                         # 拡張ポイントへの登録（registry）
   tests/
     contract/                           # 拡張ポイントの契約テスト
@@ -213,8 +215,8 @@ product-ext-acme/                       # Acme 下流リポジトリ（downstrea
 ```text [Python]
 product-ext-acme/                       # Acme 下流リポジトリ（downstream）
   src/
-    result_postprocess_ext.py           # 結果後処理フックの実装（要求B）
-    external_ingest_connector.py        # データ取り込みフックの実装（要求C）
+    result_postprocess_ext.py           # 結果後処理フックの実装（要求 B）
+    external_ingest_connector.py        # データ取り込みフックの実装（要求 C）
   pyproject.toml                        # 拡張ポイントへの登録（entry point）
   tests/
     contract/                           # 拡張ポイントの契約テスト
