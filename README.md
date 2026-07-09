@@ -38,6 +38,8 @@ docs/
 ├─ .vitepress/
 │  └─ config.mjs       # サイト設定（nav / sidebar / Mermaid）
 ├─ guide/              # チュートリアル本文（Markdown）
+├─ standards/          # 開発規約（ブランチ / リリース / バージョン運用など）
+├─ public/             # 静的アセット（favicon.svg / logo.svg）
 └─ index.md            # トップページ
 .github/workflows/     # CI（PR ビルド検証）と Pages デプロイ
 ```
