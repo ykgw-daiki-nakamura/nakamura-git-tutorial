@@ -37,6 +37,106 @@ outline: [2, 3]
 - 顧客固有コードは**顧客ごとの独立したリポジトリ（下流リポジトリ / downstream）** に置く。コアリポジトリに顧客固有コードを含めない（顧客間のコード分離 = 契約境界）。
 - 下流リポジトリにも本規約のブランチ運用（trunk-based、PR 必須、Rulesets）を適用する。
 
+#### 拡張ポイントの例
+
+結果後処理フック（`ResultPostProcessor`。.NET では命名規約に従い `IResultPostProcessor`）を題材に、コードとしての形を示す。示すのは次の 3 つで、実装言語が変わっても役割の対応は変わらない。
+
+1. コアが公開する拡張ポイントの interface
+2. 下流リポジトリに置く顧客実装
+3. コアが実装を発見する登録（.NET は DI コンテナ、TypeScript は registry、Python は entry point）
+
+各コード片の冒頭コメントは、そのファイルがコアと下流のどちらのリポジトリに属するかを示す。
+
+::: code-group
+
+```csharp [.NET]
+// ── コアリポジトリ: Product.Core/Extensibility/IResultPostProcessor.cs
+namespace Product.Core.Extensibility;
+
+// 拡張ポイントの interface は公開 API。破壊的変更は MAJOR でのみ行う。
+public interface IResultPostProcessor
+{
+    ProcessingResult Process(ProcessingResult result, ProcessingContext context);
+}
+
+// ── 下流リポジトリ product-ext-acme: src/AcmeResultPostProcessor.cs
+public sealed class AcmeResultPostProcessor : IResultPostProcessor
+{
+    private const double CorrectionBias = 0.03;
+
+    public ProcessingResult Process(ProcessingResult result, ProcessingContext context)
+        => result with { Value = result.Value * context.ScaleFactor + CorrectionBias };
+}
+
+// ── 下流リポジトリ product-ext-acme: src/AcmeExtensionModule.cs
+// コアは起動時に IExtensionModule 実装を読み込み、DI コンテナへ登録する。
+public sealed class AcmeExtensionModule : IExtensionModule
+{
+    public void Register(IServiceCollection services)
+        => services.AddSingleton<IResultPostProcessor, AcmeResultPostProcessor>();
+}
+```
+
+```ts [TypeScript]
+// ── コアリポジトリ: packages/core/src/extensibility/result-post-processor.ts
+// 拡張ポイントの interface は公開 API。破壊的変更は MAJOR でのみ行う。
+export interface ResultPostProcessor {
+  process(result: ProcessingResult, context: ProcessingContext): ProcessingResult;
+}
+
+// ── 下流リポジトリ product-ext-acme: src/acme-result-post-processor.ts
+import type { ProcessingContext, ProcessingResult, ResultPostProcessor } from "@product/core";
+
+const CORRECTION_BIAS = 0.03;
+
+export class AcmeResultPostProcessor implements ResultPostProcessor {
+  process(result: ProcessingResult, context: ProcessingContext): ProcessingResult {
+    return { ...result, value: result.value * context.scaleFactor + CORRECTION_BIAS };
+  }
+}
+
+// ── 下流リポジトリ product-ext-acme: src/register.ts
+// コアは起動時にこの register を呼び出し、registry 経由で実装を解決する。
+import type { ExtensionRegistry } from "@product/core";
+
+import { AcmeResultPostProcessor } from "./acme-result-post-processor";
+
+export default function register(registry: ExtensionRegistry): void {
+  registry.resultPostProcessors.register(new AcmeResultPostProcessor());
+}
+```
+
+```python [Python]
+# ── コアリポジトリ: product_core/extensibility.py
+from typing import Protocol
+
+# 拡張ポイントの interface は公開 API。破壊的変更は MAJOR でのみ行う。
+class ResultPostProcessor(Protocol):
+    def process(self, result: ProcessingResult, context: ProcessingContext) -> ProcessingResult: ...
+
+# ── 下流リポジトリ product-ext-acme: src/result_postprocess_ext.py
+from dataclasses import replace
+
+CORRECTION_BIAS = 0.03
+
+class AcmeResultPostProcessor:
+    def process(self, result: ProcessingResult, context: ProcessingContext) -> ProcessingResult:
+        return replace(result, value=result.value * context.scale_factor + CORRECTION_BIAS)
+
+# ── 下流リポジトリ product-ext-acme: pyproject.toml
+# コアは起動時にこの entry point group を走査し、実装を解決する。
+#
+#   [project.entry-points."product.result_post_processor"]
+#   acme = "result_postprocess_ext:AcmeResultPostProcessor"
+```
+
+:::
+
+- コアは interface だけを公開し、実装の存在を知らない。顧客名がコアのコードに現れないため、前述「Tier 1: 設定・フラグによるカスタマイズ」で禁じた顧客識別子によるコード分岐も生じない。
+- 実装の解決は、コアが提供する発見機構（DI コンテナ / registry / entry point）に委ねる。下流リポジトリは既存の口へ実装を差し込むだけで、コアの再ビルドは要らない（後述「ビルドとバージョニング」）。
+- 顧客固有の値（上記の補正値の定数）は実装の内側に閉じる。パラメータとして外から与えられる差異であれば、それは Tier 1 の設定で扱う。
+- 契約テストは、この interface のシグネチャと入出力の約束が保たれることを検証する（後述「バージョン追従の運用」）。
+
 #### ビルドとバージョニング
 
 ```mermaid
@@ -78,25 +178,52 @@ flowchart LR
 | 要求 | 内容 | Tier 判定 |
 | --- | --- | --- |
 | 要求 A | 出力帳票へのロゴ表示と、閾値超過時の通知先の追加 | **Tier 1**（ロゴ・閾値・通知先はいずれもパラメータ。構成管理側に Acme 設定として保持し、成果物は共通。コード変更なし） |
-| 要求 B | 顧客固有の補正ロジックを予測処理へ組み込む | **要検討 → Tier 2**（設定では表現できない計算ロジック。まずコア汎用機能化を検討し、汎用化の見込みがない場合のみ Tier 2 とする） |
+| 要求 B | 顧客固有の補正ロジックを処理結果へ組み込む | **要検討 → Tier 2**（設定では表現できない計算ロジック。まずコア汎用機能化を検討し、汎用化の見込みがない場合のみ Tier 2 とする） |
 | 要求 C | 顧客の社内システムからの実績データ取り込み | **Tier 2**（既存のデータ取り込み拡張ポイントの Acme 実装として記述） |
 
 コード実装が要るのは要求 B・C だけなので、その Tier 2 実装手順を示す。
 
 #### Tier 2 の実装手順（要求 B・C）
 
-1. 必要な拡張ポイントがコアに存在するか確認する。データ取り込み用フック（要求 C）は既存とする。予測後処理用フック（要求 B）が未提供であれば、まず**コアへ汎用の拡張ポイントを追加する PR** を `main` に出す（全顧客が使える口であり、通常の開発フロー。承認は「カスタマイズ階層（Tier）」に従う）。
+1. 必要な拡張ポイントがコアに存在するか確認する。データ取り込み用フック（要求 C）は既存とする。結果後処理用フック（要求 B）が未提供であれば、まず**コアへ汎用の拡張ポイントを追加する PR** を `main` に出す（全顧客が使える口であり、通常の開発フロー。承認は「カスタマイズ階層（Tier）」に従う）。
 2. 拡張ポイントが揃ったら、Acme 専用の下流リポジトリ（`product-ext-acme`、コアの downstream）を作成し、各フックの Acme 実装と契約テストを配置する。このリポジトリにも本規約のブランチ運用（trunk + PR + Rulesets）を適用する。
 
-```text
-product-ext-acme/                  # Acme 下流リポジトリ（downstream）
+::: code-group
+
+```text [.NET]
+product-ext-acme/                       # Acme 下流リポジトリ（downstream）
   src/
-    forecast_postprocess_ext.py    # 予測後処理フックの実装（要求B）
-    external_ingest_connector.py   # データ取り込みフックの実装（要求C）
+    AcmeResultPostProcessor.cs          # 結果後処理フックの実装（要求 B）
+    AcmeExternalIngestConnector.cs      # データ取り込みフックの実装（要求 C）
+    AcmeExtensionModule.cs              # 拡張ポイントへの登録（DI コンテナ）
   tests/
-    contract/                      # 拡張ポイントの契約テスト
+    contract/                           # 拡張ポイントの契約テスト
   .github/workflows/build.yml
 ```
+
+```text [TypeScript]
+product-ext-acme/                       # Acme 下流リポジトリ（downstream）
+  src/
+    acme-result-post-processor.ts       # 結果後処理フックの実装（要求 B）
+    acme-external-ingest-connector.ts   # データ取り込みフックの実装（要求 C）
+    register.ts                         # 拡張ポイントへの登録（registry）
+  tests/
+    contract/                           # 拡張ポイントの契約テスト
+  .github/workflows/build.yml
+```
+
+```text [Python]
+product-ext-acme/                       # Acme 下流リポジトリ（downstream）
+  src/
+    result_postprocess_ext.py           # 結果後処理フックの実装（要求 B）
+    external_ingest_connector.py        # データ取り込みフックの実装（要求 C）
+  pyproject.toml                        # 拡張ポイントへの登録（entry point）
+  tests/
+    contract/                           # 拡張ポイントの契約テスト
+  .github/workflows/build.yml
+```
+
+:::
 
 #### ビルド（合成）
 
