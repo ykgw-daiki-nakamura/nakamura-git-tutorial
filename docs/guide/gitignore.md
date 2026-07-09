@@ -6,7 +6,7 @@
 
 | 種類 | 例 |
 | --- | --- |
-| **依存・生成物** | `node_modules/`、`dist/`、`build/`、`*.log` |
+| **依存・生成物** | `node_modules`、`dist/`、`build/`、`*.log` |
 | **秘密情報** | `.env`、`*.pem`、APIキーを含む設定ファイル |
 | **環境・エディタ固有** | `.DS_Store`、`.vscode/`、`.idea/` |
 | **キャッシュ・一時ファイル** | `.cache/`、`*.tmp` |
@@ -17,12 +17,12 @@
 
 リポジトリのルートに `.gitignore` というファイルを置き、1 行に 1 パターンを書きます。
 
-```gitignore
-# コメントは行頭に書く（末尾 / でディレクトリのみ対象）
-node_modules/
+```text
+# コメントは行頭に書く
+node_modules
 # 拡張子でまとめて（ワイルドカード *）
 *.log
-# ビルド生成物
+# 末尾 / でディレクトリのみ対象
 dist/
 # 秘密情報
 .env
@@ -31,14 +31,14 @@ dist/
 ```
 
 ::: warning コメントは必ず独立行に
-`.gitignore` の `#` コメントは**行頭でのみ有効**です。`node_modules/  # 依存` のようにパターンと同じ行へ書くと、`#` 以降も含めて 1 つのパターンとして扱われ、**その行の無視が効かなくなります**。コメントは必ずパターンとは別の行に書いてください。効いているかは `git check-ignore -v <ファイル>` で確認できます。
+`.gitignore` の `#` コメントは**行頭でのみ有効**です。`node_modules  # 依存` のようにパターンと同じ行へ書くと、`#` 以降も含めて 1 つのパターンとして扱われ、**その行の無視が効かなくなります**。コメントは必ずパターンとは別の行に書いてください。効いているかは `git check-ignore -v <ファイル>` で確認できます。
 :::
 
 パターンの要点は次のとおりです。
 
 | 記法 | 意味 |
 | --- | --- |
-| `名前/` | 末尾の `/` でディレクトリのみにマッチ |
+| `名前/` | 末尾の `/` でディレクトリのみにマッチ（symlink はマッチしない。後述の落とし穴を参照） |
 | `*.log` | `*` は任意の文字列（`/` を除く）にマッチ |
 | `!パターン` | 先頭の `!` で、いったん無視した対象を**除外の例外**にする（ただし親ディレクトリ自体を無視している場合は再包含できない） |
 | `/名前` | 先頭の `/` でリポジトリ直下のみに限定（サブディレクトリは対象外） |
@@ -74,8 +74,10 @@ git config --global core.excludesfile ~/.gitignore_global
 
 実際の [.gitignore](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.gitignore) の例です。生成物・ランタイム成果物・個人設定を的確に除外しています。内容は次のとおりです。
 
-```gitignore
-node_modules/
+```text
+# 末尾スラッシュを付けない: 付けるとディレクトリにしかマッチせず、
+# node_modules という名前の symlink が追跡対象に入り込む
+node_modules
 docs/.vitepress/dist/
 docs/.vitepress/cache/
 
@@ -87,14 +89,39 @@ docs/.vitepress/cache/
 .claude/settings.local.json
 ```
 
-除外しているのは、`node_modules/` や `dist/` のように再生成できるものと、`.claude/worktrees/` や `.claude/settings.local.json` のように各自のローカル専用のものです。コメントは対象の直前に置いておくと、なぜ無視するのかが後から追えます。
+除外しているのは、`node_modules` や `dist/` のように再生成できるものと、`.claude/worktrees/` や `.claude/settings.local.json` のように各自のローカル専用のものです。コメントは対象の直前に置いておくと、なぜ無視するのかが後から追えます。
+
+`node_modules` にだけ末尾スラッシュが付いていないのは意図的です。理由は次節の落とし穴で説明します。
 
 ## よくある落とし穴
 
 - **コミット後に `.gitignore` へ足しても効かない** → 追跡済みなので `git rm --cached` が必要。
-- **末尾 `/` の有無で意味が変わる** → `node_modules` はファイルにもディレクトリにもマッチし配下もまとめて無視される。`node_modules/` と末尾に付けると「ディレクトリだけ」に限定でき、意図が明確になる。
 - **無視されているか確かめたい** → `git check-ignore -v <ファイル>` でどのパターンに当たったか分かる。
 - **空ディレクトリを残したい** → Git は空ディレクトリを追跡しないので、慣習的に `.gitkeep` を置く。
+
+### 末尾 `/` は symlink にマッチしない
+
+末尾の `/` は「ディレクトリだけ」に限定する意味です。意図が明確になる一方、**シンボリックリンクを取りこぼす**という副作用があります。Git はリンク先ではなくリンク自体を見るため、symlink はディレクトリとして扱われないからです。
+
+```bash
+ln -s /somewhere/node_modules node_modules
+
+# 末尾スラッシュあり: 無視されない
+echo 'node_modules/' > .gitignore
+git check-ignore node_modules   # 何も出ない（＝マッチしない）
+
+# 末尾スラッシュなし: 無視される
+echo 'node_modules' > .gitignore
+git check-ignore node_modules   # node_modules
+```
+
+`node_modules` のように **symlink になりうる対象には末尾スラッシュを付けない**のが安全です。monorepo や pnpm、devcontainer、`git worktree` の共有など、依存ディレクトリを symlink にする構成は珍しくありません。
+
+::: warning このリポジトリで実際に起きた
+`.gitignore` に `node_modules/` と書いてあったにもかかわらず、`node_modules` という symlink が `git add -A` で拾われ、**絶対パスを指すリンクがコミットされていました**。
+
+`git status` には毎回 `D node_modules` が出続け、`git worktree remove` は失敗し、別のマシンでは壊れたリンクになる。原因に気づくまで時間がかかりました。修正はパターンから末尾スラッシュを外すだけです。
+:::
 
 ---
 
