@@ -117,7 +117,7 @@ git check-ignore node_modules   # node_modules
 
 `node_modules` のように **symlink になりうる対象には末尾スラッシュを付けない**のが安全です。monorepo や pnpm、devcontainer、`git worktree` の共有など、依存ディレクトリを symlink にする構成は珍しくありません。
 
-::: warning このリポジトリで実際に起きた
+::: warning このリポジトリで実際に起きた事故
 `.gitignore` に `node_modules/` と書いてあったにもかかわらず、`node_modules` という symlink が `git add -A` で拾われ、**絶対パスを指すリンクがコミットされていました**。
 
 `git status` には毎回 `D node_modules` が出続け、`git worktree remove` は失敗し、別のマシンでは壊れたリンクになる。原因に気づくまで時間がかかりました。修正はパターンから末尾スラッシュを外すだけです。
