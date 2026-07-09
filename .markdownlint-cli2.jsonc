@@ -10,7 +10,16 @@
     // 先頭行の H1: frontmatter ベースの index.md に配慮し無効化
     "MD041": false,
     // 重複見出し: 別セクション配下での重複は許可
-    "MD024": { "siblings_only": true }
+    "MD024": { "siblings_only": true },
+    // リンク fragment の検証: GitHub 方式の slugify で判定するため、このサイト（VitePress）では
+    // 当たらない。全角括弧を GitHub は区切り無しで削除し、VitePress は "-" に変換する。
+    //   見出し「バージョン追従の運用（追従義務への対応）」
+    //     GitHub    → #バージョン追従の運用追従義務への対応
+    //     VitePress → #バージョン追従の運用-追従義務への対応  ← 実 HTML の id はこちら
+    // 正しいアンカーを無効と誤判定し（誤検知）、逆に濁点で壊れたアンカーは有効と判定する（検知漏れ）。
+    // 実 HTML の id と突き合わせる scripts/check-anchors.mjs（npm run check:anchors）が
+    // ページをまたぐリンクも含めて上位互換に検査するため、こちらは無効化する。
+    "MD051": false
   },
   "globs": ["**/*.md"],
   "ignores": [
