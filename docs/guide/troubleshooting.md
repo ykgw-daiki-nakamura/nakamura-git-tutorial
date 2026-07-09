@@ -76,13 +76,15 @@ git stash pop
 リモートの**同じブランチ**が自分の手元より先に進んでいるサインです。まず上流ブランチ（通常 `origin/<現在のブランチ>`）を取り込みます。
 
 ```bash
-git pull            # 上流ブランチを fetch + merge
+git pull --no-rebase   # 上流ブランチを fetch + merge
 # コンフリクトがあれば解決して
 git push
 ```
 
 ::: warning 取り込む先を間違えない
-`origin/main` を merge しても解消しません。拒否の原因は「上流ブランチが進んでいること」なので、取り込むのは**現在のブランチの上流**です（PR 画面の `Update branch` を押すと、リモートの作業ブランチが進んでこの状態になります）。
+拒否の原因は「**現在のブランチの上流**が進んでいること」です。作業ブランチで拒否されたときに `origin/main` を merge しても解消しません（`main` にいるなら上流はそもそも `origin/main` です）。PR 画面の `Update branch` を押すと、リモートの作業ブランチが進んでこの状態になります。
+
+`--no-rebase` は、`pull.rebase` を設定している環境でも merge で取り込むための保険です。
 :::
 
 ## よくある状況と対処の早見表
@@ -96,7 +98,7 @@ git push
 | 公開済みコミットを打ち消す | `git revert <commit>` |
 | 作業を一時退避 | `git stash` / `git stash pop` |
 | 消したコミット/ブランチを復元 | `git reflog` から救出 |
-| push が rejected | `git pull`（上流ブランチを取り込む）してから push |
+| push が rejected | `git pull --no-rebase`（上流ブランチを取り込む）してから push |
 
 困ったら、まず `git status` と `git reflog` で現状を把握することが解決への近道です。
 
