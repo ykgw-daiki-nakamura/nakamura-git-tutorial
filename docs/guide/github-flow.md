@@ -1,6 +1,6 @@
 # GitHub Flow
 
-GitHub Flow は、シンプルで実践的なブランチ運用モデルです。多くのチームの標準であり、**まず選ぶ既定として推奨できる戦略**です。代替となる他のモデル（Git Flow / GitLab Flow）との向き不向きは [ブランチ戦略の使い分け](./branching-strategies) で比較しています。
+GitHub Flow は、`main` 一本を中心に、短命なブランチとプルリクエストだけで回すブランチ運用モデルです。常設ブランチが `main` しかないぶん手順は少なくなりますが、それが成り立つのは **`main` を常にデプロイ可能に保てる**、**出荷する線が 1 本で済む**という条件を満たす場合です。他のモデル（Git Flow / GitLab Flow / Microsoft Release Flow）との向き不向きは [ブランチ戦略の使い分け](./branching-strategies) で比較しています。
 
 ## 基本ルール
 
@@ -71,6 +71,6 @@ gitGraph
 
 **小さく作って、早くマージする**——これが GitHub Flow をうまく回すコツです。
 
-::: tip 推奨は GitHub Flow、他は代替案
-その**代替案**として、`develop` / `release` ブランチを使う [Git Flow](./other-flows#git-flow) や、環境／リリースブランチを足す [GitLab Flow](./other-flows#gitlab-flow) があります。Web サービスのように継続的にデプロイする現場では、シンプルな GitHub Flow が扱いやすいですが、プロダクトによって向き不向きがあります。どれを選ぶかは [ブランチ戦略の使い分け](./branching-strategies) を参照してください。タグ付け・バージョニング・hotfix は [リリースとバージョン管理](./release) で扱います。
+::: tip 他のモデルとの関係
+`main` 一本では扱いにくい状況があります。出荷済みの複数バージョンを並行して保守する。リリース前に安定化期間を設ける。環境ごとのデプロイ状態を管理する。こうした要求に応えて常設ブランチを増やしたのが、`develop` / `release` ブランチを使う [Git Flow](./other-flows#git-flow) や、環境／リリースブランチを足す [GitLab Flow](./other-flows#gitlab-flow) です。ブランチが増えればマージ経路も増えるため、どこまで必要かはプロダクトの性質で決まります。選び方は [ブランチ戦略の使い分け](./branching-strategies) を参照してください。タグ付け・バージョニング・hotfix は [リリースとバージョン管理](./release) で扱います。
 :::
