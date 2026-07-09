@@ -110,6 +110,12 @@ export default withMermaid({
           ]
         },
         {
+          text: 'セキュリティ',
+          items: [
+            { text: '依存とサプライチェーン', link: '/standards/supply-chain' }
+          ]
+        },
+        {
           text: '顧客別カスタマイズ',
           items: [
             { text: '顧客別カスタマイズ', link: '/standards/customization' }
