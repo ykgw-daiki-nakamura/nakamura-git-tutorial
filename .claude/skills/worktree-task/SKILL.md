@@ -82,7 +82,8 @@ git worktree list   # 作成を確認
 ```
 
 - 新ブランチ `<type>/<kebab-summary>` は `origin/<base>` の最新コミットを起点に作られる。
-- **以降の手順で `<worktree>` と書いたら、作成した worktree の絶対パス
+- 上の `git worktree add` は**メイン作業ツリーからの相対パス** `.claude/worktrees/<name>` に worktree を作る。
+  **以降の手順で `<worktree>` と書いたら、こうして出来上がった worktree の絶対パス
   `<main-worktree>/.claude/worktrees/<name>` を指す**（`<main-worktree>` はメイン作業ツリーの絶対パス。
   例 `/workspaces/nakamura-git-tutorial`）。相対パスに読み替えない。
 - ローカルの未コミット変更を引き継ぎたい場合のみ、base をローカルの現在ブランチ名にする（`origin/` は付けない）。
