@@ -49,16 +49,19 @@ function collectHtml(dir) {
     if (!name.endsWith('.html')) continue
     const html = readFileSync(p, 'utf8')
     const ids = new Set([...html.matchAll(/\bid="([^"]*)"/g)].map((m) => m[1]))
-    idsOf.set(relative(distDir, p), ids)
+    // キーは `/` 区切りに正規化する（Windows の `\` 区切りだと mdToHtml() の結果と噛み合わない）
+    idsOf.set(relative(distDir, p).replace(/\\/g, '/'), ids)
   }
 }
 collectHtml(distDir)
 
 // ---- Markdown からリンクを拾う ----
 // コードフェンス・インラインコードは対象外（リンクとして描画されないため）。
+// フェンスは行頭に限らない（リスト内では字下げされる）。開きの字下げ幅は問わず、
+// 同じ記号で閉じるまでを落とす。
 function stripCode(src) {
   return src
-    .replace(/^```[\s\S]*?^```/gm, '')
+    .replace(/^[ \t]*(```+|~~~+)[\s\S]*?^[ \t]*\1[ \t]*$/gm, '')
     .replace(/`[^`\n]*`/g, '')
 }
 
@@ -84,12 +87,16 @@ for (const file of mdFiles) {
       const frag = decodeURIComponent(href.slice(hash + 1))
       if (!frag) continue
 
-      // 対象ページの md パスを解決する
+      // 対象ページの md パスを解決する。
+      // `/standards/versioning` のようなサイトルート相対は docs/ が起点。
+      // これを dirname(file) から resolve するとファイルシステムの絶対パスになり、
+      // existsSync が false になって **黙って検査対象から外れる**（取りこぼしになる）。
       let targetMd
       if (pathPart === '') {
         targetMd = file // 同一ページ内
       } else {
-        let p = resolve(dirname(file), pathPart)
+        const base = pathPart.startsWith('/') ? docsDir : dirname(file)
+        let p = resolve(base, pathPart.replace(/^\//, ''))
         if (pathPart.endsWith('/')) p = join(p, 'index.md')
         else if (!p.endsWith('.md')) p += '.md'
         targetMd = p
