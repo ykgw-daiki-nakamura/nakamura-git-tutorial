@@ -19,6 +19,7 @@ npm run docs:dev     # 開発サーバー（既定 http://localhost:5173/）
 npm run docs:build   # 本番ビルド（内部リンク切れ・Mermaid 構文エラーを検知）
 npm run docs:preview # ビルド結果をプレビュー
 npm run lint:md      # markdownlint-cli2 による Markdown 整形チェック
+npm run lint:emphasis # 強調（**…**）が実際に太字として描画されるか検査
 ```
 
 ## ディレクトリ構成
@@ -57,6 +58,23 @@ docs/
 - 初期に無効化しているルール（将来、文章を直しながら順次有効化する）: `ja-no-mixed-period`（文末句点）/ `no-doubled-joshi`（助詞の連続）/ `no-mix-dearu-desumasu`（である・ですます混在）/ `sentence-length`（一文の長さ）/ `no-exclamation-question-mark`（！？の使用）/ `arabic-kanji-numbers` / `ja-no-weak-phrase` / `ja-no-redundant-expression`。
 - 対象は `docs/**/*.md` とルート直下の `*.md`。`npm run lint:text -- --fix` で自動修正できる指摘もある（`npm run` に引数を渡すため `--` が必要）。
 
+## 強調の描画 Lint（lint:emphasis）
+
+`**…**` が**強調として描画されるか**を検査する（`npm run lint:emphasis`、CI の `lint` ジョブでも実行）。実装は [scripts/check-emphasis.mjs](scripts/check-emphasis.mjs)。
+
+CommonMark の flanking 規則により、`）` `」` `` ` `` などの句読点が `**` に隣接すると開始／終了記号として認識されず、**`**` がそのまま本文に表示される**。日本語では踏みやすい。
+
+```text
+変更の**理由（コミットメッセージ）**を後から追える     ← 閉じが成立しない
+いずれも**「出荷した線を…維持する」**ための仕組みです   ← 開きが成立しない
+```
+
+markdownlint（整形）も textlint（文章表現）もこれを見ず、`docs:build` は壊れたままビルドが通る。判定には実レンダリングが要るため、VitePress と同じ markdown-it に通して **`<strong>` の中身が原文の `**` の対応と一致するか**まで確かめる。`**` の個数だけを数えると、区切り記号が誤ってペアリングされて**意図と違う範囲が太字になる**ケースを取りこぼす。
+
+- 直し方は**閉じ `**` の直後（開きが成立しない場合は直前）に半角スペースを 1 つ入れる**。太字の範囲は変えなくてよい。
+- コードフェンス内・インラインコードスパン内・画像の `![alt](src)` は対象外（いずれも `**` が強調にならないため）。
+- 行をまたぐ強調は意図を判定できないので見送る（`**` が奇数個の行はスキップ）。
+
 ## 編集後チェック（checks.json 駆動フック）
 
 「どのファイルを編集したら何を検査するか」を [.claude/checks.json](.claude/checks.json) に宣言的にまとめ、汎用 PostToolUse フック `.claude/hooks/on-edit-check.sh` がそれを読んで該当コマンドを実行する（例: `.md` 編集 → markdownlint、`docs/**/*.md` 編集 → textlint も）。
@@ -65,6 +83,7 @@ docs/
 - 違反があれば `exit 2` で Claude にフィードバックされる。対応 glob が無いファイルや、検査コマンド未導入（依存なし）の場合は**作業を止めない**（fail-open）。
 - 設定を変えるだけで検査を足せるよう、ロジック（フック）とプロジェクト固有の対応表（`checks.json`）を分離している。
 - **textlint** も markdownlint と同格で `onEdit` に登録し、docs 編集時に CI（`lint:text`）と同じ検査をローカル即時実行する（on-edit の対象は `docs/**/*.md`。ルート直下の `*.md` は CI の `lint:text` が担保する。textlint 未導入環境ではコマンド不在で fail-open）。
+- **強調の描画検査**（`scripts/check-emphasis.mjs`）も同じく `docs/**/*.md` を対象に `onEdit` へ登録し、編集直後に CI（`lint:emphasis`）と同じ検査を走らせる。
 - 構造ファイル（例: `config.mjs`）を編集したら関連ドキュメントの更新を促す `docs-sync-reminder.sh` も同様に checks.json の `docsSync`（`{ glob, remind }`）を読む。こちらは `exit 2`（ブロック）ではなく注意喚起（additionalContext）に留める。
 
 ## コミット/PR 衛生・安全ガード（guard フック）
@@ -137,12 +156,13 @@ docs(guide): ブランチ命名規則の例を追加
 - [ ] `npm run docs:build` が通る（CI と同じ検証）
 - [ ] `npm run lint:md` が通る
 - [ ] `npm run lint:text` が通る（日本語プロース・CI と同一）
+- [ ] `npm run lint:emphasis` が通る（強調の描画・CI と同一）
 - [ ] 追加・変更ページのリンクが切れていない
 - [ ] Mermaid 図がプレビューで正しく描画される
 
 ## CI / CD とセキュリティ方針
 
-- **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint + textlint）/ `config-check`（設定↔実体の整合）/ `test-hooks`（guard フック回帰テスト）/ `dependency-review`（依存の脆弱性検査）。
+- **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint + textlint + 強調の描画）/ `config-check`（設定↔実体の整合）/ `test-hooks`（guard フック回帰テスト）/ `dependency-review`（依存の脆弱性検査）。
   - **test-hooks**: `scripts/test-hooks.sh`（`npm run test:hooks`）が `.claude/hooks/lib/*.test.sh`（例: `guard-noise.test.sh`）を一括実行し、guard 群のノイズ誤検知・worktree 対応・secrets 走査などのデグレを検知する。1 件でも失敗すれば CI が落ちる。
   - **config-check**: `scripts/check-config-consistency.mjs`（`npm run check:config`）が (a) `checks.json` のスキーマ（必須キー）・(b) `.claude/hooks/*.sh` の `settings.json` 配線（未配線/宙づり参照）・(c) `checks.json` の `issueLabels`/`prLabels` が参照するラベルの実在（`gh label list`）を検査。ネット/トークンが無い環境では (c) をスキップ（fail-open）。
 - **pr-title.yml**（PR 時）: **PR タイトルが Conventional Commits 準拠か検証**する。Squash Merge では PR タイトルがマージコミットメッセージになるため。許可 type は `checks.json` の `commit.conventional.types`（`guard-commit.sh` と同一ソース）を `.github/scripts/check-pr-title.sh` が読む。

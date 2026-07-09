@@ -11,6 +11,7 @@
     "check:config": "node scripts/check-config-consistency.mjs",
     "lint:md": "markdownlint-cli2",
     "lint:text": "textlint \"docs/**/*.md\" \"*.md\"",
+    "lint:emphasis": "node scripts/check-emphasis.mjs",
     "test:hooks": "bash scripts/test-hooks.sh"
   },
   "repository": {
@@ -29,6 +30,7 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "markdown-it": "^14.3.0",
     "markdownlint-cli2": "^0.23.0",
     "mermaid": "^11.16.0",
     "textlint": "^15.7.1",

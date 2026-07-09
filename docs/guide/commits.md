@@ -38,7 +38,7 @@ feat: ログインフォームのバリデーションを追加
 
 ## Conventional Commits
 
-要約の書き方をさらに機械可読な形に決めたのが [Conventional Commits](https://www.conventionalcommits.org/ja/) です。要約の先頭に**変更の種別（type）**を付けます。
+要約の書き方をさらに機械可読な形に決めたのが [Conventional Commits](https://www.conventionalcommits.org/ja/) です。要約の先頭に**変更の種別（type）** を付けます。
 
 ```text
 <type>(<scope>): <要約>

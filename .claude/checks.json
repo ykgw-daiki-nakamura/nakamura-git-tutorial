@@ -12,6 +12,11 @@
       "run": "node_modules/.bin/textlint {file}"
     },
     {
+      "label": "emphasis",
+      "glob": "docs/**/*.md",
+      "run": "node scripts/check-emphasis.mjs {file}"
+    },
+    {
       "label": "nav-consistency",
       "glob": "docs/.vitepress/config.mjs",
       "run": "npm run docs:check-nav"
