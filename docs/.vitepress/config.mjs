@@ -3,6 +3,34 @@ import { withMermaid } from 'vitepress-plugin-mermaid'
 const siteUrl = 'https://ykgw-daiki-nakamura.github.io/nakamura-git-tutorial/'
 const description = 'Git / GitHub をチーム開発で実践的に使いこなすための図解付きチュートリアル'
 
+// VitePress（@mdit-vue/shared）の slugify を再現し、最後に NFC 正規化する。
+//
+// なぜ要るか: 既定の slugify は `str.normalize("NFKD")` で結合文字に分解したあと、
+// rCombining（/[̀-ͯ]/ = ラテン文字の結合記号）しか取り除かない。
+// 日本語の濁点 U+3099 / 半濁点 U+309A はこの範囲外なので分解されたまま残り、
+// 見出しの id が NFD で出力される（「で」→「て」+ U+3099）。
+// ブラウザの fragment 照合は Unicode 正規化を行わないため、Markdown に手で書いた
+// 合成済みのアンカー（`#…規約`）は id と一致せず、リンクを踏んでもスクロールしない。
+// VitePress 自身が出すリンク（アウトライン・permalink）は同じ id から導出されるので
+// 気付きにくい。id を NFC に寄せて、手書きアンカーと一致させる。
+//
+// @mdit-vue/shared は vitepress にバンドルされており import できないため実装を写している。
+// 追随漏れは scripts/check-anchors.mjs（`npm run check:anchors`）が実 HTML と突き合わせて検知する。
+const rControl = /[\u0000-\u001f]/g
+const rSpecial = /[\s~`!@#$%^&*()\-_+=[\]{}|\\;:"'“”‘’<>,.?/]+/g
+const rCombining = /[\u0300-\u036F]/g
+const slugify = (str) =>
+  str
+    .normalize('NFKD')
+    .replace(rCombining, '')
+    .replace(rControl, '')
+    .replace(rSpecial, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/^(\d)/, '_$1')
+    .toLowerCase()
+    .normalize('NFC')
+
 export default withMermaid({
   title: 'nakamura-git-tutorial',
   description,
@@ -172,6 +200,11 @@ export default withMermaid({
     returnToTopLabel: 'トップへ戻る'
   },
   mermaid: {},
+  // 見出しの id を NFC 正規化する（上の slugify を参照）。
+  // markdown-it-anchor が生成する id と、そこから導出されるアウトライン・permalink が揃う。
+  markdown: {
+    anchor: { slugify }
+  },
   // ビルド出力の最適化:
   // Mermaid は各図種のレンダラを動的 import で個別チャンクへ遅延読み込みしており、
   // 常時読み込まれる app チャンク（約 610KB / Mermaid コア相当）だけが 500KB の
