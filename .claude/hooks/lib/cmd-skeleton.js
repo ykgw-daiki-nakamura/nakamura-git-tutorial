@@ -181,6 +181,10 @@ function skeleton(src) {
       let q = "";
       if (src[k] === "'" || src[k] === '"') { q = src[k]; k++; }
       let d = "";
+      // デリミタは英字か _ で始まる。数字始まりを許すと算術シフト（`$((1<<2))`）を
+      // heredoc と誤認し、デリミタ `2` が現れるまで入力を読み飛ばしてしまう。
+      // 後続の `rm -rf /` がスケルトンから消え、危険判定を回避できる状態になる。
+      if (!q && !/[A-Za-z_]/.test(src[k] ?? "")) { out += "<<"; i += 2; continue; }
       while (k < n && /[A-Za-z0-9_]/.test(src[k])) { d += src[k]; k++; }
       if (q && src[k] === q) k++;
       if (d) { heredocs.push(d); out += " << "; i = k; continue; }

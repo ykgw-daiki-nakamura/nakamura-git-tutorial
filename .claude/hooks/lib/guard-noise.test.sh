@@ -88,6 +88,11 @@ run "コマンド置換内の \")\" を含む文字列でも壊れない"    gua
 run "引用符付きの安全な絶対パスの削除は許可"            guard-dangerous.sh 0 "$RM $RF \"/tmp/build\""
 run "引用符付きの worktree 配下の削除は許可"            guard-dangerous.sh 0 "$RM $RF \"$TD/wt/node_modules\""
 run "引用符付きの \$HOME 配下の削除は許可"               guard-dangerous.sh 0 "$RM $RF \"\$HOME/.cache/x\""
+# 算術シフト << を heredoc と誤認すると、以降がスケルトンから消えて検知を回避できる
+SHIFT="$(printf 'echo $((1<<2))\n%s %s /' "$RM" "$RF")"
+run "算術シフト << の後ろの危険削除も阻止"              guard-dangerous.sh 2 "$SHIFT"
+SHIFT2="$(printf 'echo $((1<<2)) ; %s %s /' "$RM" "$RF")"
+run "同一行の算術シフト << の後ろも阻止"                guard-dangerous.sh 2 "$SHIFT2"
 # 検知は維持する（すり抜けさせない）
 run "実 ルート削除は引き続き阻止"                       guard-dangerous.sh 2 "$RM $RF /"
 run "実 ホーム削除は引き続き阻止"                       guard-dangerous.sh 2 "$RM $RF ~"
