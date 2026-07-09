@@ -84,9 +84,14 @@ if [ "$op" = "push" ]; then
   args="${args%%&&*}"; args="${args%%;*}"; args="${args%%|*}"
   read -ra _toks <<<"$args"
   is_delete=0
+  end_opts=0
   refs=()
   for t in ${_toks[@]+"${_toks[@]}"}; do
+    # `--` 以降はオプション終端。`-` で始まるブランチ名も ref として扱う
+    # （ここで取りこぼすと削除対象を特定できず、従来判定にフォールバックして阻止されてしまう）。
+    if [ "$end_opts" -eq 1 ]; then refs+=("$t"); continue; fi
     case "$t" in
+      --) end_opts=1 ;;
       --delete|-d) is_delete=1 ;;
       -*) : ;;               # その他のオプションは対象外
       *) refs+=("$t") ;;     # refs[0] はリモート名、以降が refspec
