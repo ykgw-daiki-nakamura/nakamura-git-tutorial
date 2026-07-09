@@ -96,8 +96,10 @@ git worktree list   # 作成を確認
 遡り、リポジトリ直下の `node_modules` に到達する。`npm install` せずに `lint:md` / `lint:text` /
 `lint:emphasis` / `docs:build` / `check:config` / `test:hooks` / `docs:check-nav` が動く。
 
-- **例外: `package.json` を変更する PR では、worktree 内で `npm install` する。** しないと worktree は
-  メイン側の `node_modules` を黙って使い、`package.json` の記述と実際に読み込まれる依存がずれる。
+- **例外: 依存そのものを変更する PR では、worktree 内で `npm install` する。** 対象は
+  `dependencies` / `devDependencies` / `overrides` / `package-lock.json` を触る変更
+  （`scripts` を足すだけなど、依存と無関係な `package.json` 変更は該当しない）。
+  しないと worktree はメイン側の `node_modules` を黙って使い、宣言と実際に読み込まれる依存がずれる。
   追加した依存がメイン側に**推移的依存として偶然存在する**と、ローカルでは通るのに意味が変わる
   （CI は `npm ci` で lockfile から入れ直すため気付けるが、ローカルでは気付けない）。
 - worktree 内で `npm install` すると `node_modules` の実体ができる。`.gitignore` 済みでコミット対象には
@@ -190,9 +192,11 @@ git -C <main-worktree> worktree list          # 撤去を確認
 
 **`npm install` した worktree の撤去。** `node_modules` の実体があると `git worktree remove` が
 「未コミット変更あり」と判断して失敗することがある。生成物なので、消してから撤去してよい。
+削除対象は **`<main-worktree>` 起点の絶対パス**で書く。相対パスだと実行位置しだいで別の
+`node_modules` を消しかねない。
 
 ```bash
-rm -rf .claude/worktrees/<name>/node_modules
+rm -rf <main-worktree>/.claude/worktrees/<name>/node_modules
 git -C <main-worktree> worktree remove .claude/worktrees/<name>
 ```
 
