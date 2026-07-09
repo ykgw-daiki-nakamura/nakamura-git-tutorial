@@ -76,13 +76,15 @@ gh issue edit <ISSUE> --add-label "status: in-progress" --add-assignee @me
 ローカルの `main` は更新されないため、**`origin/<base>` を base に指定**して常に最新から切る。
 
 ```bash
+# メイン作業ツリー <main-worktree> のルートで実行する（下のパスはそこからの相対パス）
 git fetch origin --quiet                                  # リモート追跡ブランチを最新化
 git worktree add -b <type>/<kebab-summary> .claude/worktrees/<name> origin/<base>
 git worktree list   # 作成を確認
 ```
 
 - 新ブランチ `<type>/<kebab-summary>` は `origin/<base>` の最新コミットを起点に作られる。
-- 上の `git worktree add` は**メイン作業ツリーからの相対パス** `.claude/worktrees/<name>` に worktree を作る。
+- 上の `git worktree add` は**メイン作業ツリーで実行する**。渡すパス `.claude/worktrees/<name>` は
+  カレントディレクトリ基準なので、別のディレクトリで実行すると worktree が意図しない場所にできる。
   **以降の手順で `<worktree>` と書いたら、こうして出来上がった worktree の絶対パス
   `<main-worktree>/.claude/worktrees/<name>` を指す**（`<main-worktree>` はメイン作業ツリーの絶対パス。
   例 `/workspaces/nakamura-git-tutorial`）。相対パスに読み替えない。
