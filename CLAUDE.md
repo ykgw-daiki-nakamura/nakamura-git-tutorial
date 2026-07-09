@@ -34,6 +34,8 @@ docs/
 .github/workflows/        # CI（ci.yml）/ PR タイトル検証（pr-title.yml）/ Pages デプロイ（deploy.yml）/ 外部リンク検査（links.yml）
 .github/scripts/          # ワークフローから呼ぶスクリプト（check-pr-title.sh 等）
 .github/conventions.json  # コミット/PR 規約の単一情報源（許可 type・type→ラベル名）
+.github/dependabot.yml    # 依存更新（npm は cooldown で公開直後のバージョンを寝かせる）
+.npmrc                    # ignore-scripts=true（インストール時の任意コード実行を止める）
 ```
 
 規約の語彙（許可 type・ラベル名）を `.claude/` ではなく `.github/` に置くのは、**それを強制するゲートが CI** だからです。CI は Claude を使わないコントリビューターにも効き、ハーネスを差し替えても残ります。`.claude/checks.json` に置くのは Claude だけが読む配線（`onEdit` / `guard.*` / `protectedBranches` など）に限り、`.github/` 配下のスクリプトが `.claude/` を読むことはありません。
@@ -188,6 +190,22 @@ docs(guide): ブランチ命名規則の例を追加
 - **issue-label-cleanup.yml**: Issue クローズ時に `status: in-progress` ラベルを自動除去（`issues: write`）。
 - **GitHub Actions は必ず commit SHA でピン留めし、`# vX.Y.Z` のバージョンコメントを添える**（Dependabot が更新）。
 - ワークフローは**最小権限**（`permissions: contents: read` を既定）とし、`persist-credentials: false`、job には `timeout-minutes` を設定する。
+
+## サプライチェーン対策（cooldown / ignore-scripts）
+
+脆弱性の**検知**（`dependency-review`）と、悪性パッケージの**取り込み・実行の抑止**は別の話。後者は 2 層で受ける。
+
+**1. Dependabot の cooldown**（[.github/dependabot.yml](.github/dependabot.yml)）。npm のサプライチェーン攻撃は「悪性バージョンを公開し、気付かれるまでの数時間〜数日で拡散する」形をとる。数日寝かせるだけで大半を回避できる。**cooldown は version update にのみ効き、security update は素通しする**ため、脆弱性修正が遅れる副作用は無い。既定は `default-days: 7` / `semver-major-days: 14`。
+
+- **`github-actions` には付けない。** このエコシステムの cooldown はリリース公開日ではなくタグのコミット日で判定し（[dependabot-core#13078](https://github.com/dependabot/dependabot-core/issues/13078)）、頻繁にリリースされる Action の更新が事実上止まる報告がある（[#13691](https://github.com/dependabot/dependabot-core/issues/13691) / [#14645](https://github.com/dependabot/dependabot-core/issues/14645)）。SHA ピンの鮮度をこの更新に依存している以上、止まる方が危ない。タグ再付与による Action 改竄には SHA ピン自体が効いている。
+- **cooldown は推移的依存に効かない**（[#14683](https://github.com/dependabot/dependabot-core/issues/14683)）。lockfile に引き込まれる依存は公開直後でも入りうる。だから 2 層目が要る。
+- npm 自体の `min-release-age` は**採用しない**。Dependabot が上げた新しめのバージョンを lockfile が指したまま `npm ci` に拒否され、CI が通らなくなる衝突が報告されている。
+
+**2. `ignore-scripts`**（[.npmrc](.npmrc)）。インストール時のライフサイクルスクリプト（`preinstall` / `install` / `postinstall` / `prepare`）を実行しない。悪性パッケージが任意コードを走らせる主要な経路がここなので、取り込んでしまってもインストール段階では実行されない。cooldown が取りこぼす推移的依存に対しては、この層が防波堤になる。
+
+- 本リポジトリの依存でレジストリ経由の install スクリプトを持つのは **esbuild（`postinstall: node install.js`）だけ**。バイナリは `optionalDependencies` の `@esbuild/<platform>` から入るため、飛ばしても `docs:build` は通る。
+- 明示的に呼ぶ `npm run <script>` は影響を受けない。一時的に必要なら `npm install --ignore-scripts=false` か `npm rebuild <pkg>`。
+- 将来 `postinstall` が本当に要る依存を入れると**ビルドが目に見えて壊れる**ので、黙って通り過ぎることはない。
 
 ## 対話・確認の作法
 

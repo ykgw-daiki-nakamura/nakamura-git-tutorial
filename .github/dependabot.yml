@@ -2,6 +2,12 @@ version: 2
 updates:
   # GitHub Actions は SHA でピン留めしているため、Dependabot で
   # 定期的に SHA とバージョンコメントを更新し、ピンの陳腐化を防ぐ。
+  #
+  # ここには cooldown を **付けない**。github-actions エコシステムの cooldown は
+  # リリース公開日ではなくタグのコミット日で判定し（dependabot-core#13078）、
+  # 頻繁にリリースされる Action の更新が事実上止まる報告がある（同 #13691 / #14645）。
+  # 本リポジトリは SHA ピンの鮮度をこの更新に依存しているので、止まる方が危ない。
+  # タグ再付与による Action 改竄には、cooldown ではなく SHA ピン自体が効いている。
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -12,3 +18,16 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+
+    # 公開直後のバージョンを取り込まない待機期間。npm のサプライチェーン攻撃は
+    # 「悪性バージョンを公開し、気付かれるまでの数時間〜数日で拡散する」形をとるため、
+    # 数日待つだけで大半を回避できる。**cooldown は version update にのみ効き、
+    # security update は素通しする**ので、脆弱性修正が遅れることはない。
+    # major は壊れやすく急ぐ理由も無いので、より長く寝かせる。
+    #
+    # 穴: cooldown は lockfile に引き込まれる **推移的依存には効かない**
+    # （dependabot-core#14683）。そこは .npmrc の ignore-scripts=true が
+    # 「インストール時に実行させない」ことで受け持つ（多層防御）。
+    cooldown:
+      default-days: 7
+      semver-major-days: 14
