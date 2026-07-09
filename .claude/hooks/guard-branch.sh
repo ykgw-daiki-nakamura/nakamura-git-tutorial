@@ -79,8 +79,14 @@ EOF
 # 削除対象を特定できない場合は下の従来判定にフォールバックする（安全側）。
 if [ "$op" = "push" ]; then
   # 種別はスケルトンで判定済み。ブランチ名の抽出は原文（$cmd）から行う。
+  # `git [-C <dir>] push` の形にマッチさせ、その直後だけを引数として切り出す。
+  # 単に最初の "push" で切ると、`-C /path/with-push/...` や前段コマンドの "push" に反応して
+  # 引数を誤って切り出し、--delete の判定に失敗して従来判定へ落ちてしまう。
+  args=""
+  if [[ "$cmd" =~ ${gitpfx}[[:space:]]+push([[:space:]]|$) ]]; then
+    args="${cmd#*"${BASH_REMATCH[0]}"}"
+  fi
   # 後続の連結コマンド（&& / ; / |）は push の引数ではないので切り落とす。
-  args="${cmd#*push}"
   args="${args%%&&*}"; args="${args%%;*}"; args="${args%%|*}"
   read -ra _toks <<<"$args"
   is_delete=0
