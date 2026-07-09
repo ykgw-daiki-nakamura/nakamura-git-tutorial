@@ -1,11 +1,15 @@
 // 設定駆動ハーネスの「設定↔実体」の整合を検査する。
 //
-// 設定ファイルは 2 つある。規約の語彙（許可 type・type→ラベル名）は CI が強制するゲートなので
-// .github/conventions.json が単一情報源。Claude ハーネス固有の配線は .claude/checks.json が持つ。
+// 設定ファイルは 3 つある。CI が強制するゲートの語彙は .github/ 側が単一情報源で、
+// 規約（許可 type・type→ラベル名）は .github/conventions.json、セキュリティポリシー（npm audit の
+// しきい値・期限付き allowlist）は .github/security.json が持つ。Claude ハーネス固有の配線は
+// .claude/checks.json が持つ。
 //
 // 検査項目:
-//   (a) 両設定ファイルが妥当な JSON で、必須キーを持つ。conventions.json は許可 type 一覧が非空配列で、
-//       type→ラベル名の対応表が type 一覧と過不足なく対応する。checks.json は onEdit/protectedBranches/guard を持つ。
+//   (a) 3 つの設定ファイルが妥当な JSON で、必須キーを持つ。conventions.json は許可 type 一覧が非空配列で、
+//       type→ラベル名の対応表が type 一覧と過不足なく対応する。security.json は audit.failOn が有効な
+//       severity で、audit.allow の各要素が ghsa/reason/expires を持つ。checks.json は
+//       onEdit/protectedBranches/guard を持つ。
 //   (b) .claude/hooks/ のトップレベル *.sh が settings.json に漏れなく配線され、かつ settings.json が
 //       参照するフックファイルが実在する（present-but-unwired と dangling-wiring の双方を検出）。
 //   (c) conventions.json の labels.types と checks.json の issueLabels / prLabels が参照するラベル名が
@@ -14,6 +18,9 @@
 //   (d) 検証スクリプトが持つフォールバックの default_types が、conventions.json の
 //       commit.conventional.types と順序を含めて一致する。jq / conventions.json を読めない環境でだけ
 //       挙動が食い違う「静かなドリフト」を防ぐ。
+//   (e) ci.yml の dependency-review-action の fail-on-severity が、security.json の audit.failOn と
+//       一致する。同じしきい値を 2 か所で宣言しているため、片方だけ変わると
+//       「PR で入る依存」と「既に入っている依存」で基準が食い違う。
 //
 // 不一致があれば原因を出力して exit 1。CI（ci.yml）とローカル（npm run check:config）から実行する。
 import { readFileSync, readdirSync, existsSync } from 'node:fs'
@@ -59,6 +66,38 @@ if (conventions) {
   }
 }
 
+// ---- (a) security.json のスキーマ ----
+// 実際のゲート（advisory 単位の判定・期限切れ検知）は scripts/check-audit.mjs が持つ。
+// ここでは「audit ジョブが読めない形になっていないか」だけを、ネット不要な範囲で確かめる。
+// allow の各要素の詳細な検証（expires の日付書式など）は check-audit.mjs に一本化し、重複させない。
+const SEVERITIES = ['info', 'low', 'moderate', 'high', 'critical']
+const securityPath = p('.github/security.json')
+let security = null
+try {
+  security = JSON.parse(readFileSync(securityPath, 'utf8'))
+} catch (e) {
+  errors.push(`(a) .github/security.json が妥当な JSON ではありません: ${e.message}`)
+}
+if (security) {
+  const audit = security.audit
+  if (!audit || typeof audit !== 'object') {
+    errors.push('(a) security.json に必須キー "audit" がありません')
+  } else {
+    if (!SEVERITIES.includes(audit.failOn)) {
+      errors.push(`(a) security.json の audit.failOn が不正です: ${JSON.stringify(audit.failOn)}（${SEVERITIES.join(' / ')} のいずれか）`)
+    }
+    if (!Array.isArray(audit.allow)) {
+      errors.push('(a) security.json の audit.allow を配列として読めません（除外が無い場合も [] を置く）')
+    } else {
+      for (const [i, entry] of audit.allow.entries()) {
+        for (const key of ['ghsa', 'reason', 'expires']) {
+          if (!entry?.[key]) errors.push(`(a) security.json の audit.allow[${i}] に "${key}" がありません（理由と再評価期限の無い除外を作らない）`)
+        }
+      }
+    }
+  }
+}
+
 // ---- (a) checks.json のスキーマ ----
 // 許可 type とラベル対応表は conventions.json へ移したので、ここでは必須キーに含めない。
 const checksPath = p('.claude/checks.json')
@@ -77,6 +116,9 @@ if (checks) {
   }
   if (checks.issueLabels?.types) {
     errors.push('(a) checks.json に issueLabels.types が残っています（type→ラベル名の情報源は .github/conventions.json に一本化済み）')
+  }
+  if ('audit' in checks) {
+    errors.push('(a) checks.json に audit キーがあります（npm audit のポリシーの情報源は .github/security.json に一本化済み）')
   }
 }
 
@@ -196,17 +238,44 @@ if (Array.isArray(conventionTypes) && conventionTypes.length > 0) {
   }
 }
 
+// ---- (e) しきい値の二重宣言のドリフト ----
+// audit ジョブ（security.json の audit.failOn）と dependency-review ジョブ（ci.yml の
+// fail-on-severity）は同じしきい値を別々に宣言する。前者は lockfile 全体、後者は PR が追加・更新した
+// 依存が対象で、役割が違うので 1 か所には寄せられない。片方だけ動くのを機械で防ぐ。
+if (security?.audit?.failOn) {
+  const ciPath = p('.github/workflows/ci.yml')
+  let ciText = null
+  try {
+    ciText = readFileSync(ciPath, 'utf8')
+  } catch (e) {
+    errors.push(`(e) .github/workflows/ci.yml を読み取れません: ${e.message}`)
+  }
+  if (ciText !== null) {
+    const m = ciText.match(/^\s*fail-on-severity:\s*(\S+)\s*$/m)
+    if (!m) {
+      // 書式が変わった / ステップが消えたときに「無言の pass」にしない（(d) と同じ方針）。
+      errors.push('(e) ci.yml から dependency-review-action の fail-on-severity を抽出できません（書式が変わった可能性）')
+    } else if (m[1] !== security.audit.failOn) {
+      errors.push(
+        '(e) ci.yml の fail-on-severity が security.json の audit.failOn と一致しません\n' +
+          `        security.json: ${security.audit.failOn}\n` +
+          `        ci.yml: ${m[1]}`,
+      )
+    }
+  }
+}
+
 // ---- レポート ----
 for (const n of notes) console.log(`ℹ ${n}`)
 if (errors.length) {
   console.error('✗ 設定↔実体の整合エラー:')
   for (const e of errors) console.error(`    ${e}`)
-  console.error('\n設定（conventions.json/checks.json/settings.json）と実体（hooks/ラベル）のズレを解消してください。')
+  console.error('\n設定（conventions.json/security.json/checks.json/settings.json）と実体（hooks/ラベル）のズレを解消してください。')
   process.exit(1)
 }
 console.log(
-  '✓ 設定↔実体の整合 OK（conventions.json / checks.json スキーマ・hook 配線' +
+  '✓ 設定↔実体の整合 OK（conventions.json / security.json / checks.json スキーマ・hook 配線' +
     (ghLabels ? '・ラベル実在' : '') +
-    '・フォールバック type 一覧）',
+    '・フォールバック type 一覧・audit しきい値）',
 )
 process.exit(0)

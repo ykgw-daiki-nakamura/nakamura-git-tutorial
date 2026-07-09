@@ -1,0 +1,17 @@
+{
+  "//": "このリポジトリのセキュリティポリシーの単一情報源。規約（conventions.json）と同じく、強制するゲートは CI なので語彙は CI 側（.github/）が持つ。JSON はコメントを持てないため、解説は \"//\" 接頭辞のキーに書く（値としては読まない）。",
+  "//readers": "読み手: (1) scripts/check-audit.mjs（`npm run check:audit`。CI の audit ジョブとローカルの両方から実行）、(2) scripts/check-config-consistency.mjs（スキーマ整合の検査）。読み手の追加・変更時は check-config-consistency.mjs の整合検査も更新する。",
+  "//scope": "ここに置くのは「CI が読む＝全コントリビューターに効く」セキュリティポリシーだけ。Claude ハーネス固有の配線（package.json 編集時に check:audit を走らせる onEdit など）は .claude/checks.json に置く。",
+
+  "//audit": "npm audit のゲート設定。failOn 以上の severity を持つ advisory が allow に無ければ CI を落とす。failOn は ci.yml の dependency-review-action の fail-on-severity と揃える（同じしきい値を 2 か所で別々に決めない）。allow は「上流に修正が存在しない」など、直せない advisory を一時的に許容するための期限付き除外リスト。expires を過ぎた除外は CI が落とすので、除外したまま忘れることができない。GHSA ID は https://github.com/advisories/<id> で参照できる。",
+  "audit": {
+    "failOn": "high",
+    "allow": [
+      {
+        "ghsa": "GHSA-fx2h-pf6j-xcff",
+        "reason": "vite の server.fs.deny バイパス（Windows の代替パス）。開発サーバー（npm run docs:dev）でのみ到達し、GitHub Pages に出るビルド成果物には影響しない。vitepress 1.6.4（最新）が vite ^5 に固定しているため上流に修正が存在せず、依存の更新では解消できない。",
+        "expires": "2026-10-09"
+      }
+    ]
+  }
+}
