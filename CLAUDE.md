@@ -55,7 +55,8 @@ docs/
 文章表記の揺れ・冗長表現を検知するため、`textlint` + `textlint-rule-preset-ja-technical-writing` を導入している（`npm run lint:text`、CI の `lint` ジョブでも実行）。整形は markdownlint、**文章は textlint**、と役割を分ける。
 
 - 設定は [.textlintrc.cjs](.textlintrc.cjs)。**段階導入**のため、現行ドキュメントで多数発火する opinionated なルールは初期は無効化し、既存文書を通しつつ残りのルールで表記を整える方針。
-- 初期に無効化しているルール（将来、文章を直しながら順次有効化する）: `ja-no-mixed-period`（文末句点）/ `no-doubled-joshi`（助詞の連続）/ `no-mix-dearu-desumasu`（である・ですます混在）/ `sentence-length`（一文の長さ）/ `no-exclamation-question-mark`（！？の使用）/ `arabic-kanji-numbers` / `ja-no-weak-phrase` / `ja-no-redundant-expression`。
+- 無効化しているルール（合計 180 件規模で発火するため、ルール単位で文章を直しながら順次有効化する。1 ルール 1 PR を目安）: `ja-no-mixed-period`（文末句点）/ `no-doubled-joshi`（助詞の連続）/ `no-mix-dearu-desumasu`（である・ですます混在）/ `sentence-length`（一文の長さ）。
+- 有効化済みの opinionated ルール: `no-exclamation-question-mark`（感嘆符・疑問符の使用）/ `arabic-kanji-numbers`（漢数字とアラビア数字の統一）/ `ja-no-weak-phrase`（弱い表現）/ `ja-no-redundant-expression`（冗長表現）。
 - 対象は `docs/**/*.md` とルート直下の `*.md`。`npm run lint:text -- --fix` で自動修正できる指摘もある（`npm run` に引数を渡すため `--` が必要）。
 
 ## 強調の描画 Lint（lint:emphasis）
@@ -164,7 +165,7 @@ docs(guide): ブランチ命名規則の例を追加
 
 - **ci.yml**（PR 時）: `build`（VitePress ビルド）/ `lint`（markdownlint + textlint + 強調の描画）/ `config-check`（設定↔実体の整合）/ `test-hooks`（guard フック回帰テスト）/ `dependency-review`（依存の脆弱性検査）。
   - **test-hooks**: `scripts/test-hooks.sh`（`npm run test:hooks`）が `.claude/hooks/lib/*.test.sh`（例: `guard-noise.test.sh`）を一括実行し、guard 群のノイズ誤検知・worktree 対応・secrets 走査などのデグレを検知する。1 件でも失敗すれば CI が落ちる。
-  - **config-check**: `scripts/check-config-consistency.mjs`（`npm run check:config`）が (a) `checks.json` のスキーマ（必須キー）・(b) `.claude/hooks/*.sh` の `settings.json` 配線（未配線/宙づり参照）・(c) `checks.json` の `issueLabels`/`prLabels` が参照するラベルの実在（`gh label list`）を検査。ネット/トークンが無い環境では (c) をスキップ（fail-open）。
+  - **config-check**: `scripts/check-config-consistency.mjs`（`npm run check:config`）が (a) `checks.json` のスキーマ（必須キー）・(b) `.claude/hooks/*.sh` の `settings.json` 配線（未配線/宙づり参照）・(c) `checks.json` の `issueLabels`/`prLabels` が参照するラベルの実在（`gh label list`）・(d) 検証スクリプトのフォールバック `default_types`（`check-pr-title.sh` / `guard-commit.sh`）が `checks.json` の `commit.conventional.types` と順序含めて一致することを検査。ネット/トークンが無い環境では (c) をスキップ（fail-open）。
 - **pr-title.yml**（PR 時）: **PR タイトルが Conventional Commits 準拠か検証**する。Squash Merge では PR タイトルがマージコミットメッセージになるため。許可 type は `checks.json` の `commit.conventional.types`（`guard-commit.sh` と同一ソース）を `.github/scripts/check-pr-title.sh` が読む。
 - **pr-label.yml**（PR 時）: **PR タイトルの type に応じてラベルを自動付与**する（`feat`→`type: feat` 等）。対応表は `checks.json` の `issueLabels.types`（`issue-label` skill と同一ソース）を `.github/scripts/label-pr-by-type.sh` が読む。対応表に無い type はスキップ。`type: *` ラベルの実体は [scripts/sync-labels.sh](scripts/sync-labels.sh) で用意する（`checks.json` の `commit.conventional.types` を情報源に冪等作成）。`pull-requests: write` が要るため pr-title と同じく base 側で評価する（`pull_request_target`）。
 - **workflow-lint.yml**（`.github/workflows/**`・`.github/actions/**` 変更 PR 時）: ワークフロー自体を検査。**actionlint**（YAML/式/埋め込みシェルの静的解析）は blocking、**zizmor**（Actions セキュリティ監査＝`pull_request_target` 誤用・インジェクション・過剰権限）は**段階導入で非ブロッキング**（`continue-on-error`）。意図的に安全な `pull_request_target`（base 評価）の findings を整理後、`continue-on-error` を外して blocking 化する。Action は SHA ピン（Dependabot 更新）。
