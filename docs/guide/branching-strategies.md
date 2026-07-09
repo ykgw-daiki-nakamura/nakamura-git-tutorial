@@ -40,7 +40,9 @@ flowchart TD
 
 **[Git Flow](./other-flows#git-flow) または [GitLab Flow](./other-flows#gitlab-flow)（リリースブランチ）** が向きます。複数バージョンを並行して保守でき、`release/*` / 安定ブランチと `hotfix/*` で計画的なリリースと緊急修正を両立できます。実際の運用例は [複数バージョンの保守（リリースブランチ運用）](./release-branches) を参照。
 
-大規模チームでスプリント単位の定期リリースを回す場合も、この形が土台になります。リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配る、という運用です。
+### 大規模チームで定期リリースしつつ複数版を保守する
+
+**[GitLab Flow](./other-flows#gitlab-flow)（リリースブランチ）** が向きます。リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。ブランチ命名やレビューを機械的に統一したい大人数のチームでも、運用を揃えやすくなります。
 
 ## 戦略を足すきっかけ
 
