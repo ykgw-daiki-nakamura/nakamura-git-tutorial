@@ -42,12 +42,36 @@ git reset --hard HEAD~1
 
 ## 公開済みのコミットを取り消したい
 
-すでに push した（チームが参照している）コミットは `reset` で消すのではなく、**`revert` で打ち消しコミットを作る**のが安全です。履歴を書き換えないため混乱を招きません。
+すでに push したコミットの直し方は 2 つあり、**そのブランチを他の人が参照しているか**で選びます。
+
+### 既定: `revert` で打ち消す
+
+`reset` で消すのではなく、**打ち消しコミットを作る**のが安全です。履歴を書き換えないため、他の人の手元と食い違いません。共有ブランチ・保護ブランチではこれ一択です。
 
 ```bash
 git revert <commit>
 git push
 ```
+
+### 例外: 自分しか触っていないブランチなら書き換えてよい
+
+まだレビューも取り込みもされていない、**自分専用の作業ブランチ**なら、コミットを直して履歴を差し替えられます。コミット ID が変わるので、通常の `push` は拒否されます。
+
+```bash
+git commit --amend          # 直前のコミットを直す
+git push --force-with-lease # 履歴が変わるので force push が要る
+```
+
+`--force-with-lease` は「自分が知らないうちにリモートが更新されていたら中断する」安全な force push です。単なる `--force` は他人の push を上書きしかねないので使いません。
+
+::: danger 書き換えてはいけない場面
+
+- **保護ブランチ**（`main` など） — このリポジトリでは `guard-dangerous` フックが保護ブランチへの force push を機械的に阻止します
+- **他の人が同じブランチで作業している** — 相手の次の `pull` で履歴が食い違います
+- **他の人が既にそのコミットを取り込んでいる**
+
+判断が付かないなら `revert` を選んでください。取り消せる操作のほうが常に安全です。
+:::
 
 ## 作業を中断して別の対応をしたい
 
@@ -63,13 +87,36 @@ git stash pop          # 退避した変更を復元
 
 ## 間違ったブランチで作業してしまった
 
-まだコミットしていなければ stash で移動できます。
+### まだコミットしていない場合
+
+stash で移動できます。
 
 ```bash
 git stash
 git switch correct-branch
 git stash pop
 ```
+
+### `main` に直接コミットしてしまった（まだ push していない）
+
+実務でいちばん多い失敗です。**コミットは消さずに作業ブランチへ移し替え**、`main` をリモートの状態へ戻します。
+
+```bash
+# 1. いまの main の位置に作業ブランチを作る（コミットはここに残る）
+git branch feature/x
+
+# 2. main をリモートの状態まで巻き戻す
+git reset --hard origin/main
+
+# 3. 作業ブランチへ移動して、いつもどおり push → PR
+git switch feature/x
+```
+
+::: warning 手順 2 の前に確認する
+`git reset --hard` は未コミットの変更を破棄します。手順 1 で `feature/x` を作ってからでないと、コミットを見失います。仮に消してしまっても `git reflog` から救出できます。
+:::
+
+すでに push してしまった場合は、`main` の履歴を書き換えず [`revert`](#公開済みのコミットを取り消したい) で打ち消します。
 
 ## push が拒否される (rejected)
 
@@ -96,6 +143,8 @@ git push
 | 直前コミットを修正 | `git commit --amend` |
 | コミットを取り消す（手元に残す） | `git reset --soft HEAD~1` |
 | 公開済みコミットを打ち消す | `git revert <commit>` |
+| 自分専用ブランチの公開済みコミットを直す | `git commit --amend` → `git push --force-with-lease` |
+| `main` に直接コミットした（未 push） | `git branch feature/x` → `git reset --hard origin/main` → `git switch feature/x` |
 | 作業を一時退避 | `git stash` / `git stash pop` |
 | 消したコミット/ブランチを復元 | `git reflog` から救出 |
 | push が rejected | `git pull --no-rebase`（上流ブランチを取り込む）してから push |
