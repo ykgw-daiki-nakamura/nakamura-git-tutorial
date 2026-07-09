@@ -13,7 +13,7 @@
 | **デプロイ** | その成果物を本番環境で動かす | CI/CD・ホスティング |
 
 ::: tip 継続デプロイ型の例
-たとえば `main` に push されるたびに GitHub Actions が自動で GitHub Pages へデプロイする**継続デプロイ型**の構成（[deploy.yml](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.github/workflows/deploy.yml) の例）では、タグや Release は**デプロイのトリガーではなく「出荷点の印」**として使います。プロダクトによっては、次章で触れるように**タグや Release をデプロイのトリガー**にする構成もあります。
+たとえば `main` に push されるたびに GitHub Actions が自動で GitHub Pages へデプロイする**継続デプロイ型**の構成（[deploy.yml](https://github.com/ykgw-daiki-nakamura/nakamura-git-tutorial/blob/main/.github/workflows/deploy.yml) の例）では、タグや Release は**デプロイのトリガーではなく「出荷点の印」** として使います。プロダクトによっては、次章で触れるように**タグや Release をデプロイのトリガー**にする構成もあります。
 :::
 
 ## セマンティックバージョニング (SemVer)
@@ -28,7 +28,7 @@
 
 ### Conventional Commits と対応している
 
-[Conventional Commits](https://www.conventionalcommits.org/ja/)（`type(scope): 要約`）は、そのまま SemVer に対応します。**普段書いているコミット種別が、次に上げるべき桁を教えてくれます。**
+[Conventional Commits](./commits#conventional-commits)（`type(scope): 要約`）は、そのまま SemVer に対応します。**普段書いているコミット種別が、次に上げるべき桁を教えてくれます。**
 
 | コミット | 上がる桁 |
 | --- | --- |

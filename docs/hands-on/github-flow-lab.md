@@ -70,7 +70,7 @@ git commit -am "docs: 自己紹介を追加 (<あなた>)"
 ```
 
 ::: tip コミットメッセージの作法
-このリポジトリでは `type(scope): 要約` 形式（Conventional Commits）を推奨しています。`docs:` `feat:` `fix:` `chore:` などの種別を先頭に付けると、履歴が読みやすくなります。
+このリポジトリでは `type(scope): 要約` 形式（Conventional Commits）を推奨しています。`docs:` `feat:` `fix:` `chore:` などの種別を先頭に付けると、履歴が読みやすくなります。書式の詳しい説明は [コミットとコミットメッセージ](../guide/commits) を参照してください。
 :::
 
 ## ステップ 3：共有リポジトリに push する

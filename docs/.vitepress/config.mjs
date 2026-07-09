@@ -66,6 +66,7 @@ export default withMermaid({
         {
           text: 'チーム開発の基本フロー',
           items: [
+            { text: 'コミットとコミットメッセージ', link: '/guide/commits' },
             { text: 'ブランチとマージ', link: '/guide/branching' },
             { text: 'リモートと GitHub', link: '/guide/remote' },
             { text: 'プルリクエストとレビュー', link: '/guide/pull-request' },
