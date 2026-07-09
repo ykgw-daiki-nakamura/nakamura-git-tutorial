@@ -97,7 +97,8 @@ git worktree list   # 作成を確認
 `lint:emphasis` / `docs:build` / `check:config` / `test:hooks` / `docs:check-nav` が動く。
 
 - **例外: 依存そのものを変更する PR では、worktree 内で `npm install` する。** 対象は
-  `dependencies` / `devDependencies` / `overrides` / `package-lock.json` を触る変更
+  依存を宣言するフィールド（`dependencies` / `devDependencies` / `peerDependencies` /
+  `optionalDependencies` / `overrides`）と `package-lock.json` を触る変更
   （`scripts` を足すだけなど、依存と無関係な `package.json` 変更は該当しない）。
   しないと worktree はメイン側の `node_modules` を黙って使い、宣言と実際に読み込まれる依存がずれる。
   追加した依存がメイン側に**推移的依存として偶然存在する**と、ローカルでは通るのに意味が変わる
@@ -197,7 +198,7 @@ git -C <main-worktree> worktree list          # 撤去を確認
 
 ```bash
 rm -rf <worktree>/node_modules
-git -C <main-worktree> worktree remove .claude/worktrees/<name>
+git -C <main-worktree> worktree remove <worktree>
 ```
 
 **移行トラップ（`node_modules` 追跡解除の前後）。** かつて `node_modules` は絶対パスを指す symlink として
