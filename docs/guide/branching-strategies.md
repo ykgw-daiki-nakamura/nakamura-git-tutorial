@@ -1,17 +1,17 @@
 # ブランチ戦略の使い分け
 
-[GitHub Flow](./github-flow) / [Git Flow](./other-flows#git-flow) / [GitLab Flow](./other-flows#gitlab-flow) / [Microsoft Release Flow](./other-flows#microsoft-release-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
+[GitHub Flow](./github-flow) / [Git Flow](./other-flows#git-flow) / [GitLab Flow](./other-flows#gitlab-flow) は、どれが「正解」ということはなく、**プロダクトの性質とデプロイの仕方**によって向き不向きが決まります。このページは、自チームに合った戦略を選ぶための判断材料をまとめます。
 
 ## 一覧で比較
 
-| 観点 | GitHub Flow | GitLab Flow | Git Flow | Microsoft Release Flow |
-| --- | --- | --- | --- | --- |
-| 常設ブランチ | `main` のみ | `main` ＋環境/リリース | `main` ＋ `develop` | `main` ＋長命 `release` |
-| ブランチの種類 | 少 | 中 | 多 | 中 |
-| 学習コスト | 低 | 中 | 高 | 中 |
-| デプロイ形態 | 継続的デプロイ | 継続的〜環境昇格 | 計画的リリース | スプリント単位のリリース |
-| 複数バージョン保守 | 苦手（リリースブランチ運用で補完） | 得意 | 得意 | 得意（main-first + cherry-pick） |
-| 向くプロダクト | Web サービス／SaaS | 環境が複数ある Web | パッケージ／モバイル／組込 | 大規模チーム／定期リリース |
+| 観点 | GitHub Flow | GitLab Flow | Git Flow |
+| --- | --- | --- | --- |
+| 常設ブランチ | `main` のみ | `main` ＋環境/リリース | `main` ＋ `develop` |
+| ブランチの種類 | 少 | 中 | 多 |
+| 学習コスト | 低 | 中 | 高 |
+| デプロイ形態 | 継続的デプロイ | 継続的〜環境昇格 | 計画的リリース |
+| 複数バージョン保守 | 苦手（リリースブランチ運用で補完） | 得意（main-first + cherry-pick） | 得意 |
+| 向くプロダクト | Web サービス／SaaS | 環境が複数ある Web／定期リリース | パッケージ／モバイル／組込 |
 
 ## 判断フローチャート
 
@@ -23,7 +23,6 @@ flowchart TD
     C -->|いいえ<br/>main→即デプロイ| E["GitHub Flow"]
     C -->|はい<br/>staging/production| F["GitLab Flow<br/>(環境ブランチ)"]
     D -->|はい<br/>バージョン番号を明示| G["Git Flow"]
-    D -->|スプリント単位で定期リリース<br/>大規模チーム| I["Microsoft<br/>Release Flow"]
     D -->|ゆるやか<br/>安定ブランチで十分| H["GitLab Flow<br/>(リリースブランチ)"]
 ```
 
@@ -43,7 +42,7 @@ flowchart TD
 
 ### 大規模チームで定期リリースしつつ複数版を保守する
 
-**[Microsoft Release Flow](./other-flows#microsoft-release-flow)** が向きます。GitHub Flow を土台に、リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。命名規則やブランチフォルダ強制で大人数の運用を機械的に揃えたいチームに向きます。
+**[GitLab Flow](./other-flows#gitlab-flow)（リリースブランチ）** が向きます。リリースを**長命な `release` ブランチ**で表し、修正は **main-first + cherry-pick** で各版へ配ります。ブランチ命名やレビューを機械的に統一したい大人数のチームでも、運用を揃えやすくなります。
 
 ## 戦略を足すきっかけ
 
@@ -58,6 +57,6 @@ flowchart TD
 ## 関連ページ
 
 - [GitHub Flow](./github-flow)
-- [他のブランチ戦略（Git Flow / GitLab Flow / Release Flow）](./other-flows)
+- [他のブランチ戦略（Git Flow / GitLab Flow）](./other-flows)
 - [複数バージョンの保守（リリースブランチ運用）](./release-branches)
 - [リリースとバージョン管理](./release)
