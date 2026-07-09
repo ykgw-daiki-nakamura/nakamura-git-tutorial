@@ -39,7 +39,7 @@ outline: [2, 3]
 
 #### 拡張ポイントの例
 
-予測後処理フック（`ForecastPostProcessor`。.NET では命名規約に従い `IForecastPostProcessor`）を題材に、コードとしての形を示す。示すのは次の 3 つで、実装言語が変わっても役割の対応は変わらない。
+結果後処理フック（`ResultPostProcessor`。.NET では命名規約に従い `IResultPostProcessor`）を題材に、コードとしての形を示す。示すのは次の 3 つで、実装言語が変わっても役割の対応は変わらない。
 
 1. コアが公開する拡張ポイントの interface
 2. 下流リポジトリに置く顧客実装
@@ -50,22 +50,22 @@ outline: [2, 3]
 ::: code-group
 
 ```csharp [.NET]
-// ── コアリポジトリ: Product.Core/Extensibility/IForecastPostProcessor.cs
+// ── コアリポジトリ: Product.Core/Extensibility/IResultPostProcessor.cs
 namespace Product.Core.Extensibility;
 
 // 拡張ポイントの interface は公開 API。破壊的変更は MAJOR でのみ行う。
-public interface IForecastPostProcessor
+public interface IResultPostProcessor
 {
-    ForecastResult Process(ForecastResult result, ForecastContext context);
+    ProcessingResult Process(ProcessingResult result, ProcessingContext context);
 }
 
-// ── 下流リポジトリ product-ext-acme: src/AcmeForecastPostProcessor.cs
-public sealed class AcmeForecastPostProcessor : IForecastPostProcessor
+// ── 下流リポジトリ product-ext-acme: src/AcmeResultPostProcessor.cs
+public sealed class AcmeResultPostProcessor : IResultPostProcessor
 {
     private const double CorrectionBias = 0.03;
 
-    public ForecastResult Process(ForecastResult result, ForecastContext context)
-        => result with { Value = result.Value * context.SeasonalityFactor + CorrectionBias };
+    public ProcessingResult Process(ProcessingResult result, ProcessingContext context)
+        => result with { Value = result.Value * context.ScaleFactor + CorrectionBias };
 }
 
 // ── 下流リポジトリ product-ext-acme: src/AcmeExtensionModule.cs
@@ -73,25 +73,25 @@ public sealed class AcmeForecastPostProcessor : IForecastPostProcessor
 public sealed class AcmeExtensionModule : IExtensionModule
 {
     public void Register(IServiceCollection services)
-        => services.AddSingleton<IForecastPostProcessor, AcmeForecastPostProcessor>();
+        => services.AddSingleton<IResultPostProcessor, AcmeResultPostProcessor>();
 }
 ```
 
 ```ts [TypeScript]
-// ── コアリポジトリ: packages/core/src/extensibility/forecast-post-processor.ts
+// ── コアリポジトリ: packages/core/src/extensibility/result-post-processor.ts
 // 拡張ポイントの interface は公開 API。破壊的変更は MAJOR でのみ行う。
-export interface ForecastPostProcessor {
-  process(result: ForecastResult, context: ForecastContext): ForecastResult;
+export interface ResultPostProcessor {
+  process(result: ProcessingResult, context: ProcessingContext): ProcessingResult;
 }
 
-// ── 下流リポジトリ product-ext-acme: src/acme-forecast-post-processor.ts
-import type { ForecastContext, ForecastPostProcessor, ForecastResult } from "@product/core";
+// ── 下流リポジトリ product-ext-acme: src/acme-result-post-processor.ts
+import type { ProcessingContext, ProcessingResult, ResultPostProcessor } from "@product/core";
 
 const CORRECTION_BIAS = 0.03;
 
-export class AcmeForecastPostProcessor implements ForecastPostProcessor {
-  process(result: ForecastResult, context: ForecastContext): ForecastResult {
-    return { ...result, value: result.value * context.seasonalityFactor + CORRECTION_BIAS };
+export class AcmeResultPostProcessor implements ResultPostProcessor {
+  process(result: ProcessingResult, context: ProcessingContext): ProcessingResult {
+    return { ...result, value: result.value * context.scaleFactor + CORRECTION_BIAS };
   }
 }
 
@@ -100,7 +100,7 @@ export class AcmeForecastPostProcessor implements ForecastPostProcessor {
 import type { ExtensionRegistry } from "@product/core";
 
 export default function register(registry: ExtensionRegistry): void {
-  registry.forecastPostProcessors.register(new AcmeForecastPostProcessor());
+  registry.resultPostProcessors.register(new AcmeResultPostProcessor());
 }
 ```
 
@@ -109,23 +109,23 @@ export default function register(registry: ExtensionRegistry): void {
 from typing import Protocol
 
 # 拡張ポイントの interface は公開 API。破壊的変更は MAJOR でのみ行う。
-class ForecastPostProcessor(Protocol):
-    def process(self, result: ForecastResult, context: ForecastContext) -> ForecastResult: ...
+class ResultPostProcessor(Protocol):
+    def process(self, result: ProcessingResult, context: ProcessingContext) -> ProcessingResult: ...
 
-# ── 下流リポジトリ product-ext-acme: src/forecast_postprocess_ext.py
+# ── 下流リポジトリ product-ext-acme: src/result_postprocess_ext.py
 from dataclasses import replace
 
 CORRECTION_BIAS = 0.03
 
-class AcmeForecastPostProcessor:
-    def process(self, result: ForecastResult, context: ForecastContext) -> ForecastResult:
-        return replace(result, value=result.value * context.seasonality_factor + CORRECTION_BIAS)
+class AcmeResultPostProcessor:
+    def process(self, result: ProcessingResult, context: ProcessingContext) -> ProcessingResult:
+        return replace(result, value=result.value * context.scale_factor + CORRECTION_BIAS)
 
 # ── 下流リポジトリ product-ext-acme: pyproject.toml
 # コアは起動時にこの entry point group を走査し、実装を解決する。
 #
-#   [project.entry-points."product.forecast_post_processor"]
-#   acme = "forecast_postprocess_ext:AcmeForecastPostProcessor"
+#   [project.entry-points."product.result_post_processor"]
+#   acme = "result_postprocess_ext:AcmeResultPostProcessor"
 ```
 
 :::
@@ -176,14 +176,14 @@ flowchart LR
 | 要求 | 内容 | Tier 判定 |
 | --- | --- | --- |
 | 要求 A | 出力帳票へのロゴ表示と、閾値超過時の通知先の追加 | **Tier 1**（ロゴ・閾値・通知先はいずれもパラメータ。構成管理側に Acme 設定として保持し、成果物は共通。コード変更なし） |
-| 要求 B | 顧客固有の補正ロジックを予測処理へ組み込む | **要検討 → Tier 2**（設定では表現できない計算ロジック。まずコア汎用機能化を検討し、汎用化の見込みがない場合のみ Tier 2 とする） |
+| 要求 B | 顧客固有の補正ロジックを処理結果へ組み込む | **要検討 → Tier 2**（設定では表現できない計算ロジック。まずコア汎用機能化を検討し、汎用化の見込みがない場合のみ Tier 2 とする） |
 | 要求 C | 顧客の社内システムからの実績データ取り込み | **Tier 2**（既存のデータ取り込み拡張ポイントの Acme 実装として記述） |
 
 コード実装が要るのは要求 B・C だけなので、その Tier 2 実装手順を示す。
 
 #### Tier 2 の実装手順（要求 B・C）
 
-1. 必要な拡張ポイントがコアに存在するか確認する。データ取り込み用フック（要求 C）は既存とする。予測後処理用フック（要求 B）が未提供であれば、まず**コアへ汎用の拡張ポイントを追加する PR** を `main` に出す（全顧客が使える口であり、通常の開発フロー。承認は「カスタマイズ階層（Tier）」に従う）。
+1. 必要な拡張ポイントがコアに存在するか確認する。データ取り込み用フック（要求 C）は既存とする。結果後処理用フック（要求 B）が未提供であれば、まず**コアへ汎用の拡張ポイントを追加する PR** を `main` に出す（全顧客が使える口であり、通常の開発フロー。承認は「カスタマイズ階層（Tier）」に従う）。
 2. 拡張ポイントが揃ったら、Acme 専用の下流リポジトリ（`product-ext-acme`、コアの downstream）を作成し、各フックの Acme 実装と契約テストを配置する。このリポジトリにも本規約のブランチ運用（trunk + PR + Rulesets）を適用する。
 
 ::: code-group
@@ -191,7 +191,7 @@ flowchart LR
 ```text [.NET]
 product-ext-acme/                       # Acme 下流リポジトリ（downstream）
   src/
-    AcmeForecastPostProcessor.cs        # 予測後処理フックの実装（要求B）
+    AcmeResultPostProcessor.cs          # 結果後処理フックの実装（要求B）
     AcmeExternalIngestConnector.cs      # データ取り込みフックの実装（要求C）
     AcmeExtensionModule.cs              # 拡張ポイントへの登録（DI コンテナ）
   tests/
@@ -202,7 +202,7 @@ product-ext-acme/                       # Acme 下流リポジトリ（downstrea
 ```text [TypeScript]
 product-ext-acme/                       # Acme 下流リポジトリ（downstream）
   src/
-    acme-forecast-post-processor.ts     # 予測後処理フックの実装（要求B）
+    acme-result-post-processor.ts       # 結果後処理フックの実装（要求B）
     acme-external-ingest-connector.ts   # データ取り込みフックの実装（要求C）
     register.ts                         # 拡張ポイントへの登録（registry）
   tests/
@@ -213,7 +213,7 @@ product-ext-acme/                       # Acme 下流リポジトリ（downstrea
 ```text [Python]
 product-ext-acme/                       # Acme 下流リポジトリ（downstream）
   src/
-    forecast_postprocess_ext.py         # 予測後処理フックの実装（要求B）
+    result_postprocess_ext.py           # 結果後処理フックの実装（要求B）
     external_ingest_connector.py        # データ取り込みフックの実装（要求C）
   pyproject.toml                        # 拡張ポイントへの登録（entry point）
   tests/
