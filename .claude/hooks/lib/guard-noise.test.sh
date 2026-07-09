@@ -55,6 +55,14 @@ run "区切り |# コメント内の push は素通り"     guard-branch.sh 0 "$
 run "区切り '&&#' コメント内の push は素通り"  guard-branch.sh 0 "$(printf 'echo hi &&# %s %s\ntrue' "$G" "$P")"
 run "区切り (# コメント内の push は素通り"     guard-branch.sh 0 "$(printf '(# %s %s\necho x )' "$G" "$P")"
 
+echo "== guard-branch (#279): リモートブランチ削除は削除対象で判定する =="
+run "main 上で作業ブランチのリモート削除は許可"  guard-branch.sh 0 "$G -C $TD $P origin --delete chore/foo"
+run "main 上で -d 短縮形の削除も許可"            guard-branch.sh 0 "$G -C $TD $P -d origin chore/foo"
+run "main 上で保護ブランチの削除は阻止"          guard-branch.sh 2 "$G -C $TD $P origin --delete main"
+run "main 上で refs/heads/main の削除も阻止"     guard-branch.sh 2 "$G -C $TD $P origin --delete refs/heads/main"
+run "main 上の通常 push は引き続き阻止"          guard-branch.sh 2 "$G -C $TD $P -u origin chore/foo"
+run "main 上の bare push は引き続き阻止"         guard-branch.sh 2 "$G -C $TD $P origin main"
+
 echo "== guard-commit =="
 run "heredoc 本文の commit は素通り"         guard-commit.sh 0 "$HD"
 run "引用内の commit は素通り"               guard-commit.sh 0 "echo \"$G $C -m bad\""

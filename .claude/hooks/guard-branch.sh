@@ -62,6 +62,53 @@ if [ -f "$checks" ]; then
 fi
 [ -n "$protected" ] || protected="main"
 
+is_protected() {
+  local name="$1" p
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    [ "$name" = "$p" ] && return 0
+  done <<EOF
+$protected
+EOF
+  return 1
+}
+
+# `git push --delete <remote> <ref>...` はブランチの削除であって「保護ブランチへの直接 push」
+# ではない。現在ブランチではなく **削除対象** で判定し、保護ブランチでなければ許可する
+# （squash マージ後に残ったリモートブランチを main から片付けられるようにする）。
+# 削除対象を特定できない場合は下の従来判定にフォールバックする（安全側）。
+if [ "$op" = "push" ]; then
+  # 種別はスケルトンで判定済み。ブランチ名の抽出は原文（$cmd）から行う。
+  # 後続の連結コマンド（&& / ; / |）は push の引数ではないので切り落とす。
+  args="${cmd#*push}"
+  args="${args%%&&*}"; args="${args%%;*}"; args="${args%%|*}"
+  read -ra _toks <<<"$args"
+  is_delete=0
+  refs=()
+  for t in ${_toks[@]+"${_toks[@]}"}; do
+    case "$t" in
+      --delete|-d) is_delete=1 ;;
+      -*) : ;;               # その他のオプションは対象外
+      *) refs+=("$t") ;;     # refs[0] はリモート名、以降が refspec
+    esac
+  done
+  if [ "$is_delete" -eq 1 ] && [ "${#refs[@]}" -ge 2 ]; then
+    for r in "${refs[@]:1}"; do
+      r="${r%\"}"; r="${r#\"}"; r="${r%\'}"; r="${r#\'}"   # 引用符を剥がす
+      r="${r##*:}"                                          # `src:dst` の dst が削除対象
+      r="${r#refs/heads/}"
+      if is_protected "$r"; then
+        {
+          echo "保護ブランチ '$r' の削除は禁止です。"
+          echo "削除してよいのは作業用ブランチだけです（例: git push origin --delete feat/xxx）。"
+        } >&2
+        exit 2
+      fi
+    done
+    exit 0   # 削除対象はすべて非保護ブランチ → 現在ブランチが main でも許可
+  fi
+fi
+
 # 現在ブランチが保護対象なら阻止
 while IFS= read -r p; do
   [ -n "$p" ] || continue
