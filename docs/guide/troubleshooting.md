@@ -76,7 +76,8 @@ git stash pop
 リモートに自分の手元にない変更があるサインです。まず取り込みます。
 
 ```bash
-git pull --rebase
+git fetch origin
+git merge origin/main
 # コンフリクトがあれば解決して
 git push
 ```
@@ -92,7 +93,7 @@ git push
 | 公開済みコミットを打ち消す | `git revert <commit>` |
 | 作業を一時退避 | `git stash` / `git stash pop` |
 | 消したコミット/ブランチを復元 | `git reflog` から救出 |
-| push が rejected | `git pull --rebase` してから push |
+| push が rejected | `git fetch origin` → `git merge origin/main` してから push |
 
 困ったら、まず `git status` と `git reflog` で現状を把握することが解決への近道です。
 

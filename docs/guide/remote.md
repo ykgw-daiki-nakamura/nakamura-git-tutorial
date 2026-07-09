@@ -56,12 +56,12 @@ git push
 | コマンド | 動作 |
 | --- | --- |
 | `git fetch` | リモートの変更を**取得するだけ**（作業ツリーは変わらない） |
-| `git pull` | `fetch` + `merge`（または `rebase`）を一度に行う |
+| `git pull` | `fetch` + `merge` を一度に行う |
 
 ```mermaid
 flowchart LR
     OR[(origin)] -->|"① fetch"| RT["リモート追跡ブランチ<br/>origin/main"]
-    RT -->|"② merge / rebase"| LB[ローカル main]
+    RT -->|"② merge"| LB[ローカル main]
     OR -->|"pull = ① + ②"| LB
 ```
 
