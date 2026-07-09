@@ -109,3 +109,15 @@ gitGraph
 2. `main` → `release/*` への反映は **cherry-pick のみ**とする。merge / rebase による取り込みは禁止する。
 3. `release/*` → `main` のマージは禁止する（upstream first の徹底）。
 4. PR は小さく保つ。大きくなる場合は feature flag を活用して分割する（feature flag は[現時点では利用を見送り検討中](./versioning#feature-flag-運用)）。
+
+### PR タイトル規約
+
+squash merge では **PR タイトルがそのまま `main` のコミットメッセージ**になる。加えて、GitHub の自動リリースノートはマージ済み PR のタイトルを見出しとして列挙する（[リリースとデプロイ](./release#github-release-運用規約)）。したがって PR タイトルは `main` の履歴とリリースノートの双方に残る文字列であり、次を規約とする。
+
+1. PR タイトルは **Conventional Commits**（`<type>(<scope>): <要約>`）に準拠させる。type は `feat` / `fix` / `docs` / `refactor` / `test` / `perf` / `build` / `ci` / `chore` を用いる。
+2. 後方互換性を壊す変更は type の直後に `!` を付ける（例: `feat(api)!: ...`）。破壊的変更の内容は PR 本文に記載する。
+3. **CI で PR タイトルの書式を検証**し、非準拠の PR はマージ不可とする（required status check に含める）。
+4. 要約は変更内容を利用者視点で具体的に書く。`修正` `対応` のような内容を持たない要約は認めない（リリースノートの見出しとして読まれるため）。
+5. squash merge 実行時、GitHub が既定で本文へ差し込む枝側のコミット一覧は削除し、PR 本文の要約に置き換える。
+
+枝（`feature/*` / `fix/*`）内の個々のコミットメッセージも Conventional Commits に揃えることを推奨するが、squash により `main` へは残らないため必須とはしない。

@@ -28,7 +28,7 @@
 
 ### Conventional Commits と対応している
 
-[Conventional Commits](https://www.conventionalcommits.org/ja/)（`type(scope): 要約`）は、そのまま SemVer に対応します。**普段書いているコミット種別が、次に上げるべき桁を教えてくれます。**
+[Conventional Commits](./commits#conventional-commits)（`type(scope): 要約`）は、そのまま SemVer に対応します。**普段書いているコミット種別が、次に上げるべき桁を教えてくれます。**
 
 | コミット | 上がる桁 |
 | --- | --- |
