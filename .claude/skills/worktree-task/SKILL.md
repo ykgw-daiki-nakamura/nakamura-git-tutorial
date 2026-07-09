@@ -87,6 +87,9 @@ git worktree list   # 作成を確認
   （未登録のリポジトリで使う場合は先に `.gitignore` へ追加しておく）。
 - 以降のファイル編集・`git` 操作は **すべてこの worktree ディレクトリ内** で行う
   （`git -C <worktree> ...` またはそのパス配下のファイルを編集）。メインの作業ツリーは触らない。
+- **`git -C` に渡すパスはシェル変数ではなくリテラルで書く。** `guard-branch` / `guard-secrets` は
+  コマンド文字列から対象作業ツリーを**静的に**解決する。`git -C "$w" commit` のように変数を使うと
+  worktree を解決できず、「保護ブランチ上での直接 commit」と誤判定してブロックされる。
 
 **依存（`node_modules`）は通常セットアップ不要。** worktree は `.claude/worktrees/<name>`、つまり
 メイン作業ツリーの**内側**にあるため、Node のモジュール解決も `npm run` の PATH 構築も親ディレクトリを
@@ -99,6 +102,10 @@ git worktree list   # 作成を確認
   （CI は `npm ci` で lockfile から入れ直すため気付けるが、ローカルでは気付けない）。
 - worktree 内で `npm install` すると `node_modules` の実体ができる。`.gitignore` 済みでコミット対象には
   ならないが、**`git worktree remove` の前に削除が必要**になることがある（下記「7. 後片付け」）。
+- 親を遡るのは Node のモジュール解決と `npm run` の PATH 構築であって、パスそのものではない。
+  worktree の cwd で `node_modules/.bin/<tool>` と**相対パスで直叩きすると解決できない**。
+  `npm run <script>` か `npx <tool>` を使う（`checks.json` の `onEdit` は `.bin` を相対パスで書くが、
+  フック本体がリポジトリ直下へ `cd` してから実行するので影響しない）。
 
 ### 4. worktree 内で作業
 
