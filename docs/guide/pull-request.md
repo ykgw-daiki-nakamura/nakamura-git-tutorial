@@ -111,7 +111,7 @@ gitGraph
 | **Rebase and merge** | コミットを一直線に追加（マージコミットなし） | 直線的な履歴を保ちつつ各コミットを残したい |
 
 ::: tip 何を基準に選ぶか
-判断軸は 3 つあります。**`main` の履歴に何を残したいか**（枝の作業コミットまで残すなら Merge commit、機能単位の 1 コミットに揃えるなら Squash）、**あとで履歴を追う単位**（PR 単位で `git log` を読むなら Squash、個々のコミットを `git bisect` で辿るなら Rebase）、そして **linear history を要求するか**（要求するなら Merge commit は使えません）です。ブランチ保護で linear history を必須にしている場合、選べるのは Squash か Rebase に絞られます。
+判断軸は 3 つあります。**`main` の履歴に何を残したいか**（枝の作業コミットまで残すなら Merge commit、機能単位の 1 コミットに揃えるなら Squash）、**あとで履歴を追う単位**（PR 単位で `git log` を読むなら Squash、コミット単位で辿りたいなら Merge commit か Rebase）、そして **linear history を要求するか**（要求するなら Merge commit は使えません）です。ブランチ保護で linear history を必須にしている場合、選べるのは Squash か Rebase に絞られます。
 :::
 
 ## PR タイトルは Conventional Commits に従う
