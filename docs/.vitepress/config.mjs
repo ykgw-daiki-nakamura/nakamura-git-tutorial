@@ -57,15 +57,15 @@ export default withMermaid({
   themeConfig: {
     logo: '/logo.svg',
     nav: [
-      { text: 'ホーム', link: '/' },
-      { text: 'ガイド', link: '/guide/introduction', activeMatch: '^/guide/' },
-      { text: '開発規約', link: '/standards/', activeMatch: '^/standards/' }
+      { text: '🏠 ホーム', link: '/' },
+      { text: '📘 ガイド', link: '/guide/introduction', activeMatch: '^/guide/' },
+      { text: '📐 開発規約', link: '/standards/', activeMatch: '^/standards/' }
     ],
     // パス別サイドバー: ガイドと開発規約でメニューを切り替える
     sidebar: {
       '/guide/': [
         {
-          text: 'はじめに・基礎',
+          text: '🌱 はじめに・基礎',
           items: [
             { text: 'Git / GitHub とは', link: '/guide/introduction' },
             { text: 'Git の基本', link: '/guide/basics' },
@@ -73,7 +73,7 @@ export default withMermaid({
           ]
         },
         {
-          text: 'チーム開発の基本フロー',
+          text: '🤝 チーム開発の基本フロー',
           items: [
             { text: 'コミットとコミットメッセージ', link: '/guide/commits' },
             { text: 'ブランチとマージ', link: '/guide/branching' },
@@ -84,7 +84,7 @@ export default withMermaid({
           ]
         },
         {
-          text: '割り込みとコンフリクトへの対処',
+          text: '🔀 割り込みとコンフリクトへの対処',
           collapsed: true,
           items: [
             { text: 'コンフリクト解決', link: '/guide/conflicts' },
@@ -92,7 +92,7 @@ export default withMermaid({
           ]
         },
         {
-          text: 'ブランチ戦略（発展）',
+          text: '🌿 ブランチ戦略（発展）',
           collapsed: true,
           items: [
             { text: 'ブランチ戦略の使い分け', link: '/guide/branching-strategies' },
@@ -100,7 +100,7 @@ export default withMermaid({
           ]
         },
         {
-          text: 'リリース運用（発展）',
+          text: '🚀 リリース運用（発展）',
           collapsed: true,
           items: [
             { text: 'リリースとバージョン管理', link: '/guide/release' },
@@ -109,7 +109,7 @@ export default withMermaid({
           ]
         },
         {
-          text: '付録',
+          text: '📚 付録',
           items: [
             { text: 'コマンド早見表', link: '/guide/commands' },
             { text: 'トラブルシューティング', link: '/guide/troubleshooting' }
@@ -118,39 +118,39 @@ export default withMermaid({
       ],
       '/standards/': [
         {
-          text: '基本方針',
+          text: '🧭 基本方針',
           items: [
             { text: '概要・基本方針', link: '/standards/' }
           ]
         },
         {
-          text: 'ブランチとバージョン',
+          text: '🌿 ブランチとバージョン',
           items: [
             { text: 'ブランチ運用', link: '/standards/branching' },
             { text: 'バージョン運用', link: '/standards/versioning' }
           ]
         },
         {
-          text: 'リリース・デプロイと障害対応',
+          text: '🚀 リリース・デプロイと障害対応',
           items: [
             { text: 'リリースとデプロイ', link: '/standards/release' },
             { text: '障害対応', link: '/standards/incident' }
           ]
         },
         {
-          text: 'セキュリティ',
+          text: '🔒 セキュリティ',
           items: [
             { text: '依存とサプライチェーン', link: '/standards/supply-chain' }
           ]
         },
         {
-          text: '顧客別カスタマイズ',
+          text: '🎛️ 顧客別カスタマイズ',
           items: [
             { text: '顧客別カスタマイズ', link: '/standards/customization' }
           ]
         },
         {
-          text: '禁止事項・用語（参照）',
+          text: '📖 禁止事項・用語（参照）',
           items: [
             { text: '禁止事項', link: '/standards/anti-patterns' },
             { text: '用語と背景', link: '/standards/glossary' }
