@@ -38,6 +38,10 @@ jobs:
       - name: Build with VitePress
         run: npm run docs:build
 
+      # 手書きのページ内アンカーが実 HTML の id と一致するかを検証（docs:build の後に実行）
+      - name: Check in-page anchors
+        run: npm run check:anchors
+
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 10
