@@ -1,4 +1,6 @@
-node_modules/
+# 末尾スラッシュを付けない: 付けるとディレクトリにしかマッチせず、
+# node_modules という名前の symlink が追跡対象に入り込む
+node_modules
 docs/.vitepress/dist/
 docs/.vitepress/cache/
 
