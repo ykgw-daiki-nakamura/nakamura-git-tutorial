@@ -118,7 +118,7 @@ gitGraph
 1. `feature/*` → `main` のマージ方式は **squash merge** とする（merge commit / rebase merge はリポジトリ設定で無効化する）。
 2. `main` → `release/*` への反映は **cherry-pick のみ**とする。merge / rebase による取り込みは禁止する。
 3. `release/*` → `main` のマージは禁止する（upstream first の徹底）。
-4. PR は小さく保つ。大きくなる場合は feature flag を活用して分割する（feature flag は[現時点では利用を見送り検討中](./versioning#feature-flag-運用)）。
+4. PR は小さく保つ。大きくなる場合は分割し、未完成の部分は到達不能な状態で `main` へ入れる。隔離手段は dark launch / 非公開 API としての先行マージ / branch by abstraction の 3 つで、適用条件は[バージョン運用](./versioning#導入までの暫定規約)に定める。long-lived な feature ブランチへ退避してはならない。feature flag による分割は[現時点では利用を見送り検討中](./versioning#feature-flag-運用)であり、導入後に上記を置き換える。
 
 ### PR タイトル規約
 
