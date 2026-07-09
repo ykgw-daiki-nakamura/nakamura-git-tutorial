@@ -79,12 +79,14 @@ EOF
 # 削除対象を特定できない場合は下の従来判定にフォールバックする（安全側）。
 if [ "$op" = "push" ]; then
   # 種別はスケルトンで判定済み。ブランチ名の抽出は原文（$cmd）から行う。
-  # `git [-C <dir>] push` の形にマッチさせ、その直後だけを引数として切り出す。
-  # 単に最初の "push" で切ると、`-C /path/with-push/...` や前段コマンドの "push" に反応して
-  # 引数を誤って切り出し、--delete の判定に失敗して従来判定へ落ちてしまう。
+  # `git [-C <dir>] push` の形にマッチさせ、その直後を **正規表現でキャプチャして** 取り出す。
+  # 単に最初の "push" で切ると、`-C /path/with-push/...` や前段コマンドの "push" に反応する。
+  # また `${cmd#*"$match"}` はパターンが glob 解釈されるため、`-C` のパスに `[` `*` `?` が
+  # 含まれると前方一致に失敗する。BASH_REMATCH から直接取り出して glob 依存を避ける。
+  # gitpfx は 2 つのグループを持つので、push 以降のキャプチャは 3・4 番目になる。
   args=""
-  if [[ "$cmd" =~ ${gitpfx}[[:space:]]+push([[:space:]]|$) ]]; then
-    args="${cmd#*"${BASH_REMATCH[0]}"}"
+  if [[ "$cmd" =~ ${gitpfx}[[:space:]]+push([[:space:]]+(.*))?$ ]]; then
+    args="${BASH_REMATCH[4]}"
   fi
   # 後続の連結コマンド（&& / ; / |）は push の引数ではないので切り落とす。
   args="${args%%&&*}"; args="${args%%;*}"; args="${args%%|*}"

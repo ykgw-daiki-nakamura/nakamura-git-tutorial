@@ -64,6 +64,10 @@ run "前段コマンドに push の語があっても削除は許可" guard-bran
 mkdir -p "$TD/push-sub"
 run "-C のパスに push を含んでも削除は許可"       guard-branch.sh 0 "$G -C $TD/push-sub $P origin --delete chore/foo"
 run "-C のパスに push を含んでも保護削除は阻止"   guard-branch.sh 2 "$G -C $TD/push-sub $P origin --delete main"
+# 引数の切り出しは glob に依存しない（`${cmd#*pat}` だとパスの [ ] * ? で前方一致に失敗する）
+mkdir -p "$TD/gl[ob]*sub"
+run "-C のパスに glob 文字を含んでも削除は許可"   guard-branch.sh 0 "$G -C $TD/gl[ob]*sub $P origin --delete chore/foo"
+run "-C のパスに glob 文字を含んでも保護削除は阻止" guard-branch.sh 2 "$G -C $TD/gl[ob]*sub $P origin --delete main"
 run "main 上で保護ブランチの削除は阻止"          guard-branch.sh 2 "$G -C $TD $P origin --delete main"
 run "main 上で -- 終端付きの保護ブランチ削除は阻止" guard-branch.sh 2 "$G -C $TD $P origin --delete -- main"
 run "main 上で refs/heads/main の削除も阻止"     guard-branch.sh 2 "$G -C $TD $P origin --delete refs/heads/main"
