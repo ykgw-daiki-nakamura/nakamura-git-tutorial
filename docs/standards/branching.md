@@ -114,10 +114,11 @@ gitGraph
 
 squash merge では **PR タイトルがそのまま `main` のコミットメッセージ**になる。加えて、GitHub の自動リリースノートはマージ済み PR のタイトルを見出しとして列挙する（[リリースとデプロイ](./release#github-release-運用規約)）。したがって PR タイトルは `main` の履歴とリリースノートの双方に残る文字列であり、次を規約とする。
 
-1. PR タイトルは **Conventional Commits**（`<type>(<scope>): <要約>`）に準拠させる。type は `feat` / `fix` / `docs` / `refactor` / `test` / `perf` / `build` / `ci` / `chore` を用いる。
-2. 後方互換性を壊す変更は type の直後に `!` を付ける（例: `feat(api)!: ...`）。破壊的変更の内容は PR 本文に記載する。
-3. **CI で PR タイトルの書式を検証**し、非準拠の PR はマージ不可とする（required status check に含める）。
-4. 要約は変更内容を利用者視点で具体的に書く。`修正` `対応` のような内容を持たない要約は認めない（リリースノートの見出しとして読まれるため）。
-5. squash merge 実行時、GitHub が既定で本文へ差し込む枝側のコミット一覧は削除し、PR 本文の要約に置き換える。
+1. PR タイトルは **Conventional Commits**（`<type>(<scope>): <要約>`）に準拠させる。`<scope>` は任意で、省略してよい。
+2. 許可する type は `feat` / `fix` / `docs` / `chore` / `ci` / `build` / `refactor` / `test` / `perf` / `style` / `revert` とする。この一覧は設定ファイル（本リポジトリでは `.claude/checks.json` の `commit.conventional.types`）を単一の情報源とし、CI の検証スクリプトと本規約はそこを参照する。
+3. 後方互換性を壊す変更は type の直後に `!` を付ける（例: `feat(api)!: ...`）。破壊的変更の内容は PR 本文に記載する。
+4. **CI で PR タイトルの書式を検証**し、非準拠の PR はマージ不可とする（required status check に含める）。
+5. 要約は変更内容を利用者視点で具体的に書く。`修正` `対応` のような内容を持たない要約は認めない（リリースノートの見出しとして読まれるため）。
+6. squash merge 時のコミットメッセージは**リポジトリ設定で固定**し、マージ実行者の手作業に依存させない。GitHub の Settings → General → Pull Requests で、既定のタイトルを **Pull request title**（API: `squash_merge_commit_title: PR_TITLE`）、既定の本文を **Pull request description**（API: `squash_merge_commit_message: PR_BODY`）に設定する。既定値のままだと枝側のコミット一覧が本文へ差し込まれ、`main` の履歴に `wip` などの作業過程が残る。
 
 枝（`feature/*` / `fix/*`）内の個々のコミットメッセージも Conventional Commits に揃えることを推奨するが、squash により `main` へは残らないため必須とはしない。
