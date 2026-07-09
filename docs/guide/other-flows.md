@@ -42,7 +42,7 @@ gitGraph
 ```
 
 - **機能開発**は `feature/*` で行い、完成したら `develop` へマージする。
-- リリースが近づいたら `develop` から `release/*` を切り、**そのブランチ上でのみ**バグ修正やバージョン番号の確定を行う（新機能は入れない）。
+- リリースが近づいたら `develop` から `release/*` を切り、**そのブランチ上でのみ**バグを修正し、バージョン番号を確定する（新機能は入れない）。
 - リリース確定時に `release/*` を `main` へマージして**タグを打ち**、同じ内容を `develop` へも戻す。
 
 ### hotfix（緊急修正）
@@ -77,7 +77,7 @@ gitGraph
   - ブランチ数が多く運用が複雑。**継続的デプロイ（CD）とは相性が悪い**。
   - `develop` と `main` の二重マージなど手順が煩雑で、長命ブランチはコンフリクトを招きやすい。
 
-::: tip Git Flow は選択肢の一つ
+::: tip Git Flow は選択肢の 1 つ
 Git Flow が持ち込む `develop` / `release` の常設ブランチは、計画的なリリースと安定化期間のために要るものです。継続的にデプロイしていて出荷済みの版を保守しないなら、その構造は使われないまま手順だけが残ります。どの戦略を選ぶべきかは [ブランチ戦略の使い分け](./branching-strategies) を参照してください。
 :::
 
@@ -141,7 +141,7 @@ gitGraph
 
 ## Microsoft Release Flow
 
-**Microsoft Release Flow**（以下このページでは Release Flow）は、Microsoft（Azure DevOps チーム）が公開しているブランチ運用のガイダンスです。[GitHub Flow](./github-flow) をベースにしつつ、**大規模チームで定期リリースと複数バージョンの保守を回す**ための工夫を加えた「型」で、GitHub Flow / [Git Flow](#git-flow) / [GitLab Flow](#gitlab-flow) と並ぶ選択肢の一つです。
+**Microsoft Release Flow**（以下このページでは Release Flow）は、Microsoft（Azure DevOps チーム）が公開しているブランチ運用のガイダンスです。[GitHub Flow](./github-flow) をベースにしつつ、**大規模チームで定期リリースと複数バージョンの保守を回す**ための工夫を加えた「型」で、GitHub Flow / [Git Flow](#git-flow) / [GitLab Flow](#gitlab-flow) と並ぶ選択肢の 1 つです。
 
 出典: [Microsoft の Git 分岐ガイダンス（Release Flow）](https://learn.microsoft.com/ja-jp/azure/devops/repos/git/git-branching-guidance)
 
