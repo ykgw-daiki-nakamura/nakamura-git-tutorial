@@ -219,7 +219,7 @@ docs(guide): ブランチ命名規則の例を追加
 
 **2. `ignore-scripts`**（[.npmrc](.npmrc)）。インストール時のライフサイクルスクリプト（`preinstall` / `install` / `postinstall` / `prepare`）を実行しない。悪性パッケージが任意コードを走らせる主要な経路がここなので、取り込んでしまってもインストール段階では実行されない。cooldown が取りこぼす推移的依存に対しては、この層が防波堤になる。
 
-- 本リポジトリの依存でレジストリ経由の install スクリプトを持つのは **esbuild（`postinstall: node install.js`）だけ**。バイナリは `optionalDependencies` の `@esbuild/<platform>` から入るため、飛ばしても `docs:build` は通る。
+- 本リポジトリの依存で install スクリプトを持つ（lockfile の `hasInstallScript`）のは **esbuild と fsevents の 2 つ**。esbuild（`postinstall: node install.js`）はバイナリを `optionalDependencies` の `@esbuild/<platform>` から入れるため飛ばしても `docs:build` は通る。fsevents は darwin 限定の optional で、macOS の dev サーバーのファイル監視を速くするだけ（入らなければポーリングにフォールバックし、CI の linux ではそもそも入らない）。
 - 明示的に呼ぶ `npm run <script>` は影響を受けない。一時的に必要なら `npm install --ignore-scripts=false` か `npm rebuild <pkg>`。
 - 将来 `postinstall` が本当に要る依存を入れると**ビルドが目に見えて壊れる**ので、黙って通り過ぎることはない。
 
