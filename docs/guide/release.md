@@ -88,30 +88,25 @@ gitGraph
     commit tag: "v1.2.0"
     checkout main
     commit id: "1.3の作業"
+    commit id: "緊急修正(main-first)" type: HIGHLIGHT
     checkout release/1.2
-    branch hotfix/1.2.1
-    checkout hotfix/1.2.1
-    commit id: "緊急修正"
-    checkout release/1.2
-    merge hotfix/1.2.1 tag: "v1.2.1"
-    checkout main
-    merge release/1.2 id: "修正をmainへ戻す"
+    commit id: "cherry-pick→1.2" tag: "v1.2.1"
 ```
 
 流れは次のとおりです。
 
 1. **リリース時に `release/1.2` を切る**——出荷したバージョンを保守するための線を残す。ここで `v1.2.0` を打つ。
 2. `main` は次の機能開発（`1.3`）へ進む。
-3. **本番でバグが見つかったら** `release/1.2` から `hotfix/1.2.1` を切って直す。
-4. 修正を `release/1.2` へマージし、**`v1.2.1` を打って Release**・デプロイする。
-5. **`release/1.2` を `main` へマージし戻す**——`main` にも同じ修正を反映し、取りこぼしを防ぐ。
+3. **本番でバグが見つかったら、まず `main` で直す**（**main-first**）。いつもどおり `fix/*` ブランチを切って PR を出し、`main` へマージする。
+4. その修正コミットを **`release/1.2` へ cherry-pick** する。修正だけを移すので、`main` の未完成な `1.3` の変更は混ざらない。
+5. `release/1.2` に **`v1.2.1` を打って Release**・デプロイする。
 
-::: warning `main` への戻し忘れに注意
-hotfix 方式で最も多い事故が、**修正を `main` へ戻し忘れる**ことです。すると次のリリースで同じバグが復活します。「hotfix は release で直し、必ず `main` へ戻す」までを 1 セットにしてください。
+::: warning 修正は必ず `main` から先に入れる
+逆順（先に `release/1.2` だけ直す）にすると、**`main` への取り込みを忘れて次のリリースで同じバグが復活**します。これが hotfix 運用で最も多い事故です。`main` に入れてから各系列へ配れば、修正が `main` に無い状態がそもそも生まれないので、取りこぼしが構造的に起きません。`release/1.2` を `main` へマージし戻す形は取らず、**修正は `main` → `release/*` の一方向にだけ流します**。
 :::
 
 ::: tip いつ release ブランチが要る？
-継続デプロイ中心の Web サービスなら、多くの場合 release ブランチは不要で、hotfix も「`main` を直して再デプロイ」で済みます。**複数バージョンを並行して保守する**、**出荷後に安定化期間を設ける**——そうした「出荷済みを直し続ける」必要が出てから導入すれば十分です。`develop` / `release` を常設する **Git Flow**、`main` + `release/*` の **GitLab Flow** など、より形式化した運用もあります。有名 OSS が実際に採る**長命なリリースブランチ**運用は [複数バージョンの保守（リリースブランチ運用）](./release-branches) で詳しく扱います。
+出荷済みのバージョンを保守しない継続デプロイ中心の Web サービスなら、release ブランチは要りません。hotfix も「`main` を直して再デプロイ」で完結します。release ブランチが要るのは、**複数バージョンを並行して保守する**とき、または**出荷後に安定化期間を設ける**とき——つまり「出荷済みを直し続ける」必要があるときです。`develop` / `release` を常設する **Git Flow**、`main` + `release/*` の **GitLab Flow** など、より形式化した運用もあります。有名 OSS が実際に採る**長命なリリースブランチ**運用は [複数バージョンの保守（リリースブランチ運用）](./release-branches) で詳しく扱います。
 :::
 
 ## CI と組み合わせる（例）
@@ -139,7 +134,7 @@ on:
 - **マージ・リリース・デプロイは別物**。リリースは「出荷点に印を付ける」こと
 - バージョンは **SemVer**（`MAJOR.MINOR.PATCH`）。**Conventional Commits がどの桁を上げるかを教えてくれる**
 - リリースには**注釈付きタグ**を打ち、**push を忘れない**。**GitHub Release** でノートを公開する
-- 出荷済みバージョンを直すときは **release ブランチ + hotfix**。修正は**必ず `main` へ戻す**
+- 出荷済みバージョンを直すときは **release ブランチ + hotfix**。修正は**必ず `main` から先に入れ**、`release/*` へ cherry-pick する
 
 実際にタグを打って Release を作り、hotfix まで一周する練習は [⑦ タグとリリース](../hands-on/release-lab) で行えます。
 
