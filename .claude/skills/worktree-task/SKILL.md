@@ -192,11 +192,11 @@ git -C <main-worktree> worktree list          # 撤去を確認
 
 **`npm install` した worktree の撤去。** `node_modules` の実体があると `git worktree remove` が
 「未コミット変更あり」と判断して失敗することがある。生成物なので、消してから撤去してよい。
-削除対象は **`<main-worktree>` 起点の絶対パス**で書く。相対パスだと実行位置しだいで別の
-`node_modules` を消しかねない。
+削除対象は他の手順と同じく **`<worktree>` プレースホルダ**で書く。相対パスだと実行位置しだいで
+別の `node_modules` を消しかねない。
 
 ```bash
-rm -rf <main-worktree>/.claude/worktrees/<name>/node_modules
+rm -rf <worktree>/node_modules
 git -C <main-worktree> worktree remove .claude/worktrees/<name>
 ```
 
