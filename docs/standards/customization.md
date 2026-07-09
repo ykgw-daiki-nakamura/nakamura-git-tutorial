@@ -39,7 +39,7 @@ outline: [2, 3]
 
 #### 拡張ポイントの例
 
-予測後処理フック（`ForecastPostProcessor`）を題材に、コードとしての形を示す。示すのは次の 3 つで、実装言語が変わっても役割の対応は変わらない。
+予測後処理フック（`ForecastPostProcessor`。.NET では命名規約に従い `IForecastPostProcessor`）を題材に、コードとしての形を示す。示すのは次の 3 つで、実装言語が変わっても役割の対応は変わらない。
 
 1. コアが公開する拡張ポイントの interface
 2. 下流リポジトリに置く顧客実装
@@ -132,7 +132,7 @@ class AcmeForecastPostProcessor:
 
 - コアは interface だけを公開し、実装の存在を知らない。顧客名がコアのコードに現れないため、前述「Tier 1: 設定・フラグによるカスタマイズ」で禁じた顧客識別子によるコード分岐も生じない。
 - 実装の解決は、コアが提供する発見機構（DI コンテナ / registry / entry point）に委ねる。下流リポジトリは既存の口へ実装を差し込むだけで、コアの再ビルドは要らない（後述「ビルドとバージョニング」）。
-- 顧客固有の値（上記の `CorrectionBias`）は実装の内側に閉じる。パラメータとして外から与えられる差異であれば、それは Tier 1 の設定で扱う。
+- 顧客固有の値（上記の補正値の定数）は実装の内側に閉じる。パラメータとして外から与えられる差異であれば、それは Tier 1 の設定で扱う。
 - 契約テストは、この interface のシグネチャと入出力の約束が保たれることを検証する（後述「バージョン追従の運用」）。
 
 #### ビルドとバージョニング
@@ -195,7 +195,7 @@ product-ext-acme/                       # Acme 下流リポジトリ（downstrea
     AcmeExternalIngestConnector.cs      # データ取り込みフックの実装（要求C）
     AcmeExtensionModule.cs              # 拡張ポイントへの登録（DI コンテナ）
   tests/
-    Contract/                           # 拡張ポイントの契約テスト
+    contract/                           # 拡張ポイントの契約テスト
   .github/workflows/build.yml
 ```
 
