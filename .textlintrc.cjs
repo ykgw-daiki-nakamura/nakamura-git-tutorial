@@ -1,7 +1,7 @@
 // textlint 設定（段階導入）。
 // 整形は markdownlint、日本語プロースは textlint、と役割を分ける。
-// preset-ja-technical-writing を有効化しつつ、現行ドキュメントで多数発火する
-// opinionated なルールは無効化し、既存文書を通しながら残りのルールで表記を整える。
+// preset-ja-technical-writing を有効化し、現行ドキュメントで多数発火する opinionated な
+// ルール「だけ」を無効化する。それ以外は有効のまま、文章を直しながら表記を整える。
 //
 // 発火の少ない no-exclamation-question-mark / arabic-kanji-numbers /
 // ja-no-weak-phrase / ja-no-redundant-expression は文面を直して有効化済み（#257）。
