@@ -56,14 +56,18 @@ git push
 | コマンド | 動作 |
 | --- | --- |
 | `git fetch` | リモートの変更を**取得するだけ**（作業ツリーは変わらない） |
-| `git pull` | `fetch` + `merge`（または `rebase`）を一度に行う |
+| `git pull` | `fetch` + `merge` を一度に行う |
 
 ```mermaid
 flowchart LR
     OR[(origin)] -->|"① fetch"| RT["リモート追跡ブランチ<br/>origin/main"]
-    RT -->|"② merge / rebase"| LB[ローカル main]
+    RT -->|"② merge"| LB[ローカル main]
     OR -->|"pull = ① + ②"| LB
 ```
+
+::: warning `git pull` の ② は設定で変わる
+`pull.rebase` を有効にしていると、② は `merge` ではなく履歴を書き換える取り込み方になります。本ガイドは **merge 基調**で説明するため、`git pull --no-rebase` のように明示するか、`git config --global pull.rebase false` を一度設定しておくと手順どおりに再現できます。
+:::
 
 ```bash
 # 安全に確認してから取り込みたい場合

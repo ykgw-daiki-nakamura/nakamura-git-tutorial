@@ -48,20 +48,11 @@ git merge --no-ff <branch>             # マージコミットを必ず作る
 git remote -v                          # リモート確認
 git remote add origin <url>            # リモート追加
 git fetch                              # 取得のみ
-git pull                               # 取得 + 統合
-git pull --rebase                      # 取得 + rebase
+git pull --no-rebase                   # 取得 + 統合（上流ブランチを fetch + merge）
+git merge origin/main                  # 作業ブランチに main を取り込む
 git push                               # 送信
 git push -u origin <branch>            # 初回（上流設定）
 git push origin --delete <branch>      # リモートブランチ削除
-```
-
-## rebase / 履歴整理
-
-```bash
-git rebase main                        # main の上に乗せ直す
-git rebase -i HEAD~3                    # 直近3件を編集
-git rebase --continue                  # コンフリクト解決後に続行
-git rebase --abort                     # 中止
 ```
 
 ## 取り消し・復旧

@@ -38,12 +38,12 @@ const timeout = 5000;
 
 ```mermaid
 flowchart TD
-    A["merge / pull / rebase<br/>でコンフリクト発生"] --> B["git status で<br/>競合ファイルを確認"]
+    A["merge / pull / cherry-pick<br/>でコンフリクト発生"] --> B["git status で<br/>競合ファイルを確認"]
     B --> C["ファイルを開き<br/>マーカーを編集して解決"]
     C --> D["git add で<br/>解決済みとマーク"]
     D --> E{"操作の種類は?"}
     E -->|merge| F["git commit"]
-    E -->|rebase| G["git rebase --continue"]
+    E -->|cherry-pick| G["git cherry-pick --continue"]
 ```
 
 ```bash
@@ -59,22 +59,26 @@ git add src/config.js
 # 4-a. マージの場合はコミットして完了
 git commit
 
-# 4-b. リベース中の場合は続行
-git rebase --continue
+# 4-b. cherry-pick 中の場合は続行
+git cherry-pick --continue
 ```
+
+::: tip cherry-pick でコンフリクトに出会う場面
+リリースブランチへ修正を移植するとき（main-first + cherry-pick）にコンフリクトが起きます。手順は [複数バージョンの保守（リリースブランチ運用）](./release-branches) を参照してください。
+:::
 
 ## 途中でやめたいとき
 
 操作を中断して元の状態に戻せます。
 
 ```bash
-git merge --abort     # マージを中止
-git rebase --abort    # リベースを中止
+git merge --abort        # マージを中止
+git cherry-pick --abort  # cherry-pick を中止
 ```
 
 ## コンフリクトを減らすコツ
 
-- **こまめに `main` を取り込む** — 作業ブランチで定期的に `git pull origin main`（または rebase）
+- **こまめに `main` を取り込む** — 作業ブランチで定期的に `git fetch origin` して `git merge origin/main`
 - **小さく・短命なブランチ** — 差分が小さいほど競合も小さい
 - **ファイル/責務を分ける** — 同じ巨大ファイルを全員が触る状況を避ける
 - **フォーマッタを統一** — 自動整形の差分による無用な競合を防ぐ
