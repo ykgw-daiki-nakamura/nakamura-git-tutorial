@@ -55,7 +55,8 @@ docs/
 設定は [.markdownlint-cli2.jsonc](.markdownlint-cli2.jsonc)。無効化済みルール以外は既定で有効。ハマりやすい点:
 
 - **MD031**: コードフェンスの前後には空行が必要（過去に CI 失敗の原因になった）。
-- 無効化済み: MD013（行長）、MD033（インライン HTML）、MD041（先頭 H1）、MD024 は同一階層のみ重複禁止。
+- 無効化済み: MD013（行長）、MD033（インライン HTML）、MD041（先頭 H1）、MD051（リンク fragment。下記参照）、MD024 は同一階層のみ重複禁止。
+- **MD051 は無効化している。** GitHub 方式の slugify で fragment を判定するため、このサイト（VitePress）の `id` とずれる。全角括弧を GitHub は区切り無しで削除し、VitePress は `-` に変換するので、正しいアンカーを無効と誤判定する。逆に濁点で壊れたアンカーは有効と判定する。実 HTML の `id` と突き合わせる `check:anchors` が、ページをまたぐリンクも含めて上位互換に検査する。
 - **Markdown を編集したら push 前に必ず `npm run lint:md` を通すこと**（CI の `lint` ジョブと同一）。
 
 ## 日本語プロース Lint（textlint・段階導入）
