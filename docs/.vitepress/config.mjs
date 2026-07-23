@@ -127,7 +127,7 @@ export default withMermaid({
           text: '🌿 ブランチとバージョン',
           items: [
             { text: 'ブランチ運用', link: '/standards/branching' },
-            { text: 'バージョン運用', link: '/standards/versioning' }
+            { text: 'バージョン運用 🚧', link: '/standards/versioning' }
           ]
         },
         {
@@ -146,7 +146,7 @@ export default withMermaid({
         {
           text: '🎛️ 顧客別カスタマイズ',
           items: [
-            { text: '顧客別カスタマイズ', link: '/standards/customization' }
+            { text: '顧客別カスタマイズ 🚧', link: '/standards/customization' }
           ]
         },
         {
