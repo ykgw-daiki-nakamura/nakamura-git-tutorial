@@ -104,8 +104,7 @@ export default withMermaid({
           collapsed: true,
           items: [
             { text: 'リリースとバージョン管理', link: '/guide/release' },
-            { text: 'リリースブランチ運用', link: '/guide/release-branches' },
-            { text: 'デュアル配布（SaaS + セルフホスト）', link: '/guide/dual-distribution' }
+            { text: 'リリースブランチ運用', link: '/guide/release-branches' }
           ]
         },
         {
