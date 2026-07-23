@@ -72,3 +72,12 @@ outline: [2, 3]
 
 - 組織管理者を含め、bypass list への恒常的な登録は行わない。緊急時は bypass ではなく、規約で定めた緊急手順（[障害対応](./incident#ホットフィックス手順)の緊急パッチ: RC タグは打ち、staging 検証のみ省略する）で対応する。
 - bypass が発生した場合（監査ログで検知）は、事後レビューを必須とする。
+
+## 参考
+
+本ページに書いた挙動は GitHub の仕様に依存する。一次情報は次のとおり。
+
+- [ルールセットで使用できるルール](https://docs.github.com/ja/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets) — 各ルールが何を拒否し、何を要求するか。本ページの「`main` に適用するルール」の箇条書きはこの内容に対応する。
+- [ルールセットについて](https://docs.github.com/ja/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets) — Repository Rulesets の考え方、許可アクター（actor allowlist）と bypass の扱い。
+- [コードオーナーについて](https://docs.github.com/ja/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) — `CODEOWNERS` の書式と、レビュアーが自動指名される条件。
+- [ワークフローでの認証に GITHUB_TOKEN を使用する](https://docs.github.com/ja/actions/security-for-github-actions/security-guides/automatic-token-authentication) — `GITHUB_TOKEN` で作成したタグ・Release が他のワークフローを起動しない仕様。タグ作成を自動化する場合の前提になる。
