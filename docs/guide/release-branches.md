@@ -150,5 +150,5 @@ gitGraph
 
 - [リリースとバージョン管理](./release) — タグ・SemVer・GitHub Release・単一 hotfix 線
 - [GitHub Flow](./github-flow) — `main` 一本のシンプルな運用（本ページの対極）
-- [ブランチとマージ](./branching) — ブランチ操作と cherry-pick の基礎
+- [ブランチ](./branching) — ブランチ操作と cherry-pick の基礎
 - [デュアル配布（SaaS + セルフホスト）でのリリース運用](./dual-distribution) — 版付き配布と継続デプロイの併走
