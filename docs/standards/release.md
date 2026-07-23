@@ -25,38 +25,26 @@ GitHub Release を「**出荷されたバージョンの単一の正（single so
 
 ### リリース手順
 
+タグ操作と成果物の流れは次のとおり。どの環境へデプロイされるかは「[デプロイパイプライン全体像](#デプロイパイプライン全体像)」に示す。
+
 ```mermaid
 flowchart TD
   MAIN[main] -->|"リリース計画に基づき作成"| CUT["release/vX.Y を作成"]
   CUT --> RC["vX.Y.0-rc.1 タグ push"]
-  RC --> RCREL["GitHub Release 自動作成<br/>(Pre-release / Draft ノート)"]
-  RCREL --> BUILD1["ビルド: コンテナイメージ +<br/>セルフホスト成果物"]
-  BUILD1 --> STG["Environment: staging へデプロイ<br/>受け入れ検証"]
-  STG -->|"不具合あり"| FIX["main で修正 →<br/>cherry-pick → rc.N+1"]
+  RC --> BUILD["RC ビルド<br/>Pre-release 作成 + 成果物添付"]
+  BUILD --> ACC{"受け入れ検証"}
+  ACC -->|"不具合あり"| FIX["main で修正 →<br/>cherry-pick → rc.N+1"]
   FIX --> RC
-  STG -->|"検証合格"| GA["vX.Y.0 タグ push"]
+  ACC -->|"合格"| GA["同一コミットに<br/>vX.Y.0 タグ push"]
   GA --> PROMOTE["RC 成果物を GA へ昇格<br/>(再ビルドしない)"]
   PROMOTE --> GAREL["GitHub Release 公開<br/>(リリースノート確定)"]
-  GAREL --> PROD["Environment: production<br/>SaaS 本番デプロイ(承認必須)"]
-  GAREL --> SHIP["セルフホスト配布<br/>(Release Assets / レジストリ)"]
 ```
 
 1. リリース計画に基づき `main` から `release/vX.Y` を作成する。作成後は新機能の追加を禁止し、cherry-pick による修正のみ受け入れる。
-2. `vX.Y.Z-rc.N` タグを push すると、CI が **Pre-release の GitHub Release** を自動作成し、成果物をビルド・添付する。**出荷成果物のビルドが行われるのはこの RC 時点のみ**である。`main` への push で走る `dev` 向けの CI ビルドは出荷対象ではなく、この規定の範囲外とする。
+2. `vX.Y.Z-rc.N` タグを push すると、CI が **Pre-release の GitHub Release** を自動作成し、成果物をビルド・添付する。出荷成果物のビルドはこの 1 回だけである（[GA 昇格規約（再ビルドの禁止）](#ga-昇格規約-再ビルドの禁止)）。
 3. staging での受け入れ検証に合格したら、**同一コミットに** `vX.Y.Z` タグを付与する（RC と GA でコミットをずらさない）。
-4. GA タグ push をトリガーに、GA ワークフローが **RC 成果物を GA へ昇格（promotion）** する（本ページ「GA 昇格規約（再ビルドの禁止）」を参照）。ビルドは実行しない。
+4. GA タグ push をトリガーに、GA ワークフローが **RC 成果物を GA へ昇格（promotion）** する。ビルドは実行しない。
 5. GitHub Release を正式公開し、リリースノートを確定する。公開された Release の成果物を用いて、SaaS 本番へデプロイし、セルフホスト向けに配布する。
-
-### 緊急時の短縮経路
-
-障害対応で時間的猶予がない場合、リリース責任者の判断で **手順 3 の staging 受け入れ検証（soak）を省略**できる（[障害対応](./incident#ホットフィックス手順)）。このとき `vX.Y.Z-rc.1` タグを push して RC ビルドを走らせ、その完了後に**同一コミットへ** `vX.Y.Z` タグを付与する。
-
-**RC タグ自体は省略しない**。省略すると、次が同時に崩れる。
-
-- 昇格元となる RC 成果物が存在しないため、GA ワークフローは昇格すべきイメージ・資産を持たず、「GA タグと最終 RC タグが同一コミットを指すこと」の検証（後述「GA 昇格規約」）も参照先を失う
-- 「staging で検証した成果物と出荷する成果物が同一である」という build once の前提が、そもそも成立しない
-
-RC タグを打つ短縮経路なら、省略されるのは *検証にかける時間* だけであり、build once・同一コミット検証・ダイジェスト検証の不変条件はすべて保たれる。省略した受け入れ検証は、GA 後に事後検証として必ず実施する。
 
 ### GitHub Release 運用規約
 
@@ -73,6 +61,8 @@ RC タグを打つ短縮経路なら、省略されるのは *検証にかける
 
 理由はビルドの再現性にある。ビルド時刻・依存解決・ベースイメージの差異で、ダイジェストは変わり得る。GA 時に再ビルドすると、「staging で検証した成果物」と「出荷される成果物」の同一性を検証できなくなる。
 
+この規定が対象とするのは**出荷成果物**であり、`main` への push で走る `dev` 向けの CI ビルドは含まない。`dev` 向けの成果物は GitHub Release に紐づかず、`staging` にも `production` にも、セルフホスト配布物にも昇格しない。
+
 | 成果物 | 昇格方法 |
 | --- | --- |
 | コンテナイメージ | 最終 RC イメージの**ダイジェストに対して** `vX.Y.Z` タグを追加付与する（`crane tag` / `skopeo copy` / `docker buildx imagetools create` 等）。イメージ本体は 1 バイトも変化しない |
@@ -87,35 +77,39 @@ RC タグを打つ短縮経路なら、省略されるのは *検証にかける
 - production へのデプロイはタグ名ではなく**イメージダイジェスト（`@sha256:...`）で参照**する。タグは人間向けの別名にすぎず、デプロイの同一性はダイジェストで担保する。
 - **バージョン文字列の埋め込みに注意**: 成果物内に埋め込むバージョン情報は `X.Y.Z` + git SHA とし、`-rc.N` サフィックスをバイナリに焼き込まない。RC / GA の区別はタグと Release のメタデータでのみ表現する（焼き込むと GA 昇格時に成果物の書き換えが必要になり、再ビルド禁止と矛盾する）。
 
+### 緊急時の短縮経路
+
+障害対応で時間的猶予がない場合、リリース責任者の判断で **手順 3 の staging 受け入れ検証（soak）を省略**できる（[障害対応](./incident#ホットフィックス手順)）。このとき `vX.Y.Z-rc.1` タグを push して RC ビルドを走らせ、その完了後に**同一コミットへ** `vX.Y.Z` タグを付与する。
+
+**RC タグ自体は省略しない**。省略すると、次が同時に崩れる。
+
+- 昇格元となる RC 成果物が存在しないため、GA ワークフローは昇格すべきイメージ・資産を持たず、前掲の GA 昇格規約が定める同一コミット検証・ダイジェスト検証も参照先を失う
+- 「staging で検証した成果物と出荷する成果物が同一である」という build once の前提が、そもそも成立しない
+
+RC タグを打つ短縮経路なら、省略されるのは *検証にかける時間* だけであり、build once・同一コミット検証・ダイジェスト検証の不変条件はすべて保たれる。省略した受け入れ検証は、GA 後に事後検証として必ず実施する。
+
 ## 環境とデプロイ（GitHub Environments）
 
 ### 環境定義
 
-環境はブランチではなく GitHub Environments として定義し、**同一アーティファクトの昇格（build once, deploy many）** を原則とする。
-
-| Environment | 用途 | デプロイ元 | 保護ルール |
-| --- | --- | --- | --- |
-| `dev` | 開発検証（次期バージョンの動作確認） | `main` への push で自動デプロイ | なし（自動）。deployment branch policy: `main` のみ |
-| `staging` | リリース候補の受け入れ検証 | `vX.Y.Z-rc.N` タグの成果物 | deployment branch/tag policy: `v*-rc*` タグのみ |
-| `production` | SaaS 本番 | `vX.Y.Z`（GA）タグの成果物 | **required reviewers（承認者 1 名以上）**、deployment tag policy: `v*` GA タグのみ |
-
-- `dev` のみ `main` 直結とし、次期バージョンの継続的な動作確認に用いる。`dev` の状態は出荷品質を意味しない。
-- `staging` と `production` はタグ（= GitHub Release）起点でのみデプロイされる。SaaS 本番が `main` から直接デプロイされる経路は存在しない。
-
-### Deployment protection rules 設定規約
-
-環境ごとの保護設定を次の通り定める。
+環境はブランチではなく GitHub Environments として定義し、**同一アーティファクトの昇格（build once, deploy many）** を原則とする。用途とデプロイ元、および Deployment protection rules による保護設定を、環境ごとに次のとおり定める。
 
 | 設定項目 | `dev` | `staging` | `production` |
 | --- | --- | --- | --- |
-| Deployment branch/tag policy | `main` のみ | タグ `v*-rc*` のみ | タグ `v*`（GA のみ、`-rc` を除外） |
+| 用途 | 開発検証（次期バージョンの動作確認） | リリース候補の受け入れ検証 | SaaS 本番 |
+| デプロイ元 | `main` への push（自動デプロイ） | `vX.Y.Z-rc.N` タグの成果物 | `vX.Y.Z`（GA）タグの成果物 |
+| Deployment branch/tag policy | `main` のみ | タグ `v*-rc*` のみ | タグ `v*`（`-rc` を含むタグはワークフロー側で拒否） |
 | Required reviewers | なし | なし（任意で 1 名） | **1 名以上（リリース責任者ロール）** |
 | デプロイ実行者による自己承認 | — | — | **禁止**（prevent self-review を有効化） |
 | Wait timer | なし | なし | 5 分（誤操作時の取り消し猶予。値はチームで調整） |
 | Admin bypass | — | 無効 | **無効**（"Allow administrators to bypass" をオフ） |
 | Environment secrets | dev 用資格情報 | staging 用資格情報 | 本番資格情報（この環境のみに格納） |
 
-補足規約:
+- `dev` のみ `main` 直結とし、次期バージョンの継続的な動作確認に用いる。`dev` の状態は出荷品質を意味しない。
+- `staging` と `production` はタグ（= GitHub Release）起点でのみデプロイされる。SaaS 本番が `main` から直接デプロイされる経路は存在しない。
+- **タグのパターンに否定は書けない。** `production` の `v*` は `vX.Y.Z-rc.N` にも一致するため、環境の設定だけでは RC を締め出せない。production デプロイのワークフロー冒頭で、タグ名が `-rc` を含む場合は失敗させる（「[GA 昇格規約（再ビルドの禁止）](#ga-昇格規約-再ビルドの禁止)」の同一コミット検証・ダイジェスト検証と同じ場所で行う）。
+
+### 環境運用の補足規約
 
 - **承認記録**: production への required reviewers 承認は GitHub Deployments の履歴に残る。これを正式なデプロイ承認記録とし、別途の承認書類は作成しない。
 - **同時実行制御**: production デプロイのワークフローには `concurrency` グループを設定して直列化する（`cancel-in-progress: false`）。進行中デプロイへの割り込みを防ぐため。
@@ -126,24 +120,13 @@ RC タグを打つ短縮経路なら、省略されるのは *検証にかける
 
 ### デプロイパイプライン全体像
 
+どの成果物がどの環境へ入り、どこに承認ゲートが立つかは次のとおり。
+
 ```mermaid
 flowchart LR
-  subgraph 開発
-    PR["PR merge to main"] --> CI["CI: test / lint / build"]
-    CI --> DEV["Environment: dev<br/>自動デプロイ"]
-  end
-  subgraph リリース
-    RCTAG["vX.Y.Z-rc.N タグ"] --> RELBUILD["Release ビルド<br/>イメージ + 配布物 + SBOM"]
-    RELBUILD --> PRERel["GitHub Release<br/>(Pre-release)"]
-    PRERel --> STG["Environment: staging"]
-    GATAG["vX.Y.Z タグ<br/>(同一コミット)"] --> PROMOTE["RC 成果物を昇格<br/>イメージ再タグ付け(digest 不変)"]
-    PROMOTE --> GAREL["GitHub Release 公開"]
-    GAREL --> APPROVE{"required reviewers"}
-    APPROVE -->|承認| PROD["Environment: production<br/>SaaS 本番(digest 参照)"]
-    GAREL --> SELF["セルフホスト配布<br/>Release Assets"]
-  end
+  MERGE["main への PR マージ<br/>(dev 向け CI ビルド)"] --> DEV["Environment: dev<br/>自動デプロイ"]
+  RCREL["vX.Y.Z-rc.N タグ<br/>= Pre-release"] --> STG["Environment: staging<br/>受け入れ検証"]
+  GAREL["vX.Y.Z タグ<br/>= GA Release"] --> APPROVE{"required reviewers"}
+  APPROVE -->|承認| PROD["Environment: production<br/>SaaS 本番(digest 参照)"]
+  GAREL --> SELF["セルフホスト配布<br/>Release Assets / レジストリ"]
 ```
-
-- **出荷成果物**のビルドが実行されるのは **RC タグ push 時の 1 回のみ**。GA タグは既存成果物への再タグ付け（昇格）であり、ビルドを伴わない（「GA 昇格規約（再ビルドの禁止）」を参照）。
-- 図の左半分にある `main` への PR マージ時の CI ビルドは、`dev` 環境の動作確認だけに用いる。その成果物は GitHub Release に紐づかず、staging にも production にも、セルフホスト配布物にも昇格しない。「1 回のみ」の規定が対象とするのは出荷成果物であり、`dev` 向けビルドは含まない。
-- GA 昇格時に「同一コミット」「ダイジェスト一致」「チェックサム一致」をパイプラインで検証し、不一致時は失敗させる。緊急時の短縮経路（「緊急時の短縮経路」）でも RC タグを打つため、この検証は無条件に有効である。
