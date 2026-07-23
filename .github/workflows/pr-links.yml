@@ -28,6 +28,10 @@ jobs:
 
       # 検査対象は固定 glob（変更ファイル名を式へ展開せず、インジェクション経路を作らない）。
       # 外部スキームのみ検査し、内部/相対リンクは対象外（docs:build が担保）。
+      # --root-dir はルート相対リンク（例: /standards/versioning）のために要る。--scheme の
+      # フィルタが効くのは URL を組み立てられたリンクだけで、ルート相対リンクは組み立ての
+      # 時点で失敗しフィルタに到達しないため、基準ディレクトリを docs/ に与えて解決させる
+      # （links.yml と同じ理由。詳細はそちらのコメント）。
       # links.yml と同じく **非ブロッキング**（fail: false）+ リトライ。外部リンク検査は
       # ネットワーク/レート制限で不安定なため PR を落とさず、結果はジョブサマリに可視化して
       # 切れリンクの早期フィードバックを得る（PR ゲートにはしない方針を踏襲）。
@@ -40,6 +44,7 @@ jobs:
             --retry-wait-time 2
             --timeout 20
             --scheme https --scheme http
+            --root-dir ${{ github.workspace }}/docs
             './docs/**/*.md' './*.md'
           fail: false
         env:
