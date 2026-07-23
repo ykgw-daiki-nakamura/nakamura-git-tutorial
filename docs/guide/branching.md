@@ -1,4 +1,4 @@
-# ブランチとマージ
+# ブランチ
 
 ブランチは、**作業を分離して並行開発を可能にする**仕組みです。これがあることで、チームでの開発が成立します。
 
@@ -42,64 +42,6 @@ git branch -d feature/login
 > **ブランチ命名規則**
 >
 > チームでは `feature/`, `fix/`, `hotfix/`, `chore/` などの接頭辞を付けると整理しやすくなります。例: `feature/user-profile`, `fix/login-error`
-
-## マージの 2 つの形
-
-### Fast-forward マージ
-
-分岐後に **`main` 側が進んでいない**場合、`main` のポインタを `feature/login` の先端まで進めるだけで取り込めます。**マージコミットは作られず**、履歴は一直線のままです。
-
-取り込み前——`main` は `A` のまま、`feature/login` だけが `B`・`C` と先に進んでいる状態:
-
-```mermaid
-gitGraph
-    commit id: "A"
-    branch feature/login
-    checkout feature/login
-    commit id: "B"
-    commit id: "C"
-```
-
-`main` に切り替えて `git merge feature/login` すると、`main` のポインタが `C` まで進むだけ（fast-forward）。枝分かれは残らず、下のように一直線になります:
-
-```mermaid
-gitGraph
-    commit id: "A"
-    commit id: "B"
-    commit id: "C"
-```
-
-### 3-way マージ（マージコミット）
-
-分岐後に**両方のブランチが進んでいる**場合（`feature/login` が `B`・`C`、`main` が `D` と別々に進んだ状態）、両者を統合する「マージコミット `M`」が作られます。
-
-```mermaid
-gitGraph
-    commit id: "A"
-    branch feature/login
-    checkout feature/login
-    commit id: "B"
-    commit id: "C"
-    checkout main
-    commit id: "D"
-    merge feature/login id: "M"
-```
-
-```bash
-# main に feature/login を取り込む
-git switch main
-git merge feature/login
-
-# 常にマージコミットを作りたい場合
-git merge --no-ff feature/login
-```
-
-> [!NOTE]
-> **`--no-ff` の使いどころ**
->
-> `--no-ff` を付けると fast-forward 可能な場合でも必ずマージコミットを作ります。「どの機能ブランチがいつ統合されたか」を履歴に残せるため、チームによってはこれを標準にしています。
-
-ここで見た**ローカルの merge の形（Fast-forward / 3-way）** を踏まえると、GitHub 上で PR をマージするときの **Merge commit / Squash and merge / Rebase and merge** の選び方が理解しやすくなります。その使い分けは [プルリクエストとレビュー（マージ方式の比較）](./pull-request#マージ方式の比較) を参照してください。
 
 ## 作業の途中でブランチを切り替えたいとき
 
