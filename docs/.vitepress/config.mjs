@@ -127,6 +127,8 @@ export default withMermaid({
           text: '🌿 ブランチとバージョン',
           items: [
             { text: 'ブランチ運用', link: '/standards/branching' },
+            { text: 'ブランチ保護', link: '/standards/branch-protection' },
+            { text: 'マージルールと PR タイトル規約', link: '/standards/merge-rules' },
             { text: 'バージョン運用 🚧', link: '/standards/versioning' }
           ]
         },
