@@ -110,6 +110,7 @@ export default withMermaid({
         {
           text: '📚 付録',
           items: [
+            { text: 'SVN との比較', link: '/guide/svn-comparison' },
             { text: 'コマンド早見表', link: '/guide/commands' },
             { text: 'トラブルシューティング', link: '/guide/troubleshooting' }
           ]
