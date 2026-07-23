@@ -12,14 +12,25 @@ outline: [2, 3]
 - `main` は次期バージョンの開発ラインであり、出荷の起点にはしない。出荷は `release/vX.Y` 上のタグから行う。
 - 修正は **main → release の一方向**にだけ流れる（upstream first）。
 
-## ブランチ一覧
+## ブランチ一覧と命名規則
 
-| ブランチ | 役割 | 寿命 | 作成元 | マージ先 |
-| --- | --- | --- | --- | --- |
-| `main` | 唯一の統合ブランチ。次期バージョンの開発ライン | 永続 | — | — |
-| `feature/*` | 機能開発・改善 | 短命 | `main` | `main`（PR 経由） |
-| `fix/*` | バグ修正 | 短命 | `main` | `main`（PR 経由） |
-| `release/vX.Y` | バージョン X.Y の安定化・出荷・保守ライン（SaaS / セルフホスト共通） | サポート期間中 | `main` | マージしない（cherry-pick のみ受け入れる） |
+| 命名形式 | 役割 | 例 | 寿命 | 作成元 | マージ先 |
+| --- | --- | --- | --- | --- | --- |
+| `main` | 唯一の統合ブランチ。次期バージョンの開発ライン | — | 永続 | — | — |
+| `feature/<issue番号>-<短い説明>` | 機能開発・改善 | `feature/1234-tenant-flag-api` | 短命 | `main` | `main`（PR 経由） |
+| `fix/<issue番号>-<短い説明>` | バグ修正 | `fix/1250-forecast-nan-handling` | 短命 | `main` | `main`（PR 経由） |
+| `release/vX.Y` | バージョン X.Y の安定化・出荷・保守ライン（SaaS / セルフホスト共通） | `release/v1.2` | サポート期間中 | `main` | — |
+
+`release/vX.Y` のマージ先が `—` なのは、release から `main` へ戻すマージを禁じているため（upstream first）。逆向きの `main` → `release/*` も、マージではなく **cherry-pick で差分を写す**（後述の「局面 3」）。cherry-pick は履歴を合流させないので、この表の「マージ先」には現れない。
+
+### タグの命名
+
+タグはブランチではなく、`release/vX.Y` 上のコミットに打つ出荷の目印である。
+
+| 種別 | 形式 | 例 |
+| --- | --- | --- |
+| リリース候補タグ | `vX.Y.Z-rc.N` | `v1.2.0-rc.1` |
+| GA タグ | `vX.Y.Z`（SemVer） | `v1.2.1` |
 
 ## ブランチモデル全体像
 
@@ -55,21 +66,83 @@ gitGraph
   commit id: "feat E"
 ```
 
-- `main` は常に「次期バージョン（N+1）」の開発ラインであり、直接デプロイ・出荷の起点にはしない。
-- 機能追加・修正は `main` から `feature/*` / `fix/*` を切って進め、**squash merge** で `main` に取り込む。
-- squash では、ブランチ側の複数コミット（`flag: 実装`・`flag: レビュー反映` など）が `main` 上の 1 コミット（`feat B (squash)`）にまとまる。ブランチ側のコミットは `main` に個別には現れない。
+この 1 枚には、次の 4 つの動きが同時に描かれている。以下、局面ごとに切り出して確認する。
+
+1. `feature/*` / `fix/*` を `main` へ squash merge する（局面 1）
+2. `main` から `release/vX.Y` を切り、タグを打って出荷する（局面 2）
+3. `main` に入れた修正を `release/*` へ cherry-pick する（局面 3）
+4. どの `release/*` へ戻すかを選ぶ（局面 4）
+
+### 局面 1: feature / fix を squash merge で main に取り込む
+
+```mermaid
+gitGraph
+  commit id: "feat A"
+  branch feature/1234-tenant-flag-api
+  commit id: "flag: 実装"
+  commit id: "flag: レビュー反映"
+  checkout main
+  commit id: "feat B (squash)"
+```
+
+- 機能追加・修正は `main` からブランチを切って進め、PR を **squash merge** で `main` に取り込む。
+- ブランチ側の 2 コミット（`flag: 実装`・`flag: レビュー反映`）は `main` に個別には現れない。squash が 1 コミット `feat B (squash)` にまとめる。
 - マージコミットも作らないため、`main` は linear history を保つ（図でブランチ線が `main` へ戻らないのはこのため）。
-- 出荷（SaaS 本番デプロイ / セルフホスト配布）は必ず `release/vX.Y` 上のタグから行う。
-- 修正は **main → release の一方向**にのみ流れる（upstream first）。図の `fix C (squash)` → `v1.1.1` や `hotfix X` → `v1.2.1` がこれにあたる。
-- backport 先は**選択的**に決める。対象は、そのバグが存在し、かつ保守期間内の release だけとする。
-  - 図では、保守中の v1.1 へ `fix C` を戻して `v1.1.1` を出している。v1.2 は fix C を載せた後の `main` から切るため、最初から修正を含む。
+- 取り込んだブランチは削除する。長く残さないのが trunk-based development の前提である。
 
-## 命名規則
+### 局面 2: main から release/vX.Y を切り、タグを打って出荷する
 
-| 種別 | 形式 | 例 |
-| --- | --- | --- |
-| feature ブランチ | `feature/<issue番号>-<短い説明>` | `feature/1234-tenant-flag-api` |
-| fix ブランチ | `fix/<issue番号>-<短い説明>` | `fix/1250-forecast-nan-handling` |
-| release ブランチ | `release/vX.Y` | `release/v1.2` |
-| リリース候補タグ | `vX.Y.Z-rc.N` | `v1.2.0-rc.1` |
-| GA タグ | `vX.Y.Z`（SemVer） | `v1.2.1` |
+```mermaid
+gitGraph
+  commit id: "feat B (squash)"
+  branch release/v1.1
+  commit id: "rc" tag: "v1.1.0-rc.1"
+  commit id: "ga" tag: "v1.1.0"
+  checkout main
+  commit id: "feat C (squash)"
+```
+
+- `release/v1.1` は、切った時点の `main` のスナップショットである。以降 `main` に入った変更が自動で流れ込むことはない。
+- release 上では安定化のコミットだけを積み、RC タグ（`v1.1.0-rc.1`）から GA タグ（`v1.1.0`）へ進める。出荷（SaaS 本番デプロイ / セルフホスト配布）は必ずこのタグから行う。
+- `main` は同時に次期バージョン（v1.2）の開発ラインとして先へ進む。`feat C (squash)` は v1.1 には入らない。
+
+### 局面 3: main の修正を release へ cherry-pick する
+
+```mermaid
+gitGraph
+  commit id: "feat B (squash)"
+  branch release/v1.1
+  commit id: "ga" tag: "v1.1.0"
+  checkout main
+  branch fix/1250-forecast-nan-handling
+  commit id: "fix: NaN 検出"
+  commit id: "fix: テスト追加"
+  checkout main
+  commit id: "fix C (squash)"
+  checkout release/v1.1
+  cherry-pick id: "fix C (squash)" tag: "v1.1.1"
+```
+
+- 出荷済みの v1.1 で見つかったバグでも、修正はまず `main` に入れる（**upstream first**）。release で直して `main` へ戻し忘れると、次期バージョンで再発する。
+- release へは cherry-pick で**差分だけを写す**。写した先には親の異なる別コミット（別の ID）ができるため、`main` と release の履歴は合流しない。`git branch --merged` にも現れず、取り込み済みかの判定には `git cherry` が要る。
+- 取り込んだら release 上でパッチ版のタグ（`v1.1.1`）を打ち、そこから出荷する。
+
+### 局面 4: backport 先は保守中の release だけに選ぶ
+
+```mermaid
+gitGraph
+  commit id: "feat B (squash)"
+  branch release/v1.1
+  commit id: "ga" tag: "v1.1.0"
+  checkout main
+  commit id: "fix C (squash)"
+  branch release/v1.2
+  commit id: "ga2" tag: "v1.2.0"
+  checkout release/v1.1
+  cherry-pick id: "fix C (squash)" tag: "v1.1.1"
+```
+
+- 同じ修正をすべての release へ戻すわけではない。backport 先は**選択的**に決め、そのバグが存在し、かつ保守期間内の release にだけ cherry-pick する。
+- `release/v1.2` は `fix C` を載せた後の `main` から切っているため、最初から修正を含む。cherry-pick は不要である。
+- 保守中の `release/v1.1` にはバグが残っているので、`fix C` を戻して `v1.1.1` を出す。
+- 保守期間の終わった release には戻さない。
