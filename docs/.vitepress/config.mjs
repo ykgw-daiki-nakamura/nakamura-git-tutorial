@@ -75,11 +75,11 @@ export default withMermaid({
         {
           text: '🤝 チーム開発の基本フロー',
           items: [
+            { text: 'GitHub Flow', link: '/guide/github-flow' },
+            { text: 'ブランチ', link: '/guide/branching' },
             { text: 'コミットとコミットメッセージ', link: '/guide/commits' },
-            { text: 'ブランチとマージ', link: '/guide/branching' },
             { text: 'リモートと GitHub', link: '/guide/remote' },
             { text: 'プルリクエストとレビュー', link: '/guide/pull-request' },
-            { text: 'GitHub Flow', link: '/guide/github-flow' },
             { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' }
           ]
         },
