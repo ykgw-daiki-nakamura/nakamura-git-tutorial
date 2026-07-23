@@ -6,6 +6,12 @@ outline: [2, 3]
 
 ブランチ体系と命名規則を定める。保護設定は[ブランチ保護](./branch-protection)、マージ方式と PR タイトルの規約は[マージルールと PR タイトル規約](./merge-rules)を参照。全体像は[概要](./)を参照。
 
+## このページの要点
+
+- ブランチは `main` / `feature/*` / `fix/*` / `release/vX.Y` の 4 種類だけとする。
+- `main` は次期バージョンの開発ラインであり、出荷の起点にはしない。出荷は `release/vX.Y` 上のタグから行う。
+- 修正は **main → release の一方向**にだけ流れる（upstream first）。
+
 ## ブランチ一覧
 
 | ブランチ | 役割 | 寿命 | 作成元 | マージ先 |
@@ -51,10 +57,12 @@ gitGraph
 
 - `main` は常に「次期バージョン（N+1）」の開発ラインであり、直接デプロイ・出荷の起点にはしない。
 - 機能追加・修正は `main` から `feature/*` / `fix/*` を切って進め、**squash merge** で `main` に取り込む。
-- squash ではブランチ側の複数コミット（`flag: 実装`・`flag: レビュー反映` など）が `main` 上の 1 コミット（`feat B (squash)`）にまとまる。ブランチのコミットは `main` に個別には現れず、マージコミットも作らない（図でブランチ線が `main` に戻らないのはこのため。`main` は linear history を保つ）。
+- squash では、ブランチ側の複数コミット（`flag: 実装`・`flag: レビュー反映` など）が `main` 上の 1 コミット（`feat B (squash)`）にまとまる。ブランチ側のコミットは `main` に個別には現れない。
+- マージコミットも作らないため、`main` は linear history を保つ（図でブランチ線が `main` へ戻らないのはこのため）。
 - 出荷（SaaS 本番デプロイ / セルフホスト配布）は必ず `release/vX.Y` 上のタグから行う。
-- 図の `fix C (squash)` → `v1.1.1` や `hotfix X` → `v1.2.1` のように、修正は **main → release の一方向**にのみ流れる（upstream first）。
-- どの `release/*` へ backport するかは**選択的**で、そのバグが存在し、かつ保守期間内の release にのみ cherry-pick する。`fix C` は保守中の v1.1 へ戻して `v1.1.1` を出す一方、v1.2 は fix C を載せた後の `main` から切るため最初から含む。
+- 修正は **main → release の一方向**にのみ流れる（upstream first）。図の `fix C (squash)` → `v1.1.1` や `hotfix X` → `v1.2.1` がこれにあたる。
+- backport 先は**選択的**に決める。対象は、そのバグが存在し、かつ保守期間内の release だけとする。
+  - 図では、保守中の v1.1 へ `fix C` を戻して `v1.1.1` を出している。v1.2 は fix C を載せた後の `main` から切るため、最初から修正を含む。
 
 ## 命名規則
 
