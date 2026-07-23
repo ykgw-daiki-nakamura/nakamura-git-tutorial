@@ -43,7 +43,7 @@ PR タイトルは、次の 2 か所に残る文字列である。
 
 | 対象 | 設定 | 効果 |
 | --- | --- | --- |
-| CI | PR タイトルの書式を検証し、required status check に含める | 非準拠の PR をマージできなくする |
+| CI | PR タイトルの書式を検証し、Required status checks に含める | 非準拠の PR をマージできなくする |
 | リポジトリ設定 | squash merge 時のコミットメッセージを **PR のタイトルと本文**に固定する | 検証を通ったタイトルがそのまま `main` に着地する |
 
 リポジトリ設定は GitHub の Settings → General → Pull Requests で行う。`Allow squash merging` の下にあるドロップダウンで `Pull request title and description` を選ぶ。UI ではタイトルと本文をこの 1 つのドロップダウンでまとめて決めるが、API では 2 フィールドに対応するため、意図どおりかは API 側で確かめられる（期待値は `PR_TITLE` と `PR_BODY`）。
