@@ -153,4 +153,3 @@ gitGraph
 - [ブランチ戦略の使い分け](./branching-strategies) — どれを選ぶかの判断
 - [複数バージョンの保守（リリースブランチ運用）](./release-branches) — release ブランチ運用の実際
 - [リリースとバージョン管理](./release) — タグ主軸のリリース
-- [デュアル配布（SaaS + セルフホスト）でのリリース運用](./dual-distribution) — SaaS と自ホスト版を単一 main で両立
