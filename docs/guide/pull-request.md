@@ -114,11 +114,11 @@ gitGraph
 > [!TIP]
 > **何を基準に選ぶか**
 >
-> 判断軸は 3 つあります。**`main` の履歴に何を残したいか**（枝の作業コミットまで残すなら Merge commit、機能単位の 1 コミットに揃えるなら Squash）、**あとで履歴を追う単位**（PR 単位で `git log` を読むなら Squash、コミット単位で辿りたいなら Merge commit か Rebase）、そして **linear history を要求するか**（要求するなら Merge commit は使えません）です。ブランチ保護で linear history を必須にしている場合、選べるのは Squash か Rebase に絞られます。
+> 判断軸は 3 つあります。**`main` の履歴に何を残したいか**（ブランチの作業コミットまで残すなら Merge commit、機能単位の 1 コミットに揃えるなら Squash）、**あとで履歴を追う単位**（PR 単位で `git log` を読むなら Squash、コミット単位で辿りたいなら Merge commit か Rebase）、そして **linear history を要求するか**（要求するなら Merge commit は使えません）です。ブランチ保護で linear history を必須にしている場合、選べるのは Squash か Rebase に絞られます。
 
 ## PR タイトルは Conventional Commits に従う
 
-**Squash and merge** を選ぶと、PR タイトルの重みが変わります。枝側のコミットは 1 つに潰されるため、**PR タイトルがそのまま `main` のコミットメッセージ**になるからです。枝の中で `wip` や `レビュー反映` と書いていても、`main` に残るのは PR タイトルだけです。
+**Squash and merge** を選ぶと、PR タイトルの重みが変わります。ブランチ側のコミットは 1 つに潰されるため、**PR タイトルがそのまま `main` のコミットメッセージ**になるからです。ブランチの中で `wip` や `レビュー反映` と書いていても、`main` に残るのは PR タイトルだけです。
 
 そこで PR タイトルは、コミットメッセージと同じ [Conventional Commits](./commits#conventional-commits) の形式で書きます。
 

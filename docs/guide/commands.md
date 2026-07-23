@@ -80,7 +80,7 @@ git tag                                # タグ一覧
 git push origin v1.2.0                 # タグをリモートへ送る
 
 gh release create v1.2.0 --generate-notes             # GitHub Release を作成
-gh release create v1.2.0 --generate-notes --target release/1.2   # 枝上のタグから
+gh release create v1.2.0 --generate-notes --target release/1.2   # リリースブランチ上のタグから
 ```
 
 詳しくは [リリースとバージョン管理](./release)、複数バージョンを保守する場合は [リリースブランチ運用](./release-branches) を参照してください。

@@ -75,11 +75,11 @@ export default withMermaid({
         {
           text: '🤝 チーム開発の基本フロー',
           items: [
+            { text: 'GitHub Flow', link: '/guide/github-flow' },
+            { text: 'ブランチ', link: '/guide/branching' },
             { text: 'コミットとコミットメッセージ', link: '/guide/commits' },
-            { text: 'ブランチとマージ', link: '/guide/branching' },
             { text: 'リモートと GitHub', link: '/guide/remote' },
             { text: 'プルリクエストとレビュー', link: '/guide/pull-request' },
-            { text: 'GitHub Flow', link: '/guide/github-flow' },
             { text: 'CI 連携 (GitHub Actions)', link: '/guide/ci' }
           ]
         },
@@ -104,13 +104,13 @@ export default withMermaid({
           collapsed: true,
           items: [
             { text: 'リリースとバージョン管理', link: '/guide/release' },
-            { text: 'リリースブランチ運用', link: '/guide/release-branches' },
-            { text: 'デュアル配布（SaaS + セルフホスト）', link: '/guide/dual-distribution' }
+            { text: 'リリースブランチ運用', link: '/guide/release-branches' }
           ]
         },
         {
           text: '📚 付録',
           items: [
+            { text: 'SVN との比較', link: '/guide/svn-comparison' },
             { text: 'コマンド早見表', link: '/guide/commands' },
             { text: 'トラブルシューティング', link: '/guide/troubleshooting' }
           ]
