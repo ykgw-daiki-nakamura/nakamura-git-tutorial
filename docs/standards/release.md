@@ -4,7 +4,7 @@ outline: [2, 3]
 
 # リリースとデプロイ
 
-リリースフロー（GitHub Release）と、環境・デプロイ（GitHub Environments）を定める。全体像は[概要](./)を参照。
+リリースフロー（GitHub Release）と、環境・デプロイ（GitHub Environments）を定める。
 
 ## このページの要点
 
