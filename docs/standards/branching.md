@@ -8,20 +8,32 @@ outline: [2, 3]
 
 ## このページの要点
 
-- ブランチは `main` / `feature/*` / `fix/*` / `release/vX.Y` の 4 種類だけとする。
+- ブランチは **main** / **feature** / **fix** / **release** の 4 種類だけとする。種類を決めるのは名前ではなく役割である。
+- feature / fix の名前は、**課題管理ツールが生成する既定のブランチ名に従ってよい**。
 - `main` は次期バージョンの開発ラインであり、出荷の起点にはしない。出荷は `release/vX.Y` 上のタグから行う。
-- 修正は **main → release の一方向**にだけ流れる（upstream first）。
+- 修正は **`main` → `release/*` の一方向**にだけ流れる（upstream first）。
 
-## ブランチ一覧と命名規則
+## ブランチ一覧
 
-| 命名形式 | 役割 | 例 | 寿命 | 作成元 | マージ先 |
+| 種類 | 役割 | 名前 | 寿命 | 作成元 | マージ先 |
 | --- | --- | --- | --- | --- | --- |
-| `main` | 唯一の統合ブランチ。次期バージョンの開発ライン | — | 永続 | — | — |
-| `feature/<issue番号>-<短い説明>` | 機能開発・改善 | `feature/1234-tenant-flag-api` | 短命 | `main` | `main`（PR 経由） |
-| `fix/<issue番号>-<短い説明>` | バグ修正 | `fix/1250-forecast-nan-handling` | 短命 | `main` | `main`（PR 経由） |
-| `release/vX.Y` | バージョン X.Y の安定化・出荷・保守ライン（SaaS / セルフホスト共通） | `release/v1.2` | サポート期間中 | `main` | — |
+| main | 唯一の統合ブランチ。次期バージョンの開発ライン | `main` | 永続 | — | — |
+| feature | 機能開発・改善 | 課題管理ツールの既定名（[命名規則](#命名規則)） | 短命 | `main` | `main`（PR 経由） |
+| fix | バグ修正 | 課題管理ツールの既定名（[命名規則](#命名規則)） | 短命 | `main` | `main`（PR 経由） |
+| release | バージョン X.Y の安定化・出荷・保守ライン（SaaS / セルフホスト共通） | `release/vX.Y` | サポート期間中 | `main` | — |
 
-`release/vX.Y` のマージ先が `—` なのは、release から `main` へ戻すマージを禁じているため（upstream first）。逆向きの `main` → `release/*` も、マージではなく **cherry-pick で差分を写す**（後述の「局面 3」）。cherry-pick は履歴を合流させないので、この表の「マージ先」には現れない。
+`release/*` のマージ先が `—` なのは、`release/*` から `main` へ戻すマージを禁じているため（upstream first）。逆向きの `main` → `release/*` も、マージではなく **cherry-pick で差分を写す**（後述の「局面 3」）。cherry-pick は履歴を合流させないので、この表の「マージ先」には現れない。
+
+## 命名規則
+
+`main` と `release/vX.Y` の名前は上表のとおり固定する。**feature / fix は、課題管理ツールが課題から生成する既定のブランチ名をそのまま使ってよい。**
+
+| ツール | 既定のブランチ名 | 例 |
+| --- | --- | --- |
+| GitHub | `<課題番号>-<課題タイトル>` | `1234-tenant-flag-api` |
+| Linear | `feature/<課題番号>-<課題タイトル>` | `feature/1234-tenant-flag-api` |
+
+課題管理ツールを使わずに手で切る場合は、`feature/<課題番号>-<短い説明>` / `fix/<課題番号>-<短い説明>` を推奨する。いずれの形でも、**課題番号を名前に含める**ことは共通の要件とする。ブランチから課題へ辿れなくなるため。
 
 ### タグの命名
 
@@ -68,7 +80,7 @@ gitGraph
 
 この 1 枚には、次の 4 つの動きが同時に描かれている。以下、局面ごとに切り出して確認する。
 
-1. `feature/*` / `fix/*` を `main` へ squash merge する（局面 1）
+1. 作業ブランチ（feature / fix）を `main` へ squash merge する（局面 1）
 2. `main` から `release/vX.Y` を切り、タグを打って出荷する（局面 2）
 3. `main` に入れた修正を `release/*` へ cherry-pick する（局面 3）
 4. どの `release/*` へ戻すかを選ぶ（局面 4）
