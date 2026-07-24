@@ -6,8 +6,6 @@ outline: [2, 3]
 
 リリースフロー（GitHub Release）と、環境・デプロイ（GitHub Environments）を定める。
 
-このページの規約が何によって守られるかは、[規約の担保状況](./enforcement)に一覧としてまとめる。
-
 ## このページの要点
 
 - GitHub Release を出荷バージョンの単一の正とする。SaaS もセルフホストも同一の Release から出荷する。

@@ -6,8 +6,6 @@ outline: [2, 3]
 
 `main` / `release/*` への取り込み方式と、PR タイトルの書式を定める。
 
-このページの規約が何によって守られるかは、[規約の担保状況](./enforcement)に一覧としてまとめる。
-
 ## このページの要点
 
 - 取り込み方式は 3 つとも固定する。`feature/*` → `main` は squash merge、`main` → `release/*` は cherry-pick のみ、`release/*` → `main` は禁止。
