@@ -8,13 +8,13 @@ outline: [2, 3]
 
 ## このページの要点
 
-- 取り込み方式は 3 つとも固定する。`feature/*` → `main` は squash merge、`main` → `release/*` は cherry-pick のみ、`release/*` → `main` は禁止。
+- 取り込み方式は 3 つとも固定する。作業ブランチ → `main` は squash merge、`main` → `release/*` は cherry-pick のみ、`release/*` → `main` は禁止。
 - PR タイトルは `main` の履歴とリリースノートの両方に残る。Conventional Commits に準拠させ、CI で検証する。
 - squash 時のコミットメッセージはリポジトリ設定で固定し、マージ実行者の手作業に依存させない。
 
 ## マージルール
 
-1. `feature/*` → `main` のマージ方式は **squash merge** とする（merge commit / rebase merge はリポジトリ設定で無効化する）。
+1. 作業ブランチ（feature / fix）→ `main` のマージ方式は **squash merge** とする（merge commit / rebase merge はリポジトリ設定で無効化する）。
 2. `main` → `release/*` への反映は **cherry-pick のみ**とする。merge / rebase による取り込みは禁止する。
 3. `release/*` → `main` のマージは禁止する（upstream first の徹底）。
 4. PR は小さく保つ。大きくなる場合は分割し、未完成の部分は到達不能な状態で `main` へ入れる。**long-lived な feature ブランチへ退避してはならない。** 隔離の手段と適用条件は[バージョン運用](./versioning#導入までの暫定規約)に定める。
@@ -35,7 +35,7 @@ PR タイトルは、次の 2 か所に残る文字列である。
 3. 要約は変更内容を利用者視点で具体的に書く。`修正` `対応` のような内容を持たない要約は認めない（リリースノートの見出しとして読まれるため）。
 4. 許可する type の一覧は、**設定ファイルを単一の情報源**とする（例: `.github/conventions.json` の `commit.conventional.types`）。本規約は一覧を持たない。
 
-ブランチ（`feature/*` / `fix/*`）内の個々のコミットメッセージも、Conventional Commits に揃えることを推奨する。ただし squash により `main` へは残らないため、必須とはしない。
+作業ブランチ（feature / fix）内の個々のコミットメッセージも、Conventional Commits に揃えることを推奨する。ただし squash により `main` へは残らないため、必須とはしない。
 
 ### 規約を担保する仕組み
 
