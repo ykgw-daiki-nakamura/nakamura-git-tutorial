@@ -21,22 +21,13 @@ outline: [2, 3]
 | Restrict direct pushes（PR 必須） | 有効 | すべての変更を PR 経由に強制する |
 | Required approvals | 1 名以上 | レビューの担保 |
 | Dismiss stale approvals on push | 有効 | 承認後の追加 push で承認を無効化し、未レビューコードの混入を防ぐ |
-| Required status checks | lint / 型チェック / テスト / ビルド | CI 成功をマージ条件とする。Require branches to be up to date を有効化（頻度が高くなった場合は merge queue の導入を検討） |
+| Required status checks | lint / 型チェック / テスト / ビルド | CI 成功をマージ条件とする。Require branches to be up to date を有効化し、`main` の最新を取り込んでいない PR もマージ不可にする（`main` が動くたびに PR の更新と CI の再実行が要るため、この待ち時間が問題になったら merge queue を検討する） |
 | Require conversation resolution | 有効 | 指摘の放置マージを防ぐ |
-| Require linear history | 有効 | squash merge 運用と整合させ、履歴を 1 PR = 1 コミットに保つ |
+| Require linear history | 有効 | マージコミットを禁じる結果、merge commit 方式は使えず squash merge と rebase merge だけが通る。squash merge 運用と整合させ、履歴を 1 PR = 1 コミットに保つ |
 | Block force pushes / deletions | 有効 | 履歴改変・ブランチ消失の防止 |
 | CODEOWNERS review | 有効（対象: DB マイグレーション、IaC、`.github/workflows/`） | 影響の大きい変更にドメイン責任者のレビューを必須化する。特にリリースワークフロー自体の変更はリリース責任者のレビューを必須とする |
 
-各ルールを有効にすると、GitHub 上では次の動作になる。
-
-- **Restrict direct pushes**: `main` への直接 push を拒否する。変更を `main` へ入れる経路が PR だけになる。
-- **Required approvals**: 指定した人数の Approve が付くまでマージを拒否する。なお GitHub では PR の作成者が自分の PR を承認できないため、この人数は作成者以外で満たす必要がある。
-- **Dismiss stale approvals on push**: 承認後に新しいコミットが push されると、それまでの Approve を自動で取り消す。承認を得た後に中身を差し替える経路をふさぐ。
-- **Required status checks**: 指定した名前のチェックが成功するまでマージを拒否する。Require branches to be up to date を併用すると、`main` の最新コミットを取り込んでいない PR もマージ不可になる（`main` 側の変更と組み合わさってはじめて壊れる変更を防げるが、`main` が動くたびに PR の更新と CI の再実行が要る。この待ち時間が問題になったら merge queue を検討する）。
-- **Require conversation resolution**: PR に付いたレビューコメントのスレッドがすべて解決済み（Resolved）になるまでマージを拒否する。
-- **Require linear history**: 親を 2 つ持つコミット（マージコミット）が積まれることを拒否する。結果として merge commit 方式のマージが使えなくなり、squash merge と rebase merge だけが通る。
-- **Block force pushes / deletions**: `git push --force` による履歴の書き換えと、ブランチ自体の削除を拒否する。
-- **CODEOWNERS review**: `CODEOWNERS` ファイルに書いたパスへ変更が及ぶと、そのパスの所有者を自動でレビュアーに指名し、所有者の承認をマージ条件に加える。
+各ルールを有効にしたとき GitHub が何を拒否し、何を要求するかは GitHub の仕様に属する。本ページでは繰り返さず、[参考](#参考)に挙げた一次情報を参照する。規約として定めるのは、その仕様を踏まえた本リポジトリの判断（上表の設定値と意図）である。
 
 ## `release/*` に適用するルール
 
@@ -75,9 +66,9 @@ outline: [2, 3]
 
 ## 参考
 
-本ページに書いた挙動は GitHub の仕様に依存する。一次情報は次のとおり。
+本ページの規約は GitHub の仕様に依存する。挙動の一次情報は次のとおり。
 
-- [ルールセットで使用できるルール](https://docs.github.com/ja/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets) — 各ルールが何を拒否し、何を要求するか。本ページの「`main` に適用するルール」の箇条書きはこの内容に対応する。
+- [ルールセットで使用できるルール](https://docs.github.com/ja/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets) — 各ルールが何を拒否し、何を要求するか。上表に挙げた各ルールの挙動はここで確かめる。
 - [ルールセットについて](https://docs.github.com/ja/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets) — Repository Rulesets の考え方、許可アクター（actor allowlist）と bypass の扱い。
 - [コードオーナーについて](https://docs.github.com/ja/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) — `CODEOWNERS` の書式と、レビュアーが自動指名される条件。
 - [ワークフローでの認証に GITHUB_TOKEN を使用する](https://docs.github.com/ja/actions/security-for-github-actions/security-guides/automatic-token-authentication) — `GITHUB_TOKEN` で作成したタグ・Release が他のワークフローを起動しない仕様。タグ作成を自動化する場合の前提になる。
