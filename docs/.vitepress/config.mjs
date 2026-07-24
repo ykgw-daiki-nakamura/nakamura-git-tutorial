@@ -120,7 +120,8 @@ export default withMermaid({
         {
           text: '🧭 基本方針',
           items: [
-            { text: '概要・基本方針', link: '/standards/' }
+            { text: '概要・基本方針', link: '/standards/' },
+            { text: '規約の担保状況', link: '/standards/enforcement' }
           ]
         },
         {
