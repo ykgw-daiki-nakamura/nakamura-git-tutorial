@@ -28,7 +28,7 @@ outline: [2, 3]
 
 ### 3. どこへ配るか — 環境はブランチで表さない
 
-**規約**: 環境（dev / staging / production）は **GitHub Environments とデプロイパイプライン**で表現する。環境ブランチ（`develop`・`staging`・`production` といった、環境名を付けた常設ブランチ）は作成しない。
+**規約**: 環境（`dev` / `staging` / `production`）は **GitHub Environments とデプロイパイプライン**で表現する。環境ブランチ（`develop`・`staging`・`production` といった、環境名を付けた常設ブランチ）は作成しない。
 
 **一言でいうと**: ブランチが表すのはバージョンの系列だけである（`main` は次期バージョン、`release/v1.2` は v1.2 系）。どの環境で何が動いているかは、ブランチではなくデプロイの記録が持つ。
 
