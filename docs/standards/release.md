@@ -4,7 +4,7 @@ outline: [2, 3]
 
 # リリースとデプロイ
 
-リリースフロー（GitHub Release）と、環境・デプロイ（GitHub Environments）を定める。
+リリースフロー（GitHub Release）と、環境・デプロイ（GitHub Environments）を定める。出荷するバージョン番号の決め方とサポート対象の範囲は[バージョン運用](./versioning)に定める。
 
 ## このページの要点
 
