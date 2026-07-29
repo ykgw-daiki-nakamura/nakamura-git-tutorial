@@ -81,11 +81,11 @@ gitGraph
 > [!TIP]
 > **Git Flow は選択肢の 1 つ**
 >
-> Git Flow が持ち込む `develop` / `release` の常設ブランチは、計画的なリリースと安定化期間のために要るものです。継続的にデプロイしていて出荷済みの版を保守しないなら、その構造は使われないまま手順だけが残ります。どの戦略を選ぶべきかは [ブランチ戦略の使い分け](./branching-strategies) を参照してください。
+> Git Flow が持ち込む `develop` / `release` の常設ブランチは、計画的なリリースと安定化期間のために要るものです。継続的にデプロイしていて出荷済みの版を保守しないなら、その構造は使われないまま手順だけが残ります。
 
 ## GitLab Flow
 
-GitLab Flow は、[GitHub Flow](./github-flow) のシンプルさを保ちつつ、**「本番へどう反映するか」という現実**を補うブランチ運用モデルです。GitHub Flow（`main` 一本）と [Git Flow](#git-flow)（多数のブランチ）の中間に位置づけられます。
+GitLab Flow は、GitHub Flow のシンプルさを保ちつつ、**「本番へどう反映するか」という現実**を補うブランチ運用モデルです。GitHub Flow（`main` 一本）と [Git Flow](#git-flow)（多数のブランチ）の中間に位置づけられます。
 
 中心にあるのは 2 つの原則です。
 
@@ -135,7 +135,7 @@ gitGraph
 
 ### GitHub Flow / Git Flow との違い
 
-- **[GitHub Flow](./github-flow) との違い**: GitHub Flow は `main` にマージ＝即デプロイを前提とする。GitLab Flow は、デプロイのタイミングと `main` へのマージを**環境／リリースブランチで分離**できる。
+- **GitHub Flow との違い**: GitHub Flow は `main` にマージ＝即デプロイを前提とする。GitLab Flow は、デプロイのタイミングと `main` へのマージを**環境／リリースブランチで分離**できる。
 - **[Git Flow](#git-flow) との違い**: Git Flow のような常設 `develop` を持たず、`main` を開発の中心に据える。ブランチの種類が少なく運用が軽い。
 
 ### 長所と短所
@@ -146,10 +146,3 @@ gitGraph
 - **短所**:
   - 環境ブランチとリリースブランチのどちらを採るか、**チームで運用を設計する必要**がある。
   - GitHub Flow よりは登場するブランチが増える。
-
-## 関連ページ
-
-- [GitHub Flow](./github-flow) — `main` 一本のシンプルな運用
-- [ブランチ戦略の使い分け](./branching-strategies) — どれを選ぶかの判断
-- [複数バージョンの保守（リリースブランチ運用）](./release-branches) — release ブランチ運用の実際
-- [リリースとバージョン管理](./release) — タグ主軸のリリース
