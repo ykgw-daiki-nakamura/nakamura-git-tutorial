@@ -2,59 +2,55 @@
 outline: [2, 3]
 ---
 
-# マージルールと PR タイトル規約
+# マージルール
 
-`main` / `release/*` への取り込み方式と、PR タイトルの書式を定める。
+`main` / `release/*` への取り込み方式を定める。PR を出す開発者が守る規約は[PR タイトル規約](./pr-title)にあり、本ページの規約はリポジトリ設定とリリース運用が担保する。
 
 ## このページの要点
 
 - 取り込み方式は 3 つとも固定する。作業ブランチ → `main` は squash merge、`main` → `release/*` は cherry-pick のみ、`release/*` → `main` は禁止。
-- PR タイトルは `main` の履歴とリリースノートの両方に残る。Conventional Commits に準拠させ、CI で検証する。
-- squash 時のコミットメッセージはリポジトリ設定で固定し、マージ実行者の手作業に依存させない。
+- squash merge はリポジトリ設定で固定し、マージ画面に方式の選択肢を出さない。PR 作成者やマージ実行者の判断に委ねない。
+- cherry-pick と upstream first の制約が効くのは、`release/*` を扱う場面（リリース・backport）である。日々の PR には現れない。
 
-## マージルール
+## 取り込み方式
 
-1. 作業ブランチ（feature / fix）→ `main` のマージ方式は **squash merge** とする（merge commit / rebase merge はリポジトリ設定で無効化する）。
-2. `main` → `release/*` への反映は **cherry-pick のみ**とする。merge / rebase による取り込みは禁止する。
-3. `release/*` → `main` のマージは禁止する（upstream first の徹底）。
-4. PR は小さく保つ。大きくなる場合は分割し、未完成の部分は到達不能な状態で `main` へ入れる。**long-lived な feature ブランチへ退避してはならない。** 隔離の手段と適用条件は[バージョン運用](./versioning#導入までの暫定規約)に定める。
+| 経路 | 方式 | 担保 | 守る主体 |
+| --- | --- | --- | --- |
+| 作業ブランチ（feature / fix）→ `main` | squash merge | 🤖 リポジトリ設定（merge commit / rebase merge を無効化） | 設定。開発者に選択肢が出ない |
+| `main` → `release/*` | cherry-pick のみ | 👤 運用（設定では merge と区別できない） | リリース責任者・backport 担当 |
+| `release/*` → `main` | 禁止 | 👤 運用（PR の向き自体は正規の操作） | 同上 |
 
-## PR タイトル規約
+区分の意味は[規約の担保状況](./enforcement#区分の定義)に定める。
 
-PR タイトルは、次の 2 か所に残る文字列である。
+### 作業ブランチから main への取り込み
 
-- squash merge では、**PR タイトルがそのまま `main` のコミットメッセージ**になる。
-- GitHub の自動リリースノートは、マージ済み PR のタイトルを見出しとして列挙する（[リリースとデプロイ](./release#github-release-運用規約)）。
+**squash merge に固定する。** merge commit と rebase merge はリポジトリ設定で無効化し、マージ画面にボタンを出さない。`main` の履歴は 1 PR = 1 コミットに揃い、[ブランチ保護](./branch-protection)で有効にする linear history とも整合する。
 
-したがって次を規約とする。
+開発者はブランチ内で何度コミットしてもよい。作業過程は `main` に残らないため、コミットの粒度やメッセージの書式を規約では縛らない（[PR タイトル規約](./pr-title#タイトルだけを規約にする理由)）。
 
-### 書式
+### squash merge のコミットメッセージ
 
-1. PR タイトルは **Conventional Commits**（`<type>(<scope>): <要約>`）に準拠させる。`<scope>` は任意で、省略してよい。
-2. 後方互換性を壊す変更は type の直後に `!` を付ける（例: `feat(api)!: ...`）。破壊的変更の内容は PR 本文に記載する。
-3. 要約は変更内容を利用者視点で具体的に書く。`修正` `対応` のような内容を持たない要約は認めない（リリースノートの見出しとして読まれるため）。
-4. 許可する type の一覧は、**設定ファイルを単一の情報源**とする（例: `.github/conventions.json` の `commit.conventional.types`）。本規約は一覧を持たない。
+squash merge が作るコミットメッセージは、リポジトリ設定で **PR のタイトルと本文**に固定する。CI が検証したタイトルをそのまま `main` に着地させるための設定で、[PR タイトル規約](./pr-title)の検証と対で意味を持つ（既定値のままにできない理由は[補足](#補足-上記の根拠)に記す）。
 
-作業ブランチ（feature / fix）内の個々のコミットメッセージも、レビュアーが読みやすいよう Conventional Commits に揃えることを推奨する。
-
-### 規約を担保する仕組み
-
-上記のうち機械で判定できる部分は、人の注意力に委ねず次の 2 つで担保する。要約が具体的か（規約 3）は判定できないため、レビューに委ねる（[規約の担保状況](./enforcement)）。
-
-| 対象 | 設定 | 効果 |
-| --- | --- | --- |
-| CI | PR タイトルの書式を検証し、Required status checks に含める | 非準拠の PR をマージできなくする |
-| リポジトリ設定 | squash merge 時のコミットメッセージを **PR のタイトルと本文**に固定する | 検証を通ったタイトルがそのまま `main` に着地する |
-
-リポジトリ設定は GitHub の Settings → General → Pull Requests で行う。`Allow squash merging` の下にあるドロップダウンで `Pull request title and description` を選ぶ。UI ではタイトルと本文をこの 1 つのドロップダウンでまとめて決めるが、API では 2 フィールドに対応するため、意図どおりかは API 側で確かめられる（期待値は `PR_TITLE` と `PR_BODY`）。
+設定は GitHub の Settings → General → Pull Requests で行う。`Allow squash merging` の下にあるドロップダウンで `Pull request title and description` を選ぶ。UI ではタイトルと本文をこの 1 つのドロップダウンでまとめて決めるが、API では 2 フィールドに対応するため、意図どおりかは API 側で確かめられる（期待値は `PR_TITLE` と `PR_BODY`）。
 
 ```bash
 gh api repos/{owner}/{repo} --jq '{squash_merge_commit_title, squash_merge_commit_message}'
 ```
 
-### 補足: 上記の根拠
+### release ブランチへの反映と upstream first
 
-**type の一覧を設定ファイルへ置く理由。** 規約と検証スクリプトの二重管理を避けるためで、type の追加・削除は設定ファイルの変更だけで済ませる。置き場所は、規約を強制するゲートである CI 自身が持つ場所（`.github/` 配下など）とする。特定のエディタや AI エージェント向けの設定ディレクトリには置かない。そのツールを使わない者にも効く規約が、任意のツールの設定に依存してしまうためである。検証スクリプトが設定ファイルを読めない環境向けに既定値を内蔵する場合は、その既定値が設定ファイルと一致することを CI で検査する。
+`main` → `release/*` への反映は **cherry-pick のみ**とする。merge / rebase による取り込みは禁止する。`release/*` → `main` のマージも禁止する（upstream first の徹底）。
+
+この 2 つは設定では強制できない。`release/*` への PR は正規の経路であり、その中身が cherry-pick か merge かを GitHub は区別しないためである。規約として明文化し、レビューで見る。適用する場面と手順は[障害対応](./incident#ホットフィックス手順)に定める。
+
+## PR の粒度と未完成の機能
+
+PR は小さく保つ。大きくなる場合は分割し、未完成の部分は到達不能な状態で `main` へ入れる。**long-lived な feature ブランチへ退避してはならない。** 隔離の手段と適用条件は[バージョン運用](./versioning#導入までの暫定規約)に定める。
+
+変更行数の上限をマージ条件にはしていないため、この項目もレビュー観点である。
+
+## 補足: 上記の根拠
 
 **squash merge の既定値を避ける理由。** 既定値（API では `squash_merge_commit_title: COMMIT_OR_PR_TITLE` と `squash_merge_commit_message: COMMIT_MESSAGES`）には 2 つの問題がある。
 
