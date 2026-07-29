@@ -128,7 +128,8 @@ export default withMermaid({
           text: '🌿 ブランチとマージ',
           items: [
             { text: 'ブランチ運用', link: '/standards/branching' },
-            { text: 'マージルールと PR タイトル規約', link: '/standards/merge-rules' }
+            { text: 'PR タイトル規約', link: '/standards/pr-title' },
+            { text: 'マージルール', link: '/standards/merge-rules' }
           ]
         },
         {

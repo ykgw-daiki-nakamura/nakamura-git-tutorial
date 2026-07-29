@@ -40,17 +40,22 @@ outline: [2, 3]
 | backport 先を、保守中かつ該当バグのある release に絞る | 👤 運用 | どの release にバグが存在するかは判断が要る |
 | ブランチ名を `feature/<issue番号>-<短い説明>` 等に揃える | 👤 運用 | 命名を強制するルールは置いていない |
 
-## [マージルールと PR タイトル規約](./merge-rules)
+## [PR タイトル規約](./pr-title)
 
 | 規約 | 区分 | 担保手段 / 担保できない理由 |
 | --- | --- | --- |
-| `feature/*` → `main` を squash merge に固定する | 🤖 強制 | リポジトリ設定（merge commit / rebase merge の無効化）+ Require linear history |
 | PR タイトルを Conventional Commits に準拠させる | 🤖 強制 | PR タイトルを検証する CI を Required status checks に含める |
 | 検証を通ったタイトルをそのまま `main` のコミットメッセージにする | 🤖 強制 | リポジトリ設定（squash のコミットメッセージを PR のタイトルと本文に固定） |
-| `main` → `release/*` は cherry-pick のみとし、merge / rebase で取り込まない | 👤 運用 | release ブランチへの PR は正規の経路であり、その中身が cherry-pick か merge かを区別する設定は無い |
-| `release/*` → `main` のマージを禁止する | 👤 運用 | 同上。PR の向きそのものは正規の操作として通る |
 | PR タイトルの要約を利用者視点で具体的に書く | 👤 運用 | CI が検査するのは書式であり、`修正` のような内容を持たない要約も書式としては通る |
 | ブランチ内の個々のコミットも Conventional Commits に揃える（推奨） | 👤 運用 | squash により `main` へ残らないため、検証の対象にしていない |
+
+## [マージルール](./merge-rules)
+
+| 規約 | 区分 | 担保手段 / 担保できない理由 |
+| --- | --- | --- |
+| 作業ブランチ（feature / fix）→ `main` を squash merge に固定する | 🤖 強制 | リポジトリ設定（merge commit / rebase merge の無効化）+ Require linear history |
+| `main` → `release/*` は cherry-pick のみとし、merge / rebase で取り込まない | 👤 運用 | release ブランチへの PR は正規の経路であり、その中身が cherry-pick か merge かを区別する設定は無い |
+| `release/*` → `main` のマージを禁止する | 👤 運用 | 同上。PR の向きそのものは正規の操作として通る |
 | long-lived な feature ブランチを作らない | 👤 運用 | ブランチの寿命に上限を課す設定は無い |
 | PR を小さく保ち、大きくなるなら分割する | 👤 運用 | 変更行数の上限をマージ条件にはしていない |
 
