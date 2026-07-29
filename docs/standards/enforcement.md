@@ -40,25 +40,6 @@ outline: [2, 3]
 | backport 先を、保守中かつ該当バグのある release に絞る | 👤 運用 | どの release にバグが存在するかは判断が要る |
 | ブランチ名を `feature/<issue番号>-<短い説明>` 等に揃える | 👤 運用 | 命名を強制するルールは置いていない |
 
-## [ブランチ保護](./branch-protection)
-
-| 規約 | 区分 | 担保手段 / 担保できない理由 |
-| --- | --- | --- |
-| `main` / `release/*` への直接 push を認めず、変更を PR 経由に限る | 🤖 強制 | Ruleset: Restrict direct pushes |
-| PR に 1 名以上の承認を要する（作成者は自分の PR を承認できない） | 🤖 強制 | Ruleset: Required approvals |
-| 承認後に push されたら、それまでの承認を無効化する | 🤖 強制 | Ruleset: Dismiss stale approvals on push |
-| CI の成功をマージ条件とする | 🤖 強制 | Ruleset: Required status checks |
-| レビューコメントを未解決のまま残してマージしない | 🤖 強制 | Ruleset: Require conversation resolution |
-| マージコミットを積まない | 🤖 強制 | Ruleset: Require linear history |
-| 履歴の書き換えとブランチの削除を認めない | 🤖 強制 | Ruleset: Block force pushes / deletions |
-| 影響の大きいパスの変更にドメイン責任者の承認を要する | 🤖 強制 | Ruleset: CODEOWNERS review |
-| `release/*` を作れる主体をリリース責任者に限る | 🤖 強制 | Ruleset: creation restriction |
-| `v*` タグを作れる主体をリリース責任者に限る | 🤖 強制 | Ruleset: タグの許可アクター |
-| 公開済みタグの更新・削除を誰にも認めない | 🤖 強制 | Ruleset: タグの更新・削除の禁止（bypass 対象なし） |
-| bypass 権限を恒常的に付与しない | 🔍 検知のみ | 発生は監査ログに残り、事後レビューの対象になる。bypass の実行そのものは止まらない |
-| cherry-pick PR に元 PR へのリンクを書く | 👤 運用 | PR テンプレートは項目を並べるだけで、記入の有無を検査しない |
-| `main` に該当コードが無い場合の直接 PR に、その理由と再発しない根拠を書く | 👤 運用 | 同上。根拠が妥当かは読まないと分からない |
-
 ## [マージルールと PR タイトル規約](./merge-rules)
 
 | 規約 | 区分 | 担保手段 / 担保できない理由 |
@@ -72,15 +53,6 @@ outline: [2, 3]
 | ブランチ内の個々のコミットも Conventional Commits に揃える（推奨） | 👤 運用 | squash により `main` へ残らないため、検証の対象にしていない |
 | long-lived な feature ブランチを作らない | 👤 運用 | ブランチの寿命に上限を課す設定は無い |
 | PR を小さく保ち、大きくなるなら分割する | 👤 運用 | 変更行数の上限をマージ条件にはしていない |
-
-## [バージョン運用 🚧](./versioning)
-
-| 規約 | 区分 | 担保手段 / 担保できない理由 |
-| --- | --- | --- |
-| 未完成機能を隔離手段のいずれかで到達不能にし、PR 本文に記載する | 👤 運用 | 到達不能かどうかはコードを読まないと分からない。`release/vX.Y` を切るリリース責任者が確認する |
-| SemVer に従ってバージョンを決める | 👤 運用 | 変更が MAJOR / MINOR / PATCH のどれにあたるかは判断が要る |
-| サポート対象を N / N-1 に保ち、EOL の release をアーカイブする | 👤 運用 | 判断と時期の管理が要る |
-| セルフホストのアップグレードで MINOR を飛ばさない | 👤 運用 | 顧客環境での操作であり、リポジトリ側から強制できない |
 
 ## [リリースとデプロイ](./release)
 
@@ -100,6 +72,15 @@ outline: [2, 3]
 | 自動生成したリリースノートを公開前に確定する | 👤 運用 | 判断が要る |
 | `-rc.N` サフィックスを成果物へ焼き込まない | 👤 運用 | 成果物の中身を検査する仕組みは置いていない |
 
+## [バージョン運用 🚧](./versioning)
+
+| 規約 | 区分 | 担保手段 / 担保できない理由 |
+| --- | --- | --- |
+| 未完成機能を隔離手段のいずれかで到達不能にし、PR 本文に記載する | 👤 運用 | 到達不能かどうかはコードを読まないと分からない。`release/vX.Y` を切るリリース責任者が確認する |
+| SemVer に従ってバージョンを決める | 👤 運用 | 変更が MAJOR / MINOR / PATCH のどれにあたるかは判断が要る |
+| サポート対象を N / N-1 に保ち、EOL の release をアーカイブする | 👤 運用 | 判断と時期の管理が要る |
+| セルフホストのアップグレードで MINOR を飛ばさない | 👤 運用 | 顧客環境での操作であり、リポジトリ側から強制できない |
+
 ## [障害対応](./incident)
 
 | 規約 | 区分 | 担保手段 / 担保できない理由 |
@@ -108,6 +89,25 @@ outline: [2, 3]
 | マイグレーションを expand-contract（後方互換）で書く | 👤 運用 | 後方互換かどうかを機械判定する仕組みは置いていない |
 | ロールフォワードを第 1 選択とし、ロールバックの可否を判断する | 👤 運用 | 障害の性質に依存する判断 |
 | 本番環境へ out-of-band の操作をしない | 👤 運用 | クラウド側のコンソール権限の問題であり、GitHub からは見えない |
+
+## [ブランチ保護](./branch-protection)
+
+| 規約 | 区分 | 担保手段 / 担保できない理由 |
+| --- | --- | --- |
+| `main` / `release/*` への直接 push を認めず、変更を PR 経由に限る | 🤖 強制 | Ruleset: Restrict direct pushes |
+| PR に 1 名以上の承認を要する（作成者は自分の PR を承認できない） | 🤖 強制 | Ruleset: Required approvals |
+| 承認後に push されたら、それまでの承認を無効化する | 🤖 強制 | Ruleset: Dismiss stale approvals on push |
+| CI の成功をマージ条件とする | 🤖 強制 | Ruleset: Required status checks |
+| レビューコメントを未解決のまま残してマージしない | 🤖 強制 | Ruleset: Require conversation resolution |
+| マージコミットを積まない | 🤖 強制 | Ruleset: Require linear history |
+| 履歴の書き換えとブランチの削除を認めない | 🤖 強制 | Ruleset: Block force pushes / deletions |
+| 影響の大きいパスの変更にドメイン責任者の承認を要する | 🤖 強制 | Ruleset: CODEOWNERS review |
+| `release/*` を作れる主体をリリース責任者に限る | 🤖 強制 | Ruleset: creation restriction |
+| `v*` タグを作れる主体をリリース責任者に限る | 🤖 強制 | Ruleset: タグの許可アクター |
+| 公開済みタグの更新・削除を誰にも認めない | 🤖 強制 | Ruleset: タグの更新・削除の禁止（bypass 対象なし） |
+| bypass 権限を恒常的に付与しない | 🔍 検知のみ | 発生は監査ログに残り、事後レビューの対象になる。bypass の実行そのものは止まらない |
+| cherry-pick PR に元 PR へのリンクを書く | 👤 運用 | PR テンプレートは項目を並べるだけで、記入の有無を検査しない |
+| `main` に該当コードが無い場合の直接 PR に、その理由と再発しない根拠を書く | 👤 運用 | 同上。根拠が妥当かは読まないと分からない |
 
 ## [依存とサプライチェーン](./supply-chain)
 
