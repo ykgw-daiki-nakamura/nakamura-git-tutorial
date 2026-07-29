@@ -36,7 +36,7 @@ jobs:
       # ネットワーク/レート制限で不安定なため PR を落とさず、結果はジョブサマリに可視化して
       # 切れリンクの早期フィードバックを得る（PR ゲートにはしない方針を踏襲）。
       - name: Check external links (lychee)
-        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: >-
             --no-progress
