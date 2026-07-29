@@ -125,19 +125,24 @@ export default withMermaid({
           ]
         },
         {
-          text: '🌿 ブランチとバージョン',
+          text: '🌿 ブランチとマージ',
           items: [
             { text: 'ブランチ運用', link: '/standards/branching' },
-            { text: 'ブランチ保護', link: '/standards/branch-protection' },
-            { text: 'マージルールと PR タイトル規約', link: '/standards/merge-rules' },
-            { text: 'バージョン運用 🚧', link: '/standards/versioning' }
+            { text: 'マージルールと PR タイトル規約', link: '/standards/merge-rules' }
           ]
         },
         {
           text: '🚀 リリース・デプロイと障害対応',
           items: [
             { text: 'リリースとデプロイ', link: '/standards/release' },
+            { text: 'バージョン運用 🚧', link: '/standards/versioning' },
             { text: '障害対応', link: '/standards/incident' }
+          ]
+        },
+        {
+          text: '🛡️ リポジトリ設定（管理者向け）',
+          items: [
+            { text: 'ブランチ保護', link: '/standards/branch-protection' }
           ]
         },
         {
