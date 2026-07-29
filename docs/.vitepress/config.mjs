@@ -135,7 +135,7 @@ export default withMermaid({
         {
           text: '🚀 リリース・デプロイと障害対応',
           items: [
-            { text: 'リリースとデプロイ', link: '/standards/release' },
+            { text: 'リリースとデプロイ 🔜', link: '/standards/release' },
             { text: 'バージョン運用 🚧', link: '/standards/versioning' },
             { text: '障害対応', link: '/standards/incident' }
           ]
