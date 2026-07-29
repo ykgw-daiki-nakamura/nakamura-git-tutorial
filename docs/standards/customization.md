@@ -152,6 +152,8 @@ class AcmeResultPostProcessor:
 
 #### ビルドとバージョニング
 
+> コアの RC / GA を前提とする以下の記述は、[リリースとデプロイが将来の運用開始に向けたもの](./release)であるため、その開始後に適用する。
+
 ```mermaid
 flowchart LR
   CORE["コア GitHub Release<br/>vX.Y.Z(イメージ digest)"] --> COMPOSE["顧客ビルド<br/>(下流 CI)"]
