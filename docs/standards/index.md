@@ -12,7 +12,7 @@ outline: [2, 3]
 
 基本方針は次のとおり。
 
-1. **trunk-based development**: `main` を唯一の統合ブランチとし、long-lived な開発ブランチを作らない。
+1. **GitLab Flow（リリースブランチ版）**: [GitHub Flow](../guide/github-flow) を土台に、`main` を唯一の統合ブランチとし、long-lived な開発ブランチを作らない。これに出荷・保守のための `release/vX.Y` を足した形（= [GitLab Flow](../guide/other-flows#gitlab-flow) のリリースブランチ版）を採用する。
 2. **タグ起点のリリース**: SaaS 版・セルフホスト版ともに、`release/vX.Y` ブランチ上のタグ（= GitHub Release）からビルドされた成果物を出荷する。SaaS 版も `main` から継続デプロイはせず、リリース単位でバージョンアップする。
 3. **ブランチはバージョン系統、環境はデプロイ状態**: 環境（dev / staging / production）は **GitHub Environments とデプロイパイプライン**で表現する。環境ブランチは作成しない。
 4. **upstream first**: すべての修正はまず `main` に取り込み、必要に応じて `release/*` へ cherry-pick する。逆方向のマージは禁止する。

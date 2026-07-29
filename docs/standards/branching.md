@@ -8,6 +8,7 @@ outline: [2, 3]
 
 ## このページの要点
 
+- 土台は [GitHub Flow](../guide/github-flow)。そこへ出荷・保守用の `release/vX.Y` を足した [GitLab Flow のリリースブランチ版](../guide/other-flows#gitlab-flow)を採る。
 - ブランチは **main** / **feature** / **fix** / **release** の 4 種類だけとする。種類を決めるのは名前ではなく役割である。
 - feature / fix の名前は、**課題管理ツールが生成する既定のブランチ名に従ってよい**。
 - `main` は次期バージョンの開発ラインであり、出荷の起点にはしない。出荷は `release/vX.Y` 上のタグから行う。
@@ -100,7 +101,7 @@ gitGraph
 - 機能追加・修正は `main` からブランチを切って進め、PR を **squash merge** で `main` に取り込む。
 - ブランチ側の 2 コミット（`flag: 実装`・`flag: レビュー反映`）は `main` に個別には現れない。squash が 1 コミット `feat B (squash)` にまとめる。
 - マージコミットも作らないため、`main` は linear history を保つ（図でブランチ線が `main` へ戻らないのはこのため）。
-- 取り込んだブランチは削除する。長く残さないのが trunk-based development の前提である。
+- 取り込んだブランチは削除する。短命なブランチだけで回すのが GitHub Flow の前提である。
 
 ### 局面 2: main から release/vX.Y を切り、タグを打って出荷する
 
